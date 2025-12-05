@@ -97,3 +97,14 @@ export interface RenderContext {
   site: WPFastyContext['site'];
   menu: WPFastyContext['menu'];
 }
+
+// Minimal page-specific context for hydration (much smaller than full RenderContext)
+export interface PageContext {
+  site: WPFastyContext['site'];
+  menu: WPFastyContext['menu'];
+  // Page-specific data (only one will be populated per page)
+  page?: {
+    type: 'home' | 'about' | 'blog' | 'post' | 'category' | 'tag' | 'author' | 'categories' | 'tags' | 'authors' | 'search' | 'notfound';
+    data: any;
+  };
+}

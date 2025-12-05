@@ -2,7 +2,7 @@ import { Elysia } from 'elysia';
 import { html } from '@elysiajs/html';
 import { readFile } from 'fs/promises';
 import { extname } from 'path';
-import { renderPage } from './render';
+import { renderPage, getPageContext } from './render';
 import { dbOperations } from './db';
 import { syncAllData } from './sync';
 
@@ -98,10 +98,12 @@ const app = new Elysia()
     const path = url.pathname;
 
     try {
-      const context = await dbOperations.getRenderContext();
-      const { html, meta } = await renderPage(path, context);
-      const serialized = JSON.stringify(context).replace(/</g, '\\u003c');
-      const body = template({ html, meta, site: context.site }).replace('__CONTEXT__', serialized);
+      const fullContext = await dbOperations.getRenderContext();
+      const { html, meta } = await renderPage(path, fullContext);
+      // Only send minimal page-specific context to client (not the full data)
+      const pageContext = getPageContext(path, fullContext);
+      const serialized = JSON.stringify(pageContext).replace(/</g, '\\u003c');
+      const body = template({ html, meta, site: fullContext.site }).replace('__CONTEXT__', serialized);
       return body;
     } catch (error) {
       console.error('SSR error:', error);

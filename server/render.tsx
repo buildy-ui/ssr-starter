@@ -5,7 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '../src/providers/theme';
 import { RenderContextProvider } from '../src/providers/render-context';
 import { defaultRenderContext } from '../src/data';
-import type { RenderContext } from '../src/data/types';
+import type { RenderContext, PageContext } from '../src/data/types';
 import { MainLayout } from '../src/layouts/MainLayout';
 import Home from '../src/routes/Home';
 import About from '../src/routes/About';
@@ -20,6 +20,204 @@ import Tags from '../src/routes/Tags';
 import Search from '../src/routes/Search';
 import Test from '../src/routes/Test';
 import NotFound from '../src/exceptions/NotFound';
+
+// Strip heavy content from posts for listings (keep only metadata + excerpt)
+function stripPostContent(post: any) {
+  const { content, ...rest } = post;
+  return rest;
+}
+
+// Build minimal page-specific context for client hydration
+// This drastically reduces HTML size by only including needed data
+export function getPageContext(path: string, fullContext: RenderContext): PageContext {
+  const normalized = path.replace(/\/+$/, '') || '/';
+  const { site, menu, categories, tags, authors } = fullContext;
+  
+  // Base context: site settings, menu, and sidebar data (categories/tags limited)
+  const base: PageContext = {
+    site,
+    menu,
+    // Sidebar needs categories/tags but we limit them
+    page: undefined,
+  };
+  
+  // Home page: home data + recent posts (stripped, limit 6)
+  if (normalized === '/') {
+    return {
+      ...base,
+      page: {
+        type: 'home',
+        data: {
+          home: fullContext.home,
+          recentPosts: fullContext.posts.posts.slice(0, 6).map(stripPostContent),
+          categories: categories.slice(0, 8),
+          tags: tags.slice(0, 10),
+        },
+      },
+    };
+  }
+  
+  // About page
+  if (normalized === '/about') {
+    return {
+      ...base,
+      page: {
+        type: 'about',
+        data: {
+          about: fullContext.about,
+          categories: categories.slice(0, 8),
+          tags: tags.slice(0, 10),
+        },
+      },
+    };
+  }
+  
+  // Blog listing: paginated posts (stripped, first 10)
+  if (normalized === '/blog') {
+    return {
+      ...base,
+      page: {
+        type: 'blog',
+        data: {
+          blog: fullContext.blog,
+          posts: fullContext.posts.posts.slice(0, 10).map(stripPostContent),
+          total: fullContext.posts.posts.length,
+          categories: categories.slice(0, 8),
+          tags: tags.slice(0, 10),
+        },
+      },
+    };
+  }
+  
+  // Single post: full post content + related posts (stripped)
+  if (normalized.startsWith('/posts/')) {
+    const slug = normalized.replace('/posts/', '');
+    const post = fullContext.posts.posts.find((p) => p.slug === slug);
+    const related = fullContext.posts.posts
+      .filter((p) => p.slug !== slug)
+      .slice(0, 3)
+      .map(stripPostContent);
+    return {
+      ...base,
+      page: {
+        type: 'post',
+        data: {
+          post,
+          relatedPosts: related,
+          categories: categories.slice(0, 8),
+          tags: tags.slice(0, 10),
+        },
+      },
+    };
+  }
+  
+  // Category page: category + posts (stripped)
+  if (normalized.startsWith('/category/')) {
+    const slug = normalized.replace('/category/', '');
+    const category = categories.find((c) => c.slug === slug);
+    const categoryPosts = fullContext.posts.posts
+      .filter((p) => p.categories.some((c) => c.slug === slug))
+      .map(stripPostContent);
+    return {
+      ...base,
+      page: {
+        type: 'category',
+        data: {
+          category,
+          posts: categoryPosts,
+          categories: categories.slice(0, 8),
+          tags: tags.slice(0, 10),
+        },
+      },
+    };
+  }
+  
+  // Tag page: tag + posts (stripped)
+  if (normalized.startsWith('/tag/')) {
+    const slug = normalized.replace('/tag/', '');
+    const tag = tags.find((t) => t.slug === slug);
+    const tagPosts = fullContext.posts.posts
+      .filter((p) => p.tags.some((t) => t.slug === slug))
+      .map(stripPostContent);
+    return {
+      ...base,
+      page: {
+        type: 'tag',
+        data: {
+          tag,
+          posts: tagPosts,
+          categories: categories.slice(0, 8),
+          tags: tags.slice(0, 10),
+        },
+      },
+    };
+  }
+  
+  // Author page: author + posts (stripped)
+  if (normalized.startsWith('/author/')) {
+    const slug = normalized.replace('/author/', '');
+    const author = authors.find((a) => a.slug === slug);
+    const authorPosts = fullContext.posts.posts
+      .filter((p) => p.author?.slug === slug)
+      .map(stripPostContent);
+    return {
+      ...base,
+      page: {
+        type: 'author',
+        data: {
+          author,
+          posts: authorPosts,
+          categories: categories.slice(0, 8),
+          tags: tags.slice(0, 10),
+        },
+      },
+    };
+  }
+  
+  // Categories listing
+  if (normalized === '/categories') {
+    return {
+      ...base,
+      page: { type: 'categories', data: { categories } },
+    };
+  }
+  
+  // Tags listing
+  if (normalized === '/tags') {
+    return {
+      ...base,
+      page: { type: 'tags', data: { tags } },
+    };
+  }
+  
+  // Authors listing
+  if (normalized === '/authors') {
+    return {
+      ...base,
+      page: { type: 'authors', data: { authors } },
+    };
+  }
+  
+  // Search page: just categories/tags for sidebar, search is client-side
+  if (normalized === '/search') {
+    return {
+      ...base,
+      page: {
+        type: 'search',
+        data: {
+          categories: categories.slice(0, 8),
+          tags: tags.slice(0, 10),
+        },
+      },
+    };
+  }
+  
+  // Not found
+  return {
+    ...base,
+    page: { type: 'notfound', data: {} },
+  };
+}
 
 const serverTheme = {
   name: 'LesseUI',
