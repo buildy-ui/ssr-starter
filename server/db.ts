@@ -37,19 +37,19 @@ function loadFromDb() {
   try {
     // Load data from LmDB into cache
     postsCache = [];
-    for (const [key, value] of postsDb) {
+    for (const { value } of postsDb.getRange()) {
       postsCache.push(value);
     }
     categoriesCache = [];
-    for (const [key, value] of categoriesDb) {
+    for (const { value } of categoriesDb.getRange()) {
       categoriesCache.push(value);
     }
     tagsCache = [];
-    for (const [key, value] of tagsDb) {
+    for (const { value } of tagsDb.getRange()) {
       tagsCache.push(value);
     }
     authorsCache = [];
-    for (const [key, value] of authorsDb) {
+    for (const { value } of authorsDb.getRange()) {
       authorsCache.push(value);
     }
   } catch (error) {
