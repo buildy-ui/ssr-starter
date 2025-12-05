@@ -1,0 +1,37 @@
+{
+  "name": "ui8kit-ssr-starter",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "tailwind:build": "bunx @tailwindcss/cli -i src/assets/css/index.css -o dist/styles.css --minify",
+    "tailwind:watch": "bunx @tailwindcss/cli -i src/assets/css/index.css -o dist/styles.css -w",
+    "client:build": "bun build src/entry-client.tsx --outdir dist --minify --target=browser --sourcemap",
+    "build": "bun run build.ts",
+    "dev": "bun run build && bun --watch server/index.ts",
+    "server:dev": "bun --watch server/index.ts",
+    "start": "NODE_ENV=production bun run server/index.ts"
+  },
+  "dependencies": {
+    "@elysiajs/html": "^1.1.0",
+    "@tailwindcss/cli": "^4.1.17",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "elysia": "^1.1.0",
+    "lmdb": "^3.0.13",
+    "lucide-react": "^0.460.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.2",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss": "^4.1.17"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.4.0",
+    "typescript": "^5.2.0"
+  }
+}
+

@@ -1,0 +1,9 @@
+node_modules
+dist
+.vscode/
+.manual/
+.project/
+.cursorignore
+bun.lock
+package-lock.json
+.env

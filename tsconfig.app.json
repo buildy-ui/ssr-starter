@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["react", "react-dom"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "typeRoots": ["./types", "./node_modules/@types"]
+  },
+  "include": ["src"],
+  "exclude": ["server", "build.ts", "dist", "data"]
+}
+

@@ -1,0 +1,317 @@
+import { dbOperations } from './db';
+import type {
+  PostData,
+  CategoryData,
+  TagData,
+  AuthorData,
+  HomeData,
+  AboutData,
+  PageSummary,
+} from '../src/data/types';
+import { defaultRenderContext } from '../src/data';
+
+const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
+
+if (!GRAPHQL_ENDPOINT) {
+  console.warn('GRAPHQL_ENDPOINT is not set. Sync will not run without a configured endpoint.');
+}
+
+async function graphqlQuery<T>(query: string, variables?: Record<string, any>): Promise<T> {
+  if (!GRAPHQL_ENDPOINT) {
+    throw new Error('GRAPHQL_ENDPOINT is not configured');
+  }
+
+  const response = await fetch(GRAPHQL_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`GraphQL error ${response.status}: ${await response.text()}`);
+  }
+
+  const payload = await response.json();
+  if (payload.errors) {
+    throw new Error(JSON.stringify(payload.errors));
+  }
+
+  return payload.data;
+}
+
+const QUERIES = {
+  posts: `
+    query GetAllPosts {
+      posts(first: 100) {
+        nodes {
+          postId
+          title
+          content
+          excerpt
+          slug
+          date
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+          categories {
+            nodes {
+              categoryId
+              name
+              slug
+              description
+              count
+            }
+          }
+          tags {
+            nodes {
+              tagId
+              name
+              slug
+              count
+            }
+          }
+          author {
+            node {
+              userId
+              name
+              slug
+              avatar {
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
+  categories: `
+    query GetCategories {
+      categories(first: 100) {
+        nodes {
+          categoryId
+          name
+          slug
+          description
+          count
+        }
+      }
+    }
+  `,
+  tags: `
+    query GetTags {
+      tags(first: 100) {
+        nodes {
+          tagId
+          name
+          slug
+          count
+        }
+      }
+    }
+  `,
+  users: `
+    query GetUsers {
+      users(first: 100) {
+        nodes {
+          userId
+          name
+          slug
+          avatar {
+            url
+          }
+        }
+      }
+    }
+  `,
+  pages: `
+    query GetPages {
+      pages(first: 20) {
+        nodes {
+          pageId
+          title
+          content
+          slug
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+        }
+      }
+    }
+  `,
+};
+
+type RawPost = NonNullable<Awaited<ReturnType<typeof graphqlQuery<{ posts: { nodes: any[] } }>>['posts']>['nodes'][number]>;
+
+function mapPost(node: any): PostData {
+  return {
+    id: node.postId,
+    slug: node.slug,
+    title: node.title,
+    excerpt: node.excerpt ?? '',
+    content: node.content ?? '',
+    date: node.date ?? new Date().toISOString(),
+    featuredImage: node.featuredImage?.node
+      ? {
+          url: node.featuredImage.node.sourceUrl,
+          alt: node.featuredImage.node.altText,
+        }
+      : undefined,
+    categories: (node.categories?.nodes || []).map((cat: any) => ({
+      id: cat.categoryId,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+      count: cat.count,
+    })),
+    tags: (node.tags?.nodes || []).map((tag: any) => ({
+      id: tag.tagId,
+      name: tag.name,
+      slug: tag.slug,
+      count: tag.count,
+    })),
+    author: node.author?.node
+      ? {
+          id: node.author.node.userId,
+          name: node.author.node.name,
+          slug: node.author.node.slug,
+          avatar: node.author.node.avatar?.url,
+        }
+      : undefined,
+  };
+}
+
+function deriveAuthors(posts: PostData[]): AuthorData[] {
+  const map = new Map<number, number>();
+  posts.forEach((post) => {
+    if (post.author) {
+      map.set(post.author.id, (map.get(post.author.id) || 0) + 1);
+    }
+  });
+  const authors: AuthorData[] = [];
+  posts.forEach((post) => {
+    if (post.author && !authors.find((a) => a.id === post.author!.id)) {
+      authors.push({
+        ...post.author,
+        count: map.get(post.author.id) ?? 0,
+      });
+    }
+  });
+  return authors;
+}
+
+function buildHomeData(posts: PostData[], pages: PageSummary[]): HomeData {
+  const heroPage = pages[0] ?? defaultRenderContext.home.page;
+  return {
+    page: {
+      title: heroPage.title,
+      excerpt: heroPage.excerpt,
+      content: heroPage.excerpt,
+      slug: heroPage.slug,
+    },
+    features: posts.slice(0, 3).map((post) => ({
+      id: post.id,
+      title: post.title,
+      excerpt: post.excerpt,
+      featuredImage: post.featuredImage,
+    })),
+  };
+}
+
+function buildAboutData(posts: PostData[], pages: PageSummary[]): AboutData {
+  const aboutPage = pages.find((page) => page.slug?.includes('about')) ?? pages[0] ?? defaultRenderContext.about.page;
+  return {
+    page: {
+      title: aboutPage.title,
+      excerpt: aboutPage.excerpt,
+      content: aboutPage.content ?? aboutPage.excerpt,
+      slug: aboutPage.slug,
+    },
+    features: posts.slice(3, 6).map((post) => ({
+      id: post.id,
+      title: post.title,
+      excerpt: post.excerpt,
+      featuredImage: post.featuredImage,
+    })),
+  };
+}
+
+function buildPageSummaries(pages: any[]): PageSummary[] {
+  return pages.map((page) => ({
+    id: page.pageId,
+    slug: page.slug,
+    title: page.title,
+    excerpt: page.content ? page.content.substring(0, 150) + '...' : '',
+    content: page.content,
+    featuredImage: page.featuredImage?.node
+      ? {
+          url: page.featuredImage.node.sourceUrl,
+          alt: page.featuredImage.node.altText,
+        }
+      : undefined,
+  }));
+}
+
+function buildBlogData(): { page: { title: string; excerpt: string; content: string; slug: string } } {
+  return {
+    page: {
+      title: 'Blog',
+      excerpt: 'Latest posts and updates',
+      content: '',
+      slug: 'blog',
+    },
+  };
+}
+
+export async function syncAllData() {
+  if (!GRAPHQL_ENDPOINT) {
+    console.warn('Skipping sync because GRAPHQL_ENDPOINT is not configured.');
+    return;
+  }
+
+  console.log('🔄 Syncing data from WordPress GraphQL...');
+
+  const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
+    graphqlQuery<{ posts: { nodes: any[] } }>(QUERIES.posts),
+    graphqlQuery<{ categories: { nodes: any[] } }>(QUERIES.categories),
+    graphqlQuery<{ tags: { nodes: any[] } }>(QUERIES.tags),
+    graphqlQuery<{ users: { nodes: any[] } }>(QUERIES.users),
+    graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages),
+  ]);
+
+  const posts = (postsResult.posts.nodes || []).map(mapPost);
+  const categories: CategoryData[] = (categoriesResult.categories.nodes || []).map((cat: any) => ({
+    id: cat.categoryId,
+    name: cat.name,
+    slug: cat.slug,
+    description: cat.description,
+    count: cat.count,
+  }));
+  const tags: TagData[] = (tagsResult.tags.nodes || []).map((tag: any) => ({
+    id: tag.tagId,
+    name: tag.name,
+    slug: tag.slug,
+    count: tag.count,
+  }));
+  const authors = deriveAuthors(posts);
+  const pages = buildPageSummaries(pagesResult.pages.nodes || []);
+
+  dbOperations.savePosts(posts);
+  dbOperations.saveCategories(categories);
+  dbOperations.saveTags(tags);
+  dbOperations.saveAuthors(authors);
+
+  dbOperations.saveMeta('home', buildHomeData(posts, pages));
+  dbOperations.saveMeta('about', buildAboutData(posts, pages));
+  dbOperations.saveMeta('blog', buildBlogData());
+  dbOperations.saveMeta('pages', pages);
+  dbOperations.saveMeta('site', defaultRenderContext.site);
+  dbOperations.saveMeta('menu', defaultRenderContext.menu);
+
+  console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors.`);
+}

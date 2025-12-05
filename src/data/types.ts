@@ -1,0 +1,99 @@
+import type { WPFastyContext } from './wpfasty/types';
+
+export interface ImageData {
+  url: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  caption?: string;
+}
+
+export interface PageData {
+  title: string;
+  excerpt: string;
+  content: string;
+  slug: string;
+  featuredImage?: ImageData;
+  id?: number;
+  url?: string;
+}
+
+export interface Feature {
+  id: number;
+  title: string;
+  excerpt: string;
+  featuredImage?: ImageData;
+}
+
+export interface HomeData {
+  page: PageData;
+  features: Feature[];
+}
+
+export interface BlogData {
+  page: PageData;
+}
+
+export interface AboutData {
+  page: PageData;
+  features: Feature[];
+}
+
+export interface CategoryData {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  count?: number;
+}
+
+export interface TagData {
+  id: number;
+  name: string;
+  slug: string;
+  count?: number;
+}
+
+export interface AuthorData {
+  id: number;
+  name: string;
+  slug: string;
+  avatar?: string;
+  bio?: string;
+  count?: number;
+}
+
+export interface PostData {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  date: string;
+  featuredImage?: ImageData;
+  categories: CategoryData[];
+  tags: TagData[];
+  author?: AuthorData;
+}
+
+export interface PageSummary {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content?: string;
+  featuredImage?: ImageData;
+}
+
+export interface RenderContext {
+  home: HomeData;
+  about: AboutData;
+  blog: BlogData;
+  posts: { posts: PostData[] };
+  categories: CategoryData[];
+  tags: TagData[];
+  authors: AuthorData[];
+  pages: PageSummary[];
+  site: WPFastyContext['site'];
+  menu: WPFastyContext['menu'];
+}
