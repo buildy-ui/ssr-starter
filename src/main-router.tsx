@@ -1,3 +1,4 @@
+import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from '@/App'
 import NotFound from '@/exceptions/NotFound'
@@ -17,7 +18,7 @@ import Test from '@/routes/Test'
 
 export default function MainRouter() {
   return (
-    <BrowserRouter future={{ v7_startTransition: true }}>
+    <BrowserRouter>
       <Routes>
         <Route element={<App />}>
           <Route index element={<Home />} />
