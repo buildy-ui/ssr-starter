@@ -4,8 +4,17 @@ import MainRouter from './main-router'
 import { ThemeProvider, lesseUITheme } from '@/providers/theme'
 import { RenderContextProvider } from '@/providers/render-context'
 
-// RenderContext was serialized on the server into window.__RENDER_CONTEXT__
-const context = (globalThis as any).__RENDER_CONTEXT__
+function readRenderContext() {
+  const el = document.getElementById('render-context')
+  if (!el) return null
+  try {
+    return JSON.parse(el.textContent || 'null')
+  } catch {
+    return null
+  }
+}
+
+const context = readRenderContext()
 const rootEl = document.getElementById('root')
 
 if (!rootEl) {

@@ -6,7 +6,17 @@ import MainRouter from './main-router'
 // styles
 import './assets/css/index.css'
 
-const context = (globalThis as any).__RENDER_CONTEXT__
+function readRenderContext() {
+  const el = document.getElementById('render-context')
+  if (!el) return null
+  try {
+    return JSON.parse(el.textContent || 'null')
+  } catch {
+    return null
+  }
+}
+
+const context = readRenderContext()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
