@@ -2,7 +2,7 @@ node_modules
 dist
 .vscode/
 .manual/
-.mdb
+*.mdb
 .cursorignore
 bun.lock
 package-lock.json

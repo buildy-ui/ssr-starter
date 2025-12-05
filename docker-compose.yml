@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      GRAPHQL_ENDPOINT: ${GRAPHQL_ENDPOINT:?set your GraphQL endpoint}
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
