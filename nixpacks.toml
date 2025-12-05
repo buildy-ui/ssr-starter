@@ -1,0 +1,15 @@
+# Nixpacks configuration for Bun + SSR
+providers = ["bun"]
+
+[variables]
+PORT = "3000"
+
+[phases.install]
+cmds = ["bun install --frozen-lockfile"]
+
+[phases.build]
+cmds = ["bun run build"]
+
+[start]
+cmd = "bun run start"
+
