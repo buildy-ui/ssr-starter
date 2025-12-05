@@ -1,10 +1,12 @@
+# syntax=docker/dockerfile:1.4
 FROM oven/bun:1 as base
 
 WORKDIR /app
 
-# Install dependencies (cached by lockfile)
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# Install dependencies (uses lockfile if provided)
+COPY package.json ./
+RUN --mount=type=bind,source=bun.lock,target=/tmp/bun.lock,required=false \
+    if [ -f /tmp/bun.lock ]; then cp /tmp/bun.lock ./bun.lock; bun install --frozen-lockfile; else bun install; fi
 
 # Copy source
 COPY . .
