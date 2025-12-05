@@ -1,8 +1,8 @@
 import { hydrateRoot, createRoot } from 'react-dom/client'
 import { StrictMode } from 'react'
 import MainRouter from './main-router'
-import { ThemeProvider, lesseUITheme } from '@/providers/theme'
-import { RenderContextProvider } from '@/providers/render-context'
+import { ThemeProvider, lesseUITheme } from './providers/theme'
+import { RenderContextProvider } from './providers/render-context'
 
 function readRenderContext() {
   const el = document.getElementById('render-context')

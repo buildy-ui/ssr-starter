@@ -1,17 +1,15 @@
 # syntax=docker/dockerfile:1.4
-FROM oven/bun:1 as base
+FROM oven/bun:1
 
 WORKDIR /app
 
-# Install dependencies (uses bun.lock if present)
-RUN --mount=type=bind,source=.,target=/src,readonly \
-    --mount=type=cache,target=/root/.bun \
-    cp /src/package.json ./ && \
-    if [ -f /src/bun.lock ]; then cp /src/bun.lock ./bun.lock; bun install --frozen-lockfile; else bun install; fi
-
-# Copy source
+# Copy all source files first
 COPY . .
 
+# Install dependencies
+RUN bun install
+
+# Set environment
 ARG GRAPHQL_ENDPOINT
 ENV NODE_ENV=production \
     PORT=3000 \
@@ -20,7 +18,9 @@ ENV NODE_ENV=production \
 # Build assets (data sync + Tailwind + client bundle)
 RUN bun run build
 
+# Verify the build output exists
+RUN ls -la dist/
+
 EXPOSE 3000
 
 CMD ["bun", "run", "start"]
-

@@ -1,40 +1,41 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import App from '@/App'
-import NotFound from '@/exceptions/NotFound'
-import ErrorBoundary from '@/exceptions/ErrorBoundary'
-import Home from '@/routes/Home'
-import About from '@/routes/About'
-import Blog from '@/routes/Blog'
-import Post from '@/routes/Post'
-import Category from '@/routes/Category'
-import Tag from '@/routes/Tag'
-import Author from '@/routes/Author'
-import Categories from '@/routes/Categories'
-import Tags from '@/routes/Tags'
-import Authors from '@/routes/Authors'
-import Search from '@/routes/Search'
-import Test from '@/routes/Test'
+import { MainLayout } from './layouts/MainLayout'
+import { useRenderContext } from './providers/render-context'
+import NotFound from './exceptions/NotFound'
+import Home from './routes/Home'
+import About from './routes/About'
+import Blog from './routes/Blog'
+import Post from './routes/Post'
+import Category from './routes/Category'
+import Tag from './routes/Tag'
+import Author from './routes/Author'
+import Categories from './routes/Categories'
+import Tags from './routes/Tags'
+import Authors from './routes/Authors'
+import Search from './routes/Search'
+import Test from './routes/Test'
 
+// Client router must match server structure for hydration
 export default function MainRouter() {
+  const { context } = useRenderContext()
+  
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<App />}>
-          <Route index element={<Home />} />
-          <Route path="about" element={<About />} />
-          <Route path="blog" element={<Blog />} />
-          <Route path="search" element={<Search />} />
-          <Route path="categories" element={<Categories />} />
-          <Route path="tags" element={<Tags />} />
-          <Route path="authors" element={<Authors />} />
-          <Route path="category/:slug" element={<Category />} />
-          <Route path="tag/:slug" element={<Tag />} />
-          <Route path="author/:slug" element={<Author />} />
-          <Route path="posts/:slug" element={<Post />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-        <Route path="/test" element={<Test />} errorElement={<ErrorBoundary />} />
+        <Route path="/" element={<MainLayout context={context} sidebar="none"><Home /></MainLayout>} />
+        <Route path="/about" element={<MainLayout context={context} sidebar="left"><About /></MainLayout>} />
+        <Route path="/blog" element={<MainLayout context={context}><Blog /></MainLayout>} />
+        <Route path="/search" element={<MainLayout context={context}><Search /></MainLayout>} />
+        <Route path="/categories" element={<MainLayout context={context}><Categories /></MainLayout>} />
+        <Route path="/tags" element={<MainLayout context={context}><Tags /></MainLayout>} />
+        <Route path="/authors" element={<MainLayout context={context}><Authors /></MainLayout>} />
+        <Route path="/category/:slug" element={<MainLayout context={context}><Category /></MainLayout>} />
+        <Route path="/tag/:slug" element={<MainLayout context={context}><Tag /></MainLayout>} />
+        <Route path="/author/:slug" element={<MainLayout context={context}><Author /></MainLayout>} />
+        <Route path="/posts/:slug" element={<MainLayout context={context}><Post /></MainLayout>} />
+        <Route path="/test" element={<MainLayout context={context} sidebar="none"><Test /></MainLayout>} />
+        <Route path="*" element={<MainLayout context={context} sidebar="none"><NotFound /></MainLayout>} />
       </Routes>
     </BrowserRouter>
   )

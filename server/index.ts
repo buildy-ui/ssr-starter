@@ -49,7 +49,12 @@ const app = new Elysia()
   .get('/entry-client.js', async () => {
     try {
       const buffer = await readFile('./dist/entry-client.js');
-      return new Response(buffer, { headers: { 'content-type': 'application/javascript' } });
+      return new Response(buffer, {
+        headers: {
+          'content-type': 'application/javascript',
+          'cache-control': 'no-cache, no-store, must-revalidate',
+        },
+      });
     } catch (error) {
       return new Response('// client bundle not built', { headers: { 'content-type': 'application/javascript' }, status: 404 });
     }

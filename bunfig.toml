@@ -1,0 +1,6 @@
+[build]
+# Resolve path aliases for browser bundling
+[build.alias]
+"@/*" = ["./src/*"]
+"@ui8kit/core" = ["./src/components/ui8kit.ts"]
+
