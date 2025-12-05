@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from '@/App'
 import NotFound from '@/exceptions/NotFound'
 import ErrorBoundary from '@/exceptions/ErrorBoundary'
@@ -15,34 +15,26 @@ import Authors from '@/routes/Authors'
 import Search from '@/routes/Search'
 import Test from '@/routes/Test'
 
-export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App />,
-    errorElement: <ErrorBoundary />,
-    children: [
-      { index: true, element: <Home /> },
-      { path: 'about', element: <About /> },
-      { path: 'blog', element: <Blog /> },
-      { path: 'search', element: <Search /> },
-      { path: 'categories', element: <Categories /> },
-      { path: 'tags', element: <Tags /> },
-      { path: 'authors', element: <Authors /> },
-      { path: 'category/:slug', element: <Category /> },
-      { path: 'tag/:slug', element: <Tag /> },
-      { path: 'author/:slug', element: <Author /> },
-      { path: 'posts/:slug', element: <Post /> },
-      { path: '*', element: <NotFound /> }
-    ]
-  },
-  {
-    path: '/test',
-    element: <Test />
-  }
-], {
-  future: { v7_startTransition: true }
-})
-
 export default function MainRouter() {
-  return <RouterProvider router={router} />
+  return (
+    <BrowserRouter future={{ v7_startTransition: true }}>
+      <Routes>
+        <Route element={<App />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="blog" element={<Blog />} />
+          <Route path="search" element={<Search />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="tags" element={<Tags />} />
+          <Route path="authors" element={<Authors />} />
+          <Route path="category/:slug" element={<Category />} />
+          <Route path="tag/:slug" element={<Tag />} />
+          <Route path="author/:slug" element={<Author />} />
+          <Route path="posts/:slug" element={<Post />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+        <Route path="/test" element={<Test />} errorElement={<ErrorBoundary />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
