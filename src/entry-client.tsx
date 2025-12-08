@@ -37,14 +37,7 @@ function initTheme() {
     })
   }
 
-  // Mobile menu toggle
-  const menuBtn = document.querySelector<HTMLElement>('[data-toggle-menu]')
-  const menu = document.querySelector<HTMLElement>('[data-menu]')
-  if (menuBtn && menu) {
-    menuBtn.addEventListener('click', () => {
-      menu.classList.toggle('hidden')
-    })
-  }
+// Sheet components work with pure CSS (checkbox + peer), no JS needed
 }
 
 if (typeof document !== 'undefined') {

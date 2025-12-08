@@ -5,6 +5,7 @@ import { CategoryList } from '@/components/CategoryList'
 import { TagList } from '@/components/TagList'
 import { PopularPosts } from '@/components/PopularPosts'
 import { NewsletterSignup } from '@/components/NewsletterSignup'
+import { Sheet } from '@/components/Sheet'
 import { Menu, Sun, Moon } from 'lucide-react'
 import type { RenderContext } from '@/data/types'
 
@@ -44,28 +45,30 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
                 <Icon lucideIcon={Moon} className="hidden dark:block" />
               </Button>
 
-              <Button variant="ghost" aria-label="Toggle menu" data-toggle-menu className="md:hidden">
-                <Icon lucideIcon={Menu} />
-              </Button>
+              <Sheet
+                id="mobile-menu"
+                side="left"
+                title="Navigation"
+                size="md"
+                showTrigger
+                triggerIcon={Menu}
+                triggerVariant="ghost"
+                className="md:hidden"
+              >
+                <Stack gap="sm">
+                  <SearchBar />
+                  {menu.primary.items.map(item => (
+                    <a key={item.id} href={item.url} className="block w-full">
+                      <Button variant="ghost" className="w-full justify-start">
+                        {item.title}
+                      </Button>
+                    </a>
+                  ))}
+                </Stack>
+              </Sheet>
             </Group>
           </Group>
         </Container>
-
-        {/* Mobile Menu */}
-        <Block className="hidden md:hidden border-t border-border" data-menu>
-          <Container size="lg" py="md">
-            <Stack gap="sm">
-              <SearchBar />
-              {menu.primary.items.map(item => (
-                <a key={item.id} href={item.url}>
-                  <Button variant="ghost" className="w-full justify-start">
-                    {item.title}
-                  </Button>
-                </a>
-              ))}
-            </Stack>
-          </Container>
-        </Block>
       </Block>
 
       <Block component="main" py="lg" data-class="main-page">
