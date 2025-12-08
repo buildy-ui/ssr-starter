@@ -27,7 +27,6 @@ export interface Feature {
 
 export interface HomeData {
   page: PageData;
-  features: Feature[];
 }
 
 export interface BlogData {
@@ -86,9 +85,6 @@ export interface PageSummary {
 }
 
 export interface RenderContext {
-  home: HomeData;
-  about: AboutData;
-  blog: BlogData;
   posts: { posts: PostData[] };
   categories: CategoryData[];
   tags: TagData[];

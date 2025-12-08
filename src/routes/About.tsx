@@ -1,26 +1,17 @@
-import { Block, Stack, Title, Text, Grid, Card, Image } from '@ui8kit/core'
+import { Block, Stack } from '@ui8kit/core'
 import { useRenderContext } from '@/providers/render-context'
 import { SEO } from '@/components/SEO'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { HtmlContent } from '@/components/HtmlContent'
-import { useTheme } from '@/providers/theme'
-
 
 export default function About() {
   const { context, loading, error } = useRenderContext()
-  const { rounded } = useTheme()
 
   if (loading) {
     return (
       <Block component="main" py="lg">
-        <Stack gap="lg">
-          <SEO title="Loading About..." description="Loading page content..." />
-          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'About' }]} />
-          <Stack gap="lg">
-            <Title order={2} size="3xl" fw="bold">Loading About...</Title>
-            <Text size="md" c="secondary-foreground">Fetching page content...</Text>
-          </Stack>
-        </Stack>
+        <SEO title="Loading About..." description="Loading page content..." />
+        <p>Loading...</p>
       </Block>
     )
   }
@@ -28,14 +19,8 @@ export default function About() {
   if (error) {
     return (
       <Block component="main" py="lg">
-        <Stack gap="lg">
-          <SEO title="About Error" description="Failed to load page content" />
-          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'About' }]} />
-          <Stack gap="lg">
-            <Title order={2} size="3xl" fw="bold">About Error</Title>
-            <Text size="md" c="secondary-foreground">Failed to load page content: {error}</Text>
-          </Stack>
-        </Stack>
+        <SEO title="About Error" description="Failed to load page content" />
+        <p>Failed to load page content: {error}</p>
       </Block>
     )
   }
@@ -43,45 +28,28 @@ export default function About() {
   if (!context) {
     return (
       <Block component="main" py="lg">
-        <Stack gap="lg">
-          <SEO title="About Not Available" description="Page content not available" />
-          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'About' }]} />
-          <Stack gap="lg">
-            <Title order={2} size="3xl" fw="bold">Content Not Available</Title>
-            <Text size="md" c="secondary-foreground">Page content is not available at the moment.</Text>
-          </Stack>
-        </Stack>
+        <SEO title="About Not Available" description="Page content not available" />
+        <p>Page content is not available at the moment.</p>
       </Block>
     )
   }
 
-  const { about } = context
+  const aboutPage = context.pages.find((p) => p.slug === 'about')
+  if (!aboutPage) {
+    return (
+      <Block component="main" py="lg">
+        <SEO title="About not found" description="About page is missing" />
+        <p>About page not found</p>
+      </Block>
+    )
+  }
+
   return (
     <Block component="main" py="lg">
       <Stack gap="lg">
-        <SEO title={about.page.title} description={about.page.excerpt} />
+        <SEO title={aboutPage.title} description={aboutPage.excerpt} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'About' }]} />
-        <Stack gap="lg">
-          <Stack gap="lg">
-            <Title order={2} size="3xl" fw="bold">{about.page.title}</Title>
-            <HtmlContent html={about.page.excerpt} className="prose prose-sm text-secondary-foreground leading-relaxed" />
-          </Stack>
-          <Grid cols="1-2-3" gap="lg">
-            {about.features.map((f: any) => (
-              <Card key={f.id} p="lg" rounded={rounded.default} shadow="md" bg="card">
-                <Stack gap="lg">
-                  {f.featuredImage?.url && (
-                    <Image src={f.featuredImage.url} alt={f.featuredImage.alt} rounded={rounded.default} w="full" h="auto" fit="cover" />
-                  )}
-                  <Stack gap="md">
-                    <Title order={3} size="xl" fw="semibold">{f.title}</Title>
-                    <HtmlContent html={f.excerpt} className="prose prose-sm text-secondary-foreground leading-relaxed" />
-                  </Stack>
-                </Stack>
-              </Card>
-            ))}
-          </Grid>
-        </Stack>
+        <HtmlContent html={aboutPage.content || aboutPage.excerpt} className="prose prose-lg max-w-none" />
       </Stack>
     </Block>
   )

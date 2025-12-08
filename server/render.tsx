@@ -149,12 +149,13 @@ function getMetaForPath(path: string, context: RenderContext): MetaPayload {
   const canonical = `${baseUrl}${normalized === '/' ? '' : normalized}`;
 
   if (normalized === '/') {
+    const homePage = context.pages.find((p) => p.slug === 'home');
     return {
-      title: context.home.page.title,
-      description: context.home.page.excerpt,
+      title: homePage?.title ?? context.site.title,
+      description: homePage?.excerpt ?? context.site.description,
       canonical,
-      ogTitle: context.home.page.title,
-      ogDescription: context.home.page.excerpt,
+      ogTitle: homePage?.title ?? context.site.title,
+      ogDescription: homePage?.excerpt ?? context.site.description,
     };
   }
 

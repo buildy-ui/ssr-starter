@@ -78,16 +78,6 @@ const fallbackPages: PageSummary[] = [
   },
 ];
 
-const fallbackHome: HomeData = {
-  page: {
-    title: page.title,
-    excerpt: page.excerpt,
-    content: page.content,
-    slug: page.slug,
-  },
-  features: buildFeatures(fallbackPostsData),
-};
-
 const fallbackBlog = {
   page: {
     title: 'Blog',
@@ -108,9 +98,6 @@ const fallbackAbout: AboutData = {
 };
 
 export const defaultRenderContext: RenderContext = {
-  home: fallbackHome,
-  about: fallbackAbout,
-  blog: fallbackBlog,
   posts: { posts: fallbackPostsData },
   categories: fallbackCategories,
   tags: fallbackTags,

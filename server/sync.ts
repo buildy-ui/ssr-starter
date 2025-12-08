@@ -1,13 +1,5 @@
 import { dbOperations } from './db';
-import type {
-  PostData,
-  CategoryData,
-  TagData,
-  AuthorData,
-  HomeData,
-  AboutData,
-  PageSummary,
-} from '../src/data/types';
+import type { PostData, CategoryData, TagData, AuthorData, PageSummary } from '../src/data/types';
 import { defaultRenderContext } from '../src/data';
 
 const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
@@ -205,42 +197,6 @@ function deriveAuthors(posts: PostData[]): AuthorData[] {
   return authors;
 }
 
-function buildHomeData(posts: PostData[], pages: PageSummary[]): HomeData {
-  const heroPage = pages[0] ?? defaultRenderContext.home.page;
-  return {
-    page: {
-      title: heroPage.title,
-      excerpt: heroPage.excerpt,
-      content: heroPage.excerpt,
-      slug: heroPage.slug,
-    },
-    features: posts.slice(0, 3).map((post) => ({
-      id: post.id,
-      title: post.title,
-      excerpt: post.excerpt,
-      featuredImage: post.featuredImage,
-    })),
-  };
-}
-
-function buildAboutData(posts: PostData[], pages: PageSummary[]): AboutData {
-  const aboutPage = pages.find((page) => page.slug?.includes('about')) ?? pages[0] ?? defaultRenderContext.about.page;
-  return {
-    page: {
-      title: aboutPage.title,
-      excerpt: aboutPage.excerpt,
-      content: aboutPage.content ?? aboutPage.excerpt,
-      slug: aboutPage.slug,
-    },
-    features: posts.slice(3, 6).map((post) => ({
-      id: post.id,
-      title: post.title,
-      excerpt: post.excerpt,
-      featuredImage: post.featuredImage,
-    })),
-  };
-}
-
 function buildPageSummaries(pages: any[]): PageSummary[] {
   return pages.map((page) => ({
     id: page.pageId,
@@ -255,17 +211,6 @@ function buildPageSummaries(pages: any[]): PageSummary[] {
         }
       : undefined,
   }));
-}
-
-function buildBlogData(): { page: { title: string; excerpt: string; content: string; slug: string } } {
-  return {
-    page: {
-      title: 'Blog',
-      excerpt: 'Latest posts and updates',
-      content: '',
-      slug: 'blog',
-    },
-  };
 }
 
 export async function syncAllData() {
@@ -305,13 +250,10 @@ export async function syncAllData() {
   dbOperations.saveCategories(categories);
   dbOperations.saveTags(tags);
   dbOperations.saveAuthors(authors);
+  dbOperations.savePages(pages);
 
-  dbOperations.saveMeta('home', buildHomeData(posts, pages));
-  dbOperations.saveMeta('about', buildAboutData(posts, pages));
-  dbOperations.saveMeta('blog', buildBlogData());
-  dbOperations.saveMeta('pages', pages);
   dbOperations.saveMeta('site', defaultRenderContext.site);
   dbOperations.saveMeta('menu', defaultRenderContext.menu);
 
-  console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors.`);
+  console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
 }

@@ -84,6 +84,26 @@ const app = new Elysia()
       return new Response('Not found', { status: 404 });
     }
   })
+  .get('/api/posts', async ({ query }) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+
+    const allPosts = dbOperations.getPosts();
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const items = allPosts.slice(start, end);
+    const total = allPosts.length;
+    const hasMore = end < total;
+
+    return {
+      items,
+      page,
+      limit,
+      total,
+      hasMore
+    };
+  })
+
   .get('/health', async () => {
     const posts = await dbOperations.getPosts();
     return {
