@@ -1,4 +1,4 @@
-// Компонент для безопасного рендеринга HTML с suppressHydrationWarning
+// Component for safe HTML rendering with suppressHydrationWarning
 export interface HtmlContentProps {
   html: string
   className?: string

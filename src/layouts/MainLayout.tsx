@@ -76,12 +76,12 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
             </Stack>
           ) : (
             <Grid cols="1-4" gap={defaultGap}>
-              <Grid.Col span={3} data-class="main-content" order={sidebar === 'left' ? 2 : 1}>
+              <Grid.Col span={3} data-class="main-content" className={sidebar === 'left' ? 'md:order-2 order-1' : 'order-1'}>
                 <Stack gap="lg">
                   {children}
                 </Stack>
               </Grid.Col>
-              <Grid.Col span={1} data-class="sidebar" order={sidebar === 'left' ? 1 : 2}>
+              <Grid.Col span={1} data-class="sidebar" className={sidebar === 'left' ? 'md:order-1 order-2' : 'order-2'}>
                 <Aside context={context} />
               </Grid.Col>
             </Grid>
