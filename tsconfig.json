@@ -2,19 +2,23 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "esModuleInterop": true,
     "strict": true,
     "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "@ui8kit/core": ["src/components/ui8kit.ts"]
-    },
-    "types": ["react", "react-dom"]
+    }
   },
   "include": ["src", "types"],
   "exclude": ["dist", "data", "server", "build.ts", "tailwind.config.ts"]

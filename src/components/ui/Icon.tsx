@@ -1,5 +1,5 @@
 import type { ElementType, ReactNode } from "react";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef } from "react";
 import { cn } from "../../lib/utils";
 import {
   spacingVariants,
@@ -24,20 +24,14 @@ export const Icon = forwardRef<HTMLElement, IconProps>(
   ({
     children,
     className,
-    component = 'span',
+    component: Component = 'span',
     size = 'sm',
     lucideIcon: LucideIcon,
     m, mx, my,
     c = 'foreground',
     ...props
   }, ref) => {
-    const Element = component as ElementType;
     const { 'aria-hidden': ariaHidden, role, ...rest } = props;
-    const [isClient, setIsClient] = useState(false);
-
-    useEffect(() => {
-      setIsClient(true);
-    }, []);
 
     const baseClasses = cn(
       'inline-block flex items-center justify-center',
@@ -47,8 +41,10 @@ export const Icon = forwardRef<HTMLElement, IconProps>(
       className
     );
 
+    const ComponentWithRef = Component as React.ComponentType<any>;
+
     return (
-      <Element
+      <ComponentWithRef
         ref={ref}
         data-class="icon"
         className={baseClasses}
@@ -56,20 +52,18 @@ export const Icon = forwardRef<HTMLElement, IconProps>(
         role={role}
         {...rest}
       >
-        {LucideIcon && isClient ? (
-          <span>
-            <LucideIcon
-              className={cn(
-                iconSizeVariants({ size }),
-                spacingVariants({ m, mx, my }),
-                colorVariants({ c })
-              )}
-            />
-          </span>
+        {LucideIcon ? (
+          <LucideIcon
+            className={cn(
+              iconSizeVariants({ size }),
+              spacingVariants({ m, mx, my }),
+              colorVariants({ c })
+            )}
+          />
         ) : (
           children
         )}
-      </Element>
+      </ComponentWithRef>
     );
   }
 );

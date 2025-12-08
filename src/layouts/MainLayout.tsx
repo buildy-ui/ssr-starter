@@ -1,8 +1,5 @@
 import { ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Block, Container, Group, Stack, Title, Text, Sheet, Button, Icon, Grid } from '@ui8kit/core'
-import { useTheme } from "@/providers/theme"
-import { useMobile } from "@/hooks/use-mobile"
+import { Block, Container, Group, Stack, Title, Text, Button, Icon, Grid } from '@ui8kit/core'
 import { SearchBar } from '@/components/SearchBar'
 import { CategoryList } from '@/components/CategoryList'
 import { TagList } from '@/components/TagList'
@@ -10,16 +7,11 @@ import { PopularPosts } from '@/components/PopularPosts'
 import { NewsletterSignup } from '@/components/NewsletterSignup'
 import { Menu, Sun, Moon } from 'lucide-react'
 import type { RenderContext } from '@/data/types'
-import { useRenderContext } from '@/providers/render-context'
 
 export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | 'none', context }: { children: ReactNode; sidebar?: 'left' | 'right' | 'none'; context?: RenderContext }) {
-  const { context: ctxFromHook } = useRenderContext()
-  const ctx = context ?? ctxFromHook
-  const isMobile = useMobile()
-  const { toggleDarkMode, isDarkMode } = useTheme()
-  const { menu } = ctx
-  const defaultGap = isMobile ? "none" : "lg";
-  const navigate = useNavigate()
+  if (!context) return null
+  const { menu } = context
+  const defaultGap = "lg"
 
   return (
     <>
@@ -27,43 +19,53 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
         <Container size="lg">
           <Group justify="between" align="center">
             <Group align="center" gap="md">
-              <Link to="/">
+              <a href="/">
                 <Title order={2} size="2xl" fw="bold" c="primary">UI8Kit</Title>
-              </Link>
+              </a>
               <Text size="sm" c="secondary-foreground">Design System</Text>
             </Group>
 
             <Group align="center" gap="sm">
 
-              {!isMobile && (
-                <nav>
-                  <Group align="center" gap="sm" data-class="nav">
-                    {menu.primary.items.map(item => (
-                      <Button onClick={() => navigate(item.url)} key={item.id} variant="ghost" size="sm">
+              <nav className="hidden md:flex">
+                <Group align="center" gap="sm" data-class="nav">
+                  {menu.primary.items.map(item => (
+                    <a key={item.id} href={item.url}>
+                      <Button variant="ghost" size="sm">
                         {item.title}
                       </Button>
-                    ))}
-                  </Group>
-                </nav>
-              )}
+                    </a>
+                  ))}
+                </Group>
+              </nav>
 
-              <Button variant="ghost" aria-label="Toggle dark mode" onClick={toggleDarkMode}>
-                <Icon lucideIcon={isDarkMode ? Sun : Moon} />
+              <Button variant="ghost" aria-label="Toggle dark mode" data-toggle-dark>
+                <Icon lucideIcon={Sun} className="block dark:hidden" />
+                <Icon lucideIcon={Moon} className="hidden dark:block" />
               </Button>
 
-              {isMobile && (
-                <Sheet id="site-sheet" side="left" title="Menu" showTrigger triggerIcon={Menu}>
-                  <Stack gap="sm">
-                    <SearchBar />
-                    {menu.primary.items.map(item => (
-                      <Button key={item.id} variant="ghost" onClick={() => navigate(item.url)}>{item.title}</Button>
-                    ))}
-                  </Stack>
-                </Sheet>
-              )}
+              <Button variant="ghost" aria-label="Toggle menu" data-toggle-menu className="md:hidden">
+                <Icon lucideIcon={Menu} />
+              </Button>
             </Group>
           </Group>
         </Container>
+
+        {/* Mobile Menu */}
+        <Block className="hidden md:hidden border-t border-border" data-menu>
+          <Container size="lg" py="md">
+            <Stack gap="sm">
+              <SearchBar />
+              {menu.primary.items.map(item => (
+                <a key={item.id} href={item.url}>
+                  <Button variant="ghost" className="w-full justify-start">
+                    {item.title}
+                  </Button>
+                </a>
+              ))}
+            </Stack>
+          </Container>
+        </Block>
       </Block>
 
       <Block component="main" py="lg" data-class="main-page">
@@ -80,7 +82,7 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
                 </Stack>
               </Grid.Col>
               <Grid.Col span={1} data-class="sidebar" order={sidebar === 'left' ? 1 : 2}>
-                <Aside context={ctx} />
+                <Aside context={context} />
               </Grid.Col>
             </Grid>
           )}
@@ -92,9 +94,9 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
           <Stack gap="lg" align="center">
             <Text size="sm" c="secondary-foreground" ta="center">© 2025 UI8Kit Design System</Text>
             <Group gap="md" justify="center">
-              <Link to="/"><Text size="xs" c="secondary-foreground">Home</Text></Link>
-              <Link to="/blog"><Text size="xs" c="secondary-foreground">Blog</Text></Link>
-              <Link to="/about"><Text size="xs" c="secondary-foreground">About</Text></Link>
+              <a href="/"><Text size="xs" c="secondary-foreground">Home</Text></a>
+              <a href="/blog"><Text size="xs" c="secondary-foreground">Blog</Text></a>
+              <a href="/about"><Text size="xs" c="secondary-foreground">About</Text></a>
             </Group>
           </Stack>
         </Container>
@@ -108,10 +110,10 @@ const Aside = ({ context }: { context: RenderContext }) => (
     <Stack gap="lg">
       <SearchBar />
       <CategoryList items={context.categories as any} />
-      <Link to="/categories"><Text size="sm" c="secondary-foreground">View all categories</Text></Link>
+      <a href="/categories"><Text size="sm" c="secondary-foreground">View all categories</Text></a>
       <TagList items={context.tags as any} />
-      <Link to="/tags"><Text size="sm" c="secondary-foreground">View all tags</Text></Link>
-      <Link to="/authors"><Text size="sm" c="secondary-foreground">View all authors</Text></Link>
+      <a href="/tags"><Text size="sm" c="secondary-foreground">View all tags</Text></a>
+      <a href="/authors"><Text size="sm" c="secondary-foreground">View all authors</Text></a>
       <PopularPosts />
       <NewsletterSignup />
     </Stack>

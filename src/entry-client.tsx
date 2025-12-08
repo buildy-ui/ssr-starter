@@ -29,13 +29,22 @@ function initTheme() {
   const current = readStoredTheme() ?? detectSystemPref()
   applyTheme(current)
 
-  const toggle = document.querySelector<HTMLElement>('[aria-label="Toggle dark mode"]')
-  if (!toggle) return
+  const toggle = document.querySelector<HTMLElement>('[data-toggle-dark]')
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark'
+      applyTheme(next as ThemeState)
+    })
+  }
 
-  toggle.addEventListener('click', () => {
-    const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark'
-    applyTheme(next as ThemeState)
-  })
+  // Mobile menu toggle
+  const menuBtn = document.querySelector<HTMLElement>('[data-toggle-menu]')
+  const menu = document.querySelector<HTMLElement>('[data-menu]')
+  if (menuBtn && menu) {
+    menuBtn.addEventListener('click', () => {
+      menu.classList.toggle('hidden')
+    })
+  }
 }
 
 if (typeof document !== 'undefined') {
