@@ -125,6 +125,7 @@ function AppRouter({ path, context }: { path: string; context: RenderContext }) 
             <Route path="/" element={<MainLayout context={context} sidebar="none"><Home /></MainLayout>} />
             <Route path="/about" element={<MainLayout context={context} sidebar="left"><About /></MainLayout>} />
             <Route path="/blog" element={<MainLayout context={context}><Blog /></MainLayout>} />
+            <Route path="/blog/:page" element={<MainLayout context={context}><Blog /></MainLayout>} />
             <Route path="/search" element={<MainLayout context={context}><Search /></MainLayout>} />
             <Route path="/categories" element={<MainLayout context={context}><Categories /></MainLayout>} />
             <Route path="/tags" element={<MainLayout context={context}><Tags /></MainLayout>} />
@@ -174,6 +175,15 @@ function getMetaForPath(path: string, context: RenderContext): MetaPayload {
   if (normalized === '/blog') {
     return {
       title: `${context.site.title} — Blog`,
+      description: 'Latest posts and updates from the blog',
+      canonical,
+    };
+  }
+
+  if (normalized.startsWith('/blog/')) {
+    const page = normalized.replace('/blog/', '') || '1';
+    return {
+      title: `${context.site.title} — Blog (Page ${page})`,
       description: 'Latest posts and updates from the blog',
       canonical,
     };

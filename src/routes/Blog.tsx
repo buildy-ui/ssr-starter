@@ -1,78 +1,36 @@
-import { Block, Stack, Title, Text, Grid } from '@ui8kit/core'
+import { Block, Stack, Title, Text, Grid, Group, Button } from '@ui8kit/core'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { SEO } from '@/components/SEO'
-import { HtmlContent } from '@/components/HtmlContent'
 import { PostCard } from '@/components/PostCard'
-import { Pagination } from '@/components/Pagination'
-import { useMemo, useState } from 'react'
 import { useRenderContext } from '@/data'
+import { useParams } from 'react-router-dom'
 
 export default function Blog() {
-  const { context, loading, error } = useRenderContext()
-  const [page, setPage] = useState(1)
+  const { context } = useRenderContext()
+  const { page } = useParams()
+  const currentPage = Math.max(1, Number(page) || 1)
   const perPage = 3
 
-  // Always calculate pagination data, but with fallback
   const postsData = context?.posts.posts || []
-  const total = Math.max(1, Math.ceil(postsData.length / perPage))
-  const pageItems = useMemo(() => postsData.slice((page - 1) * perPage, page * perPage), [postsData, page])
-
-  // Show loading state
-  if (loading) {
-    return (
-      <Block component="main" py="lg">
-        <Stack gap="lg">
-          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog' }]} />
-          <Stack gap="md">
-            <Title order={1} size="2xl">Loading Blog...</Title>
-            <Text c="secondary-foreground">Fetching posts from CMS...</Text>
-          </Stack>
-        </Stack>
-      </Block>
-    )
-  }
-
-  // Show error state
-  if (error) {
-    return (
-      <Block component="main" py="lg">
-        <Stack gap="lg">
-          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog' }]} />
-          <Stack gap="md">
-            <Title order={1} size="2xl">Blog Error</Title>
-            <Text c="secondary-foreground">Failed to load posts: {error}</Text>
-          </Stack>
-        </Stack>
-      </Block>
-    )
-  }
-
-  // Use context data
-  if (!context) {
-    return (
-      <Block component="main" py="lg">
-        <Stack gap="lg">
-          <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog' }]} />
-          <Stack gap="md">
-            <Title order={1} size="2xl">Blog</Title>
-            <Text c="secondary-foreground">No data available</Text>
-          </Stack>
-        </Stack>
-      </Block>
-    )
-  }
-
-  const { blog } = context
+  const totalPages = Math.max(1, Math.ceil(postsData.length / perPage))
+  const start = (currentPage - 1) * perPage
+  const pageItems = postsData.slice(start, start + perPage)
+  const hasPrev = currentPage > 1
+  const hasNext = currentPage < totalPages
+  const prevHref = currentPage === 2 ? '/blog' : `/blog/${currentPage - 1}`
+  const nextHref = `/blog/${currentPage + 1}`
 
   return (
     <Block component="main" py="lg">
       <Stack gap="lg">
-        <SEO title={blog.page.title} description={blog.page.excerpt} />
+        <SEO
+          title={`Blog${currentPage > 1 ? ` - Page ${currentPage}` : ''}`}
+          description="Latest posts"
+        />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog' }]} />
-        <Stack gap="md">
-          <Title order={1} size="2xl">{blog.page.title}</Title>
-          <HtmlContent html={blog.page.content || blog.page.excerpt} className="prose" />
-        </Stack>
+        <Title order={1} size="2xl">
+          Blog {currentPage > 1 && `- Page ${currentPage}`}
+        </Title>
 
         <Grid cols="1-2-3" gap="lg">
           {pageItems.map((p: any) => (
@@ -80,7 +38,21 @@ export default function Blog() {
           ))}
         </Grid>
 
-        <Pagination page={page} total={total} onPrev={() => setPage(p => Math.max(1, p - 1))} onNext={() => setPage(p => Math.min(total, p + 1))} />
+        <Group align="center" justify="center" gap="sm">
+          {hasPrev && (
+            <a href={prevHref}>
+              <Button variant="secondary">← Prev</Button>
+            </a>
+          )}
+          <Text size="sm" c="secondary-foreground">
+            Page {currentPage} of {totalPages}
+          </Text>
+          {hasNext && (
+            <a href={nextHref}>
+              <Button>Next →</Button>
+            </a>
+          )}
+        </Group>
       </Stack>
     </Block>
   )

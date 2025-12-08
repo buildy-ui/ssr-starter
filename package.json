@@ -5,8 +5,8 @@
   "scripts": {
     "tailwind:build": "bunx @tailwindcss/cli -i src/assets/css/index.css -o dist/styles.css --minify",
     "tailwind:watch": "bunx @tailwindcss/cli -i src/assets/css/index.css -o dist/styles.css -w",
-    "client:build": "bun build src/entry-client.tsx --outdir dist --minify --target=browser --sourcemap",
-    "build": "bun run build.ts && bun run tailwind:build && bun run client:build",
+    "client:build": "bun build src/entry-client.tsx --outdir dist --minify --target=browser --sourcemap=inline --public-path=/",
+    "build": "bun run tailwind:build && bun run client:build",
     "dev": "bun run build && bun --watch server/index.ts",
     "server:dev": "bun --watch server/index.ts",
     "start": "NODE_ENV=production bun run server/index.ts"

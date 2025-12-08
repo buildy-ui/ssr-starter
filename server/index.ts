@@ -26,7 +26,6 @@ const template = (payload: { html: string; meta: { title: string; description: s
   <link rel="canonical" href="${meta.canonical}" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMzYjlkZTgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1hdG9tLWljb24gbHVjaWRlLWF0b20iPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEiLz48cGF0aCBkPSJNMjAuMiAyMC4yYzIuMDQtMi4wMy4wMi03LjM2LTQuNS0xMS45LTQuNTQtNC41Mi05Ljg3LTYuNTQtMTEuOS00LjUtMi4wNCAyLjAzLS4wMiA3LjM2IDQuNSAxMS45IDQuNTQgNC41MiA5Ljg3IDYuNTQgMTEuOSA0LjVaIi8+PHBhdGggZD0iTTE1LjcgMTUuN2M0LjUyLTQuNTQgNi41NC05Ljg3IDQuNS0xMS45LTIuMDMtMi4wNC03LjM2LS4wMi0xMS45IDQuNS00LjUyIDQuNTQtNi41NCA5Ljg3LTQuNSAxMS45IDIuMDMgMi4wNCA3LjM2LjAyIDExLjktNC41WiIvPjwvc3ZnPg==" />
   <script>!function(){const e=localStorage.getItem("ui:dark");let t=!1;null!==e?t="1"===e:window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&(t=!0),t?(document.documentElement.classList.add("dark"),document.documentElement.style.colorScheme="dark"):(document.documentElement.classList.remove("dark"),document.documentElement.style.colorScheme="light")}();</script>
-  <script id="render-context" type="application/json">__CONTEXT__</script>
   <link rel="stylesheet" href="/styles.css" />
   <script type="module" src="/entry-client.js"></script>
 </head>
@@ -100,8 +99,7 @@ const app = new Elysia()
     try {
       const context = await dbOperations.getRenderContext();
       const { html, meta } = await renderPage(path, context);
-      const serialized = JSON.stringify(context).replace(/</g, '\\u003c');
-      const body = template({ html, meta, site: context.site }).replace('__CONTEXT__', serialized);
+      const body = template({ html, meta, site: context.site });
       return body;
     } catch (error) {
       console.error('SSR error:', error);

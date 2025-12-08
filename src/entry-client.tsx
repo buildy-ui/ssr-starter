@@ -1,41 +1,47 @@
-import { hydrateRoot, createRoot } from 'react-dom/client'
-import { StrictMode } from 'react'
-import MainRouter from './main-router'
-import { ThemeProvider, lesseUITheme } from './providers/theme'
-import { RenderContextProvider } from './providers/render-context'
+// Minimal client script: only handles dark mode toggle and respects stored preference.
 
-function readRenderContext() {
-  const el = document.getElementById('render-context')
-  if (!el) return null
+type ThemeState = 'light' | 'dark'
+
+function readStoredTheme(): ThemeState | null {
   try {
-    return JSON.parse(el.textContent || 'null')
-  } catch {
-    return null
+    const stored = window.localStorage.getItem('ui:dark')
+    if (stored === '1') return 'dark'
+    if (stored === '0') return 'light'
+  } catch {}
+  return null
+}
+
+function detectSystemPref(): ThemeState {
+  if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark'
+  return 'light'
+}
+
+function applyTheme(theme: ThemeState) {
+  const isDark = theme === 'dark'
+  document.documentElement.classList.toggle('dark', isDark)
+  document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
+  try {
+    window.localStorage.setItem('ui:dark', isDark ? '1' : '0')
+  } catch {}
+}
+
+function initTheme() {
+  const current = readStoredTheme() ?? detectSystemPref()
+  applyTheme(current)
+
+  const toggle = document.querySelector<HTMLElement>('[aria-label="Toggle dark mode"]')
+  if (!toggle) return
+
+  toggle.addEventListener('click', () => {
+    const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark'
+    applyTheme(next as ThemeState)
+  })
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initTheme()
+  } else {
+    document.addEventListener('DOMContentLoaded', initTheme, { once: true })
   }
 }
-
-const context = readRenderContext()
-const rootEl = document.getElementById('root')
-
-if (!rootEl) {
-  throw new Error('Root container #root not found')
-}
-
-const render =
-  typeof hydrateRoot === 'function'
-    ? (node: React.ReactElement) => hydrateRoot(rootEl, node)
-    : (node: React.ReactElement) => {
-        const root = createRoot(rootEl)
-        root.render(node)
-        return root
-      }
-
-render(
-  <StrictMode>
-    <ThemeProvider theme={lesseUITheme}>
-      <RenderContextProvider value={context}>
-        <MainRouter />
-      </RenderContextProvider>
-    </ThemeProvider>
-  </StrictMode>
-)
