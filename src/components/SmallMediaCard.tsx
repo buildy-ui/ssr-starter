@@ -2,6 +2,7 @@ import { Group, Image, Stack, Title, Text, Card } from '@ui8kit/core'
 import { Link } from 'react-router-dom'
 import { postPath } from '@/lib/paths'
 import { useTheme } from '@/providers/theme'
+import { HtmlContent } from '@/components/HtmlContent'
 
 type Item = {
   id: number
@@ -25,7 +26,7 @@ export function SmallMediaCard({ item }: { item: Item }) {
           <Link to={postPath(item.slug)}>
             <Title order={4} size="sm" fw="bold" c="foreground">{item.title}</Title>
           </Link>
-          {item.excerpt && <Text size="xs" c="secondary-foreground" leading="relaxed">{item.excerpt.slice(0, 80)}...</Text>}
+          {item.excerpt && <HtmlContent html={item.excerpt.slice(0, 80)} className="text-sm text-secondary-foreground leading-relaxed" />}
         </Stack>
       </Group>
     </Card>

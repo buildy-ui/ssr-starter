@@ -68,7 +68,10 @@ export interface PostData {
   title: string;
   excerpt: string;
   content: string;
-  date: string;
+  date: {
+    display: string;
+    raw: string;
+  };
   featuredImage?: ImageData;
   categories: CategoryData[];
   tags: TagData[];

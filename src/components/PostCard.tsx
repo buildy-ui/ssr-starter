@@ -2,16 +2,10 @@ import { Card, Image, Stack, Title, Text, Group, Badge, Button } from '@ui8kit/c
 import { Link } from 'react-router-dom'
 import { postPath } from '@/lib/paths'
 import { useTheme } from '@/providers/theme'
+import { HtmlContent } from '@/components/HtmlContent'
+import { PostData } from '@/data/types'
 
-type Post = {
-  id: number
-  title: string
-  excerpt: string
-  slug: string
-  thumbnail?: { url: string; alt: string }
-  categories?: { id: number; name: string; slug: string }[]
-  media?: string
-}
+type Post = PostData
 
 export function PostCard({ post, media = 'default' }: { post: Post, media?: 'top' | 'default' }) {
   const { rounded } = useTheme()
@@ -19,11 +13,11 @@ export function PostCard({ post, media = 'default' }: { post: Post, media?: 'top
   return (
     <Card p={media === 'top' ? 'none' : 'lg'} rounded={rounded.default} shadow="md" bg="card" data-class="post-card">
       <Stack gap={media === 'top' ? 'none' : 'lg'}>
-        {post.thumbnail?.url && (
+        {post.featuredImage?.url && (
           <Link to={postPath(post.slug)}>
             <Image
-              src={post.thumbnail.url}
-              alt={post.thumbnail.alt}
+              src={post.featuredImage.url}
+              alt={post.featuredImage.alt}
               rounded={media === 'top' ? 'none' : rounded.default}
               w="full"
               h="auto"
@@ -35,7 +29,7 @@ export function PostCard({ post, media = 'default' }: { post: Post, media?: 'top
           <Link to={postPath(post.slug)}>
             <Title order={3} size="xl" fw="semibold" c="foreground">{post.title}</Title>
           </Link>
-          <Text size="xs" c="secondary-foreground" leading="relaxed">{post.excerpt}</Text>
+          <HtmlContent html={post.excerpt.slice(0, 140)} className="text-sm text-secondary-foreground leading-relaxed" />
           {post.categories?.length ? (
             <Group gap="sm" align="center">
               {post.categories.slice(0, 2).map(cat => (
@@ -45,8 +39,8 @@ export function PostCard({ post, media = 'default' }: { post: Post, media?: 'top
           ) : null}
         </Stack>
         <Stack p={media === 'top' ? 'md' : 'none'} align="end">
-          <Link to={postPath(post.slug)}>
-            <Button variant="secondary">Read more</Button>
+          <Link to={postPath(post.slug)} title={`Read "${post.title}"`}>
+            <Button variant="secondary">Read post</Button>
           </Link>
         </Stack>
       </Stack>
