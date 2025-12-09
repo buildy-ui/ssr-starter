@@ -9,13 +9,14 @@ type Post = PostData
 
 export function PostCard({ post, media = 'default' }: { post: Post, media?: 'top' | 'default' }) {
   const { rounded } = useTheme()
+  const cardImage = post.featuredImage?.sizes?.full;
 
   // Prefer medium for cards; fall back to mediumLarge -> thumbnail -> thumbnail field -> full
-  const cardImage = post.featuredImage?.sizes?.medium
+  /* const cardImage = post.featuredImage?.sizes?.medium
     || post.featuredImage?.sizes?.mediumLarge
     || post.featuredImage?.sizes?.thumbnail
     || post.thumbnail
-    || post.featuredImage;
+    || post.featuredImage; */
 
   return (
     <Card p={media === 'top' ? 'none' : 'lg'} rounded={rounded.default} shadow="md" bg="card" data-class="post-card">
