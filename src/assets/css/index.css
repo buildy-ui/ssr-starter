@@ -10,7 +10,7 @@
  * RSD/StyleX injects styles directly into the DOM.
  */
 
-@source "../src/**/*.{ts,tsx}";
+@source "../../../src/**/*.{ts,tsx}";
 
 :root {
   --background: hsl(0 0% 97.2549%);
@@ -203,4 +203,69 @@ body {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-primary;
+}
+
+.prose {
+  @apply text-foreground leading-relaxed;
+}
+.prose h1 {
+  @apply text-3xl font-bold;
+  margin-bottom: calc(var(--spacing) * 4) !important;
+}
+.prose h2 {
+  @apply text-2xl font-semibold;
+  margin-top: calc(var(--spacing) * 6) !important;
+  margin-bottom: calc(var(--spacing) * 3) !important;
+}
+.prose h3 {
+  @apply text-xl font-semibold;
+  margin-top: calc(var(--spacing) * 5) !important;
+  margin-bottom: calc(var(--spacing) * 2) !important;
+}
+.prose p {
+  @apply text-base;
+  margin-block: calc(var(--spacing) * 4) !important;
+}
+.prose a {
+  @apply text-primary underline;
+}
+.prose ul {
+  @apply list-disc;
+  margin-block: calc(var(--spacing) * 4) !important;
+  padding-left: calc(var(--spacing) * 6) !important;
+}
+.prose ol {
+  @apply list-decimal;
+  margin-block: calc(var(--spacing) * 4) !important;
+  padding-left: calc(var(--spacing) * 6) !important;
+}
+.prose li {
+  margin-block: calc(var(--spacing) * 1) !important;
+}
+.prose blockquote {
+  @apply border-l-4 border-muted italic text-secondary-foreground;
+  margin-block: calc(var(--spacing) * 4) !important;
+  padding-left: calc(var(--spacing) * 4) !important;
+}
+.prose img {
+  @apply rounded-md;
+  margin-block: calc(var(--spacing) * 4) !important;
+}
+.prose code {
+  @apply px-1 py-0.5 rounded bg-muted text-foreground;
+}
+.prose pre {
+  @apply p-3 rounded bg-muted overflow-x-auto;
+  margin-block: calc(var(--spacing) * 4) !important;
+}
+.prose hr {
+  @apply border-border;
+  margin-block: calc(var(--spacing) * 6) !important;
+}
+.prose figure {
+  margin-block: calc(var(--spacing) * 4) !important;
+}
+.prose figcaption {
+  @apply text-sm text-secondary-foreground;
+  margin-top: calc(var(--spacing) * 2) !important;
 }
