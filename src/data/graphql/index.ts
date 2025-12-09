@@ -419,13 +419,39 @@ async function fetchPagesFromAPI(): Promise<Array<{
   }
 }
 
+// Normalize WPGraphQL mediaDetails.sizes which may come as array with "name"
+function normalizeSizes(
+  sizes:
+    | {
+        thumbnail?: { sourceUrl: string; width: string; height: string };
+        medium?: { sourceUrl: string; width: string; height: string };
+        medium_large?: { sourceUrl: string; width: string; height: string };
+        large?: { sourceUrl: string; width: string; height: string };
+      }
+    | Array<{ name: string; sourceUrl: string; width: string; height: string }>
+    | undefined
+) {
+  if (!sizes) return {};
+  if (Array.isArray(sizes)) {
+    const map: Record<string, { sourceUrl: string; width: string; height: string }> = {};
+    sizes.forEach((s) => {
+      if (s?.name) map[s.name] = s as any;
+    });
+    return map;
+  }
+  return sizes;
+}
+
 // Helper to build image data from GraphQL size
-function buildImageSize(size: { sourceUrl: string; width: string; height: string } | undefined, alt?: string): { url: string; width: number; height: number; alt?: string } | undefined {
+function buildImageSize(
+  size: { sourceUrl: string; width: string | number; height: string | number } | undefined,
+  alt?: string
+): { url: string; width: number; height: number; alt?: string } | undefined {
   if (!size) return undefined;
   return {
     url: size.sourceUrl,
-    width: parseInt(size.width, 10) || 0,
-    height: parseInt(size.height, 10) || 0,
+    width: typeof size.width === 'number' ? size.width : parseInt(size.width, 10) || 0,
+    height: typeof size.height === 'number' ? size.height : parseInt(size.height, 10) || 0,
     alt
   };
 }
@@ -433,7 +459,7 @@ function buildImageSize(size: { sourceUrl: string; width: string; height: string
 // Transform GraphQL post to our internal format
 function transformGraphQLPostToInternal(post: GraphQLPost): any {
   const img = post.featuredImage?.node;
-  const sizes = img?.mediaDetails?.sizes;
+  const sizes = normalizeSizes(img?.mediaDetails?.sizes);
   const alt = img?.altText;
   const caption = img?.caption;
 

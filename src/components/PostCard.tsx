@@ -10,11 +10,11 @@ type Post = PostData
 export function PostCard({ post, media = 'default' }: { post: Post, media?: 'top' | 'default' }) {
   const { rounded } = useTheme()
 
-  // Get the best image size for cards (medium or thumbnail as fallback)
-  const cardImage = post.featuredImage?.sizes?.mediumLarge
-    || post.featuredImage?.sizes?.medium 
+  // Prefer medium for cards; fall back to mediumLarge -> thumbnail -> thumbnail field -> full
+  const cardImage = post.featuredImage?.sizes?.medium
+    || post.featuredImage?.sizes?.mediumLarge
     || post.featuredImage?.sizes?.thumbnail
-    || post.thumbnail 
+    || post.thumbnail
     || post.featuredImage;
 
   return (

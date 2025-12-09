@@ -46,6 +46,16 @@ const QUERIES = {
             node {
               sourceUrl
               altText
+              mediaDetails {
+                width
+                height
+                sizes {
+                  name
+                  sourceUrl
+                  width
+                  height
+                }
+              }
             }
           }
           categories {
@@ -138,22 +148,63 @@ const QUERIES = {
   `,
 };
 
-type RawPost = NonNullable<Awaited<ReturnType<typeof graphqlQuery<{ posts: { nodes: any[] } }>>['posts']>['nodes'][number]>;
-
 function mapPost(node: any): PostData {
+  const sizesArray = node.featuredImage?.node?.mediaDetails?.sizes as
+    | Array<{ name: string; sourceUrl: string; width: string; height: string }>
+    | undefined;
+
+  const sizesMap: Record<string, { sourceUrl: string; width: string; height: string }> = {};
+  sizesArray?.forEach((s) => {
+    if (s?.name) sizesMap[s.name] = s;
+  });
+
+  const buildSize = (s?: { sourceUrl: string; width: string; height: string }) =>
+    s
+      ? {
+          url: s.sourceUrl,
+          width: parseInt(s.width, 10) || 0,
+          height: parseInt(s.height, 10) || 0,
+          alt: node.featuredImage?.node?.altText,
+        }
+      : undefined;
+
+  const full = node.featuredImage?.node?.mediaDetails
+    ? {
+        url: node.featuredImage.node.sourceUrl,
+        width: node.featuredImage.node.mediaDetails.width ?? 0,
+        height: node.featuredImage.node.mediaDetails.height ?? 0,
+        alt: node.featuredImage.node.altText,
+      }
+    : undefined;
+
+  const sizes = {
+    thumbnail: buildSize(sizesMap.thumbnail),
+    medium: buildSize(sizesMap.medium),
+    mediumLarge: buildSize(sizesMap.medium_large),
+    large: buildSize(sizesMap.large),
+    full,
+  };
+
+  const thumb = sizes.thumbnail || full;
+
   return {
     id: node.postId,
     slug: node.slug,
     title: node.title,
     excerpt: node.excerpt ?? '',
     content: node.content ?? '',
-    date: node.date ?? new Date().toISOString(),
+    date: {
+      display: node.date ? new Date(node.date).toLocaleDateString() : new Date().toLocaleDateString(),
+      raw: node.date ?? new Date().toISOString(),
+    },
     featuredImage: node.featuredImage?.node
       ? {
-          url: node.featuredImage.node.sourceUrl,
+          url: sizes.large?.url || sizes.mediumLarge?.url || sizes.medium?.url || node.featuredImage.node.sourceUrl,
           alt: node.featuredImage.node.altText,
+          sizes,
         }
       : undefined,
+    thumbnail: thumb,
     categories: (node.categories?.nodes || []).map((cat: any) => ({
       id: cat.categoryId,
       name: cat.name,

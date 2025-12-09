@@ -13,12 +13,12 @@ export const db = open({
   mapSize: 2 * 1024 * 1024 * 1024, // 2GB
 });
 
-const postsDb = db.openDB('posts');
-const categoriesDb = db.openDB('categories');
-const tagsDb = db.openDB('tags');
-const authorsDb = db.openDB('authors');
-const pagesDb = db.openDB('pages');
-const metaDb = db.openDB('meta');
+const postsDb = db.openDB({ name: 'posts' });
+const categoriesDb = db.openDB({ name: 'categories' });
+const tagsDb = db.openDB({ name: 'tags' });
+const authorsDb = db.openDB({ name: 'authors' });
+const pagesDb = db.openDB({ name: 'pages' });
+const metaDb = db.openDB({ name: 'meta' });
 
 // In-memory cache for faster access
 let postsCache: PostData[] = [];
@@ -69,18 +69,22 @@ async function syncFromGraphQL() {
       getPages()
     ]);
 
-    // Transform and save posts
+    // Transform and save posts (preserve date object, images, sizes, thumbnail)
     const transformedPosts = posts.posts.map((post: any) => ({
       id: post.id,
       slug: post.slug,
       title: post.title,
       excerpt: post.excerpt,
       content: post.content,
-      date: post.date?.formatted || new Date().toISOString(),
+      date: post.date ?? {
+        display: new Date().toLocaleDateString(),
+        raw: new Date().toISOString(),
+      },
       featuredImage: post.featuredImage,
+      thumbnail: post.thumbnail,
       categories: post.categories || [],
       tags: post.tags || [],
-      author: post.author
+      author: post.author,
     }));
 
     // Transform and save pages
