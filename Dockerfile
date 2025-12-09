@@ -11,9 +11,11 @@ RUN bun install
 
 # Set environment
 ARG GRAPHQL_ENDPOINT
+ARG S3_ASSETS_URL
 ENV NODE_ENV=production \
     PORT=3000 \
-    GRAPHQL_ENDPOINT=${GRAPHQL_ENDPOINT}
+    GRAPHQL_ENDPOINT=${GRAPHQL_ENDPOINT} \
+    S3_ASSETS_URL=${S3_ASSETS_URL}
 
 # Build assets (data sync + Tailwind + client bundle)
 RUN bun run build

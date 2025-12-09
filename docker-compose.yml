@@ -5,8 +5,10 @@ services:
       dockerfile: Dockerfile
       args:
         GRAPHQL_ENDPOINT: ${GRAPHQL_ENDPOINT}
+        S3_ASSETS_URL: ${S3_ASSETS_URL}
     environment:
       GRAPHQL_ENDPOINT: ${GRAPHQL_ENDPOINT:?set your GraphQL endpoint}
+      S3_ASSETS_URL: ${S3_ASSETS_URL:?set your S3 assets URL}
       NODE_ENV: production
       PORT: 3000
     ports:
