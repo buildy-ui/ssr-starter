@@ -79,7 +79,7 @@ const app = new Elysia()
   })
 
   .get('/health', async () => {
-    const posts = await dbOperations.getPosts();
+    const posts = dbOperations.getPosts();
     return {
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -91,7 +91,7 @@ const app = new Elysia()
     const path = url.pathname;
 
     try {
-      const context = await dbOperations.getRenderContext();
+      const context = dbOperations.getRouteContext(path);
       const { html, meta } = await renderPage(path, context);
       const body = renderHtmlTemplate({ html, meta, site: context.site, assets: context.assets });
       return body;

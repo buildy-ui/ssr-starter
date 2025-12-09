@@ -20,12 +20,26 @@ const authorsDb = db.openDB({ name: 'authors' });
 const pagesDb = db.openDB({ name: 'pages' });
 const metaDb = db.openDB({ name: 'meta' });
 
-// In-memory cache for faster access
+// In-memory caches for fast, allocation-free reads
 let postsCache: PostData[] = [];
 let categoriesCache: CategoryData[] = [];
 let tagsCache: TagData[] = [];
 let authorsCache: AuthorData[] = [];
 let pagesCache: PageSummary[] = [];
+let metaCache: Record<string, unknown> = {};
+
+// Render-time caches (rebuilt after every sync/write)
+let renderContextCache: RenderContext | null = null;
+const routeContextCache = new Map<string, RenderContext>();
+
+function normalizePath(path: string) {
+  return path.replace(/\/+$/, '') || '/';
+}
+
+function invalidateContextCaches() {
+  renderContextCache = null;
+  routeContextCache.clear();
+}
 
 function loadFromDb() {
   try {
@@ -50,6 +64,11 @@ function loadFromDb() {
     for (const { value } of pagesDb.getRange()) {
       pagesCache.push(value);
     }
+    metaCache = {};
+    for (const { key, value } of metaDb.getRange()) {
+      metaCache[String(key)] = value;
+    }
+    invalidateContextCaches();
   } catch (error) {
     console.warn('Failed to load data from LmDB, using empty cache:', error);
   }
@@ -125,34 +144,41 @@ export const dbOperations = {
   savePosts(posts: PostData[]) {
     replaceStore(postsDb, posts, (post) => post.id);
     postsCache = posts;
+    invalidateContextCaches();
   },
 
   saveCategories(categories: CategoryData[]) {
     replaceStore(categoriesDb, categories, (cat) => cat.id);
     categoriesCache = categories;
+    invalidateContextCaches();
   },
 
   saveTags(tags: TagData[]) {
     replaceStore(tagsDb, tags, (tag) => tag.id);
     tagsCache = tags;
+    invalidateContextCaches();
   },
 
   saveAuthors(authors: AuthorData[]) {
     replaceStore(authorsDb, authors, (author) => author.id);
     authorsCache = authors;
+    invalidateContextCaches();
   },
 
   savePages(pages: PageSummary[]) {
     replaceStore(pagesDb, pages, (page) => page.id);
     pagesCache = pages;
+    invalidateContextCaches();
   },
 
   saveMeta(key: string, value: unknown) {
     metaDb.put(key, value);
+    metaCache[key] = value;
+    invalidateContextCaches();
   },
 
   getMeta<T>(key: string, fallback: T): T {
-    return (metaDb.get(key) as T) ?? fallback;
+    return (metaCache[key] as T) ?? fallback;
   },
 
   getPosts(): PostData[] {
@@ -175,8 +201,10 @@ export const dbOperations = {
     return pagesCache;
   },
 
-  async getRenderContext(): Promise<RenderContext> {
-    return {
+  getRenderContext(): RenderContext {
+    if (renderContextCache) return renderContextCache;
+
+    renderContextCache = {
       posts: { posts: this.getPosts() },
       categories: this.getCategories(),
       tags: this.getTags(),
@@ -188,5 +216,20 @@ export const dbOperations = {
         s3AssetsUrl: process.env.S3_ASSETS_URL!,
       },
     };
+    return renderContextCache;
+  },
+
+  getRouteContext(path: string): RenderContext {
+    const normalized = normalizePath(path);
+    const cached = routeContextCache.get(normalized);
+    if (cached) return cached;
+
+    const context = this.getRenderContext();
+    routeContextCache.set(normalized, context);
+    return context;
+  },
+
+  invalidateCaches() {
+    invalidateContextCaches();
   },
 };
