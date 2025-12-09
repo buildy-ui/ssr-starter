@@ -8,6 +8,18 @@ export interface ImageData {
   caption?: string;
 }
 
+export interface ImageSizes {
+  thumbnail?: ImageData;
+  medium?: ImageData;
+  mediumLarge?: ImageData;
+  large?: ImageData;
+  full?: ImageData;
+}
+
+export interface MediaData extends ImageData {
+  sizes?: ImageSizes;
+}
+
 export interface PageData {
   title: string;
   excerpt: string;
@@ -72,7 +84,7 @@ export interface PostData {
     display: string;
     raw: string;
   };
-  featuredImage?: ImageData;
+  featuredImage?: MediaData;
   thumbnail?: ImageData;
   categories: CategoryData[];
   tags: TagData[];

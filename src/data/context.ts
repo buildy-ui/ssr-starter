@@ -19,13 +19,25 @@ const mapLegacyPost = (source: any): PostData => ({
   title: source.title,
   excerpt: source.excerpt,
   content: source.content ?? '',
-  date: source.date?.formatted ?? new Date().toISOString(),
+  date: {
+    display: source.date?.display ?? source.date?.formatted ?? new Date().toLocaleDateString(),
+    raw: source.date?.formatted ?? new Date().toISOString(),
+  },
   featuredImage: source.featuredImage
     ? {
         url: source.featuredImage.url,
         alt: source.featuredImage.alt,
         width: source.featuredImage.width,
         height: source.featuredImage.height,
+        sizes: source.featuredImage.sizes,
+      }
+    : undefined,
+  thumbnail: source.thumbnail
+    ? {
+        url: source.thumbnail.url,
+        alt: source.thumbnail.alt,
+        width: source.thumbnail.width,
+        height: source.thumbnail.height,
       }
     : undefined,
   categories: (source.categories || []).map((cat: any) => ({

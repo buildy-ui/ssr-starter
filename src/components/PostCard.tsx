@@ -10,19 +10,25 @@ type Post = PostData
 export function PostCard({ post, media = 'default' }: { post: Post, media?: 'top' | 'default' }) {
   const { rounded } = useTheme()
 
+  // Get the best image size for cards (medium or thumbnail as fallback)
+  const cardImage = post.featuredImage?.sizes?.mediumLarge
+    || post.featuredImage?.sizes?.medium 
+    || post.featuredImage?.sizes?.thumbnail
+    || post.thumbnail 
+    || post.featuredImage;
+
   return (
     <Card p={media === 'top' ? 'none' : 'lg'} rounded={rounded.default} shadow="md" bg="card" data-class="post-card">
       <Stack gap={media === 'top' ? 'none' : 'lg'}>
-        {post.thumbnail?.url && (
+        {cardImage?.url && (
           <Link to={postPath(post.slug)}>
             <Image
-              src={post.thumbnail.url}
-              alt={post.thumbnail.alt}
+              src={cardImage.url}
+              alt={cardImage.alt}
               rounded={media === 'top' ? 'none' : rounded.default}
-              width={post.thumbnail.width}
-              height={post.thumbnail.height}
+              width={cardImage.width}
+              height={cardImage.height}
               fit="cover"
-              aspect="16/9"
             />
           </Link>
         )}

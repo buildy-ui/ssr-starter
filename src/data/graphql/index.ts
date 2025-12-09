@@ -34,6 +34,32 @@ interface GraphQLPost {
       sourceUrl: string;
       altText: string;
       caption?: string;
+      mediaDetails?: {
+        width?: number;
+        height?: number;
+        sizes?: {
+          thumbnail?: {
+            sourceUrl: string;
+            width: string;
+            height: string;
+          };
+          medium?: {
+            sourceUrl: string;
+            width: string;
+            height: string;
+          };
+          medium_large?: {
+            sourceUrl: string;
+            width: string;
+            height: string;
+          };
+          large?: {
+            sourceUrl: string;
+            width: string;
+            height: string;
+          };
+        };
+      };
     };
   };
   postFields?: Array<{
@@ -82,6 +108,32 @@ async function fetchPostsFromAPI(): Promise<GraphQLPost[]> {
               sourceUrl
               altText
               caption
+              mediaDetails {
+                width
+                height
+                sizes {
+                  thumbnail {
+                    sourceUrl
+                    width
+                    height
+                  }
+                  medium {
+                    sourceUrl
+                    width
+                    height
+                  }
+                  medium_large {
+                    sourceUrl
+                    width
+                    height
+                  }
+                  large {
+                    sourceUrl
+                    width
+                    height
+                  }
+                }
+              }
             }
           }
           postFields {
@@ -107,6 +159,19 @@ async function fetchPostsFromAPI(): Promise<GraphQLPost[]> {
     }
 
     const result: GraphQLResponse = await response.json();
+
+    // Debug: log available media sizes to inspect what WP returns.
+    // Logs only a small sample to avoid flooding output.
+    const sampleSizes = result.data.posts.nodes.slice(0, 3).map((post) => ({
+      id: post.postId,
+      title: post.title,
+      featuredImage: {
+        sourceUrl: post.featuredImage?.node.sourceUrl,
+        sizes: post.featuredImage?.node.mediaDetails?.sizes,
+      },
+    }));
+    console.log('GraphQL media sizes sample:', JSON.stringify(sampleSizes, null, 2));
+
     return result.data.posts.nodes;
   } catch (error) {
     console.error('Failed to fetch posts from GraphQL API:', error);
@@ -263,6 +328,25 @@ async function fetchPagesFromAPI(): Promise<Array<{
     node: {
       sourceUrl: string;
       altText: string;
+      mediaDetails?: {
+        sizes?: {
+          thumbnail?: {
+            sourceUrl: string;
+            width: number;
+            height: number;
+          };
+          medium?: {
+            sourceUrl: string;
+            width: number;
+            height: number;
+          };
+          large?: {
+            sourceUrl: string;
+            width: number;
+            height: number;
+          };
+        };
+      };
     };
   };
   pageFields?: Array<{
@@ -284,6 +368,25 @@ async function fetchPagesFromAPI(): Promise<Array<{
             node {
               sourceUrl
               altText
+              mediaDetails {
+                sizes {
+                  thumbnail {
+                    sourceUrl
+                    width
+                    height
+                  }
+                  medium {
+                    sourceUrl
+                    width
+                    height
+                  }
+                  large {
+                    sourceUrl
+                    width
+                    height
+                  }
+                }
+              }
             }
           }
           pageFields {
@@ -316,8 +419,38 @@ async function fetchPagesFromAPI(): Promise<Array<{
   }
 }
 
+// Helper to build image data from GraphQL size
+function buildImageSize(size: { sourceUrl: string; width: string; height: string } | undefined, alt?: string): { url: string; width: number; height: number; alt?: string } | undefined {
+  if (!size) return undefined;
+  return {
+    url: size.sourceUrl,
+    width: parseInt(size.width, 10) || 0,
+    height: parseInt(size.height, 10) || 0,
+    alt
+  };
+}
+
 // Transform GraphQL post to our internal format
 function transformGraphQLPostToInternal(post: GraphQLPost): any {
+  const img = post.featuredImage?.node;
+  const sizes = img?.mediaDetails?.sizes;
+  const alt = img?.altText;
+  const caption = img?.caption;
+
+  // Build sizes object with all available image sizes
+  const imageSizes = img ? {
+    thumbnail: buildImageSize(sizes?.thumbnail, alt),
+    medium: buildImageSize(sizes?.medium, alt),
+    mediumLarge: buildImageSize(sizes?.medium_large, alt),
+    large: buildImageSize(sizes?.large, alt),
+    full: img.mediaDetails?.width ? {
+      url: img.sourceUrl,
+      width: img.mediaDetails.width,
+      height: img.mediaDetails.height || 0,
+      alt
+    } : undefined
+  } : undefined;
+
   return {
     title: post.title,
     content: post.content,
@@ -325,17 +458,19 @@ function transformGraphQLPostToInternal(post: GraphQLPost): any {
     url: `/posts/post-${post.postId}`,
     id: post.postId,
     excerpt: post.excerpt,
-    featuredImage: post.featuredImage ? {
-      url: post.featuredImage.node.sourceUrl,
-      width: 800, // Default dimensions
-        height: 600,
-      alt: post.featuredImage.node.altText
+    featuredImage: img ? {
+      url: sizes?.large?.sourceUrl || img.sourceUrl,
+      width: parseInt(sizes?.large?.width || '0', 10) || img.mediaDetails?.width || 800,
+      height: parseInt(sizes?.large?.height || '0', 10) || img.mediaDetails?.height || 600,
+      alt,
+      caption,
+      sizes: imageSizes
     } : null,
-    thumbnail: post.featuredImage ? {
-      url: post.featuredImage.node.sourceUrl,
-        width: 250,
-        height: 216,
-      alt: post.featuredImage.node.altText
+    thumbnail: img ? {
+      url: sizes?.thumbnail?.sourceUrl || img.sourceUrl,
+      width: parseInt(sizes?.thumbnail?.width || '0', 10) || 150,
+      height: parseInt(sizes?.thumbnail?.height || '0', 10) || 150,
+      alt
     } : null,
       meta: {
         _edit_last: '1',
@@ -493,15 +628,15 @@ export async function getPages(): Promise<Array<{
     excerpt: page.excerpt,
     url: `/pages/${page.slug}`,
     featuredImage: page.featuredImage ? {
-      url: page.featuredImage.node.sourceUrl,
-      width: 800,
-      height: 600,
+      url: page.featuredImage.node.mediaDetails?.sizes?.large?.sourceUrl || page.featuredImage.node.sourceUrl,
+      width: page.featuredImage.node.mediaDetails?.sizes?.large?.width || 800,
+      height: page.featuredImage.node.mediaDetails?.sizes?.large?.height || 600,
       alt: page.featuredImage.node.altText
     } : undefined,
     thumbnail: page.featuredImage ? {
-      url: page.featuredImage.node.sourceUrl.replace('/w=800&h=600&fit=crop', '/w=300&h=200&fit=crop'),
-      width: 300,
-      height: 200,
+      url: page.featuredImage.node.mediaDetails?.sizes?.thumbnail?.sourceUrl || page.featuredImage.node.sourceUrl,
+      width: page.featuredImage.node.mediaDetails?.sizes?.thumbnail?.width || 300,
+      height: page.featuredImage.node.mediaDetails?.sizes?.thumbnail?.height || 200,
       alt: page.featuredImage.node.altText
     } : undefined,
     meta: {
@@ -616,15 +751,15 @@ export async function getPageBySlug(slug: string): Promise<{
       excerpt: page.content ? page.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : '',
       url: `/${page.slug}`,
       featuredImage: page.featuredImage ? {
-        url: page.featuredImage.node.sourceUrl,
-        width: 800,
-        height: 600,
+        url: page.featuredImage.node.mediaDetails?.sizes?.large?.sourceUrl || page.featuredImage.node.sourceUrl,
+        width: page.featuredImage.node.mediaDetails?.sizes?.large?.width || 800,
+        height: page.featuredImage.node.mediaDetails?.sizes?.large?.height || 600,
         alt: page.featuredImage.node.altText
       } : undefined,
       thumbnail: page.featuredImage ? {
-        url: page.featuredImage.node.sourceUrl.replace('/w=800&h=600&fit=crop', '/w=300&h=200&fit=crop'),
-        width: 300,
-        height: 200,
+        url: page.featuredImage.node.mediaDetails?.sizes?.thumbnail?.sourceUrl || page.featuredImage.node.sourceUrl,
+        width: page.featuredImage.node.mediaDetails?.sizes?.thumbnail?.width || 300,
+        height: page.featuredImage.node.mediaDetails?.sizes?.thumbnail?.height || 200,
         alt: page.featuredImage.node.altText
       } : undefined,
       meta: {

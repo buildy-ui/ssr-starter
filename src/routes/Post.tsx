@@ -75,7 +75,14 @@ export default function Post() {
         <SEO title={post.title} description={post.excerpt} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: post.title }]} />
         {post.featuredImage?.url && (
-          <Image src={post.featuredImage.url} alt={post.featuredImage.alt} rounded={rounded.default} w="full" h="auto" fit="cover" />
+          <Image 
+            src={post.featuredImage.sizes?.large?.url || post.featuredImage.sizes?.full?.url || post.featuredImage.url} 
+            alt={post.featuredImage.alt} 
+            rounded={rounded.default} 
+            w="full" 
+            h="auto" 
+            fit="cover" 
+          />
         )}
 
         <Stack gap="md">
