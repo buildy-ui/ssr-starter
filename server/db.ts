@@ -36,6 +36,14 @@ function normalizePath(path: string) {
   return path.replace(/\/+$/, '') || '/';
 }
 
+function extractSlug(path: string, prefix: string) {
+  if (!path.startsWith(prefix)) return null;
+  const slug = path.slice(prefix.length);
+  return slug || null;
+}
+
+const BLOG_PAGE_SIZE = Number(process.env.BLOG_PAGE_SIZE ?? 3);
+
 function invalidateContextCaches() {
   renderContextCache = null;
   routeContextCache.clear();
@@ -224,9 +232,102 @@ export const dbOperations = {
     const cached = routeContextCache.get(normalized);
     if (cached) return cached;
 
-    const context = this.getRenderContext();
-    routeContextCache.set(normalized, context);
-    return context;
+    const full = this.getRenderContext();
+    const posts = full.posts.posts;
+
+    // Home
+    if (normalized === '/') {
+      const perPage = 8;
+      const slice = posts.slice(0, perPage);
+      const ctx: RenderContext = {
+        ...full,
+        posts: { posts: slice },
+        route: { type: 'home', perPage, totalPosts: posts.length },
+      };
+      routeContextCache.set(normalized, ctx);
+      return ctx;
+    }
+
+    // Blog with optional page
+    if (normalized === '/blog' || normalized.startsWith('/blog/')) {
+      const pageStr = normalized === '/blog' ? '1' : normalized.replace('/blog/', '');
+      const page = Math.max(1, Number(pageStr) || 1);
+      const perPage = BLOG_PAGE_SIZE;
+      const start = (page - 1) * perPage;
+      const pageItems = posts.slice(start, start + perPage);
+      const ctx: RenderContext = {
+        ...full,
+        posts: { posts: pageItems },
+        route: { type: 'blog', page, perPage, totalPosts: posts.length },
+      };
+      routeContextCache.set(normalized, ctx);
+      return ctx;
+    }
+
+    // Single post
+    if (normalized.startsWith('/posts/')) {
+      const slug = extractSlug(normalized, '/posts/');
+      const current = slug ? posts.find((p) => p.slug === slug) : undefined;
+      const related = posts.filter((p) => p.slug !== slug).slice(0, 4);
+      const ctx: RenderContext = {
+        ...full,
+        posts: { posts: current ? [current, ...related] : related },
+        route: { type: 'post', slug: slug ?? undefined, totalPosts: posts.length },
+      };
+      routeContextCache.set(normalized, ctx);
+      return ctx;
+    }
+
+    // Category
+    if (normalized.startsWith('/category/')) {
+      const slug = extractSlug(normalized, '/category/');
+      const filtered = slug ? posts.filter((p) => p.categories?.some((c) => c.slug === slug)) : [];
+      const ctx: RenderContext = {
+        ...full,
+        posts: { posts: filtered },
+        route: { type: 'category', categorySlug: slug ?? undefined, totalPosts: filtered.length },
+      };
+      routeContextCache.set(normalized, ctx);
+      return ctx;
+    }
+
+    // Tag
+    if (normalized.startsWith('/tag/')) {
+      const slug = extractSlug(normalized, '/tag/');
+      const filtered = slug ? posts.filter((p) => p.tags?.some((t) => t.slug === slug)) : [];
+      const ctx: RenderContext = {
+        ...full,
+        posts: { posts: filtered },
+        route: { type: 'tag', tagSlug: slug ?? undefined, totalPosts: filtered.length },
+      };
+      routeContextCache.set(normalized, ctx);
+      return ctx;
+    }
+
+    // Author
+    if (normalized.startsWith('/author/')) {
+      const slug = extractSlug(normalized, '/author/');
+      const filtered = slug ? posts.filter((p) => p.author?.slug === slug) : [];
+      const ctx: RenderContext = {
+        ...full,
+        posts: { posts: filtered },
+        route: { type: 'author', authorSlug: slug ?? undefined, totalPosts: filtered.length },
+      };
+      routeContextCache.set(normalized, ctx);
+      return ctx;
+    }
+
+    // Search keeps full dataset
+    if (normalized === '/search') {
+      const ctx: RenderContext = { ...full, route: { type: 'search', totalPosts: posts.length } };
+      routeContextCache.set(normalized, ctx);
+      return ctx;
+    }
+
+    // Default: full context
+    const ctx: RenderContext = { ...full, route: { type: 'other', totalPosts: posts.length } };
+    routeContextCache.set(normalized, ctx);
+    return ctx;
   },
 
   invalidateCaches() {

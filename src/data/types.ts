@@ -111,4 +111,14 @@ export interface RenderContext {
   assets: {
     s3AssetsUrl: string;
   };
+  route?: {
+    type: 'home' | 'blog' | 'post' | 'category' | 'tag' | 'author' | 'search' | 'other';
+    page?: number;
+    perPage?: number;
+    totalPosts?: number;
+    slug?: string;
+    categorySlug?: string;
+    tagSlug?: string;
+    authorSlug?: string;
+  };
 }

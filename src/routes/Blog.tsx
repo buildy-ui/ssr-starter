@@ -9,12 +9,16 @@ export default function Blog() {
   const { context } = useRenderContext()
   const { page } = useParams()
   const currentPage = Math.max(1, Number(page) || 1)
-  const perPage = 3
 
-  const postsData = context?.posts.posts || []
-  const totalPages = Math.max(1, Math.ceil(postsData.length / perPage))
-  const start = (currentPage - 1) * perPage
-  const pageItems = postsData.slice(start, start + perPage)
+  const perPage = context?.route?.perPage ?? 3
+  const totalPosts = context?.route?.totalPosts ?? (context?.posts.posts.length ?? 0)
+  const totalPages = Math.max(1, Math.ceil(totalPosts / perPage))
+
+  // For SSR we already slice posts per route; keep fallback for safety.
+  const pageItems = context?.route?.type === 'blog'
+    ? context.posts.posts
+    : context?.posts.posts.slice((currentPage - 1) * perPage, (currentPage - 1) * perPage + perPage) || []
+
   const hasPrev = currentPage > 1
   const hasNext = currentPage < totalPages
   const prevHref = currentPage === 2 ? '/blog' : `/blog/${currentPage - 1}`
