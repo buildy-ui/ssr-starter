@@ -332,9 +332,9 @@ function transformGraphQLPostToInternal(post: GraphQLPost): any {
       alt: post.featuredImage.node.altText
     } : null,
     thumbnail: post.featuredImage ? {
-      url: post.featuredImage.node.sourceUrl.replace('/w=800&h=600&fit=crop', '/w=300&h=200&fit=crop'),
-        width: 300,
-        height: 200,
+      url: post.featuredImage.node.sourceUrl,
+        width: 250,
+        height: 216,
       alt: post.featuredImage.node.altText
     } : null,
       meta: {

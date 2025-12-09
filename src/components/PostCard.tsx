@@ -13,15 +13,16 @@ export function PostCard({ post, media = 'default' }: { post: Post, media?: 'top
   return (
     <Card p={media === 'top' ? 'none' : 'lg'} rounded={rounded.default} shadow="md" bg="card" data-class="post-card">
       <Stack gap={media === 'top' ? 'none' : 'lg'}>
-        {post.featuredImage?.url && (
+        {post.thumbnail?.url && (
           <Link to={postPath(post.slug)}>
             <Image
-              src={post.featuredImage.url}
-              alt={post.featuredImage.alt}
+              src={post.thumbnail.url}
+              alt={post.thumbnail.alt}
               rounded={media === 'top' ? 'none' : rounded.default}
-              w="full"
-              h="auto"
+              width={post.thumbnail.width}
+              height={post.thumbnail.height}
               fit="cover"
+              aspect="16/9"
             />
           </Link>
         )}

@@ -73,6 +73,7 @@ export interface PostData {
     raw: string;
   };
   featuredImage?: ImageData;
+  thumbnail?: ImageData;
   categories: CategoryData[];
   tags: TagData[];
   author?: AuthorData;
