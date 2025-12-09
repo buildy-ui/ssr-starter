@@ -1,3 +1,4 @@
+// bun scripts/dump-graphql-media.ts
 import { writeFile } from 'fs/promises'
 
 // Minimal GraphQL query to inspect media sizes for posts.

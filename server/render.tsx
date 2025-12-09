@@ -4,7 +4,6 @@ import { StaticRouter } from 'react-router-dom/server';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '../src/providers/theme';
 import { RenderContextProvider } from '../src/providers/render-context';
-import { defaultRenderContext } from '../src/data';
 import type { RenderContext } from '../src/data/types';
 import { MainLayout } from '../src/layouts/MainLayout';
 import Home from '../src/routes/Home';
@@ -35,7 +34,7 @@ const serverTheme = {
   isNavFixed: true,
 };
 
-interface MetaPayload {
+export interface MetaPayload {
   title: string;
   description: string;
   canonical: string;
@@ -46,75 +45,6 @@ interface MetaPayload {
 function normalizePath(path: string) {
   return path.replace(/\/+$/, '') || '/';
 }
-
-/* function MainLayout({
-  children,
-  context,
-  sidebar = 'right',
-}: {
-  children: React.ReactNode;
-  context: RenderContext;
-  sidebar?: 'left' | 'right' | 'none';
-}) {
-  const { menu } = context;
-  return (
-    <>
-      <Block component="nav" py="xs" bg="background" data-class="nav-bar" borderBottom="1px" borderColor="border" shadow="lg">
-        <Container size="lg">
-          <Group justify="between" align="center">
-            <Group align="center" gap="md">
-              <a href="/">
-                <Title order={2} size="2xl" fw="bold" c="primary">UI8Kit</Title>
-              </a>
-              <Text size="sm" c="secondary-foreground">Design System</Text>
-            </Group>
-            <Group align="center" gap="sm">
-              <nav>
-                <Group align="center" gap="sm" data-class="nav">
-                  {menu.primary.items.map(item => (
-                    <a key={item.id} href={item.url}>
-                      <Text size="sm">{item.title}</Text>
-                    </a>
-                  ))}
-                </Group>
-              </nav>
-            </Group>
-          </Group>
-        </Container>
-      </Block>
-
-      <Block component="main" py="lg" data-class="main-page">
-        <Container size="lg">
-          {sidebar === 'none' ? (
-            <Stack gap="lg">
-              {children}
-            </Stack>
-          ) : (
-            <Group align="start" gap="lg">
-              <Stack style={{ flex: 3 }}>{children}</Stack>
-              <Stack style={{ flex: 1 }}>
-                <Text size="sm" c="secondary-foreground">Sidebar</Text>
-              </Stack>
-            </Group>
-          )}
-        </Container>
-      </Block>
-
-      <Block component="footer" py="md" borderTop="1px" borderColor="border" bg="card" data-class="site-footer">
-        <Container size="lg">
-          <Stack gap="lg" align="center">
-            <Text size="sm" c="secondary-foreground" ta="center">© 2025 UI8Kit Design System</Text>
-            <Group gap="md" justify="center">
-              <a href="/"><Text size="xs" c="secondary-foreground">Home</Text></a>
-              <a href="/blog"><Text size="xs" c="secondary-foreground">Blog</Text></a>
-              <a href="/about"><Text size="xs" c="secondary-foreground">About</Text></a>
-            </Group>
-          </Stack>
-        </Container>
-      </Block>
-    </>
-  );
-} */
 
 function AppRouter({ path, context }: { path: string; context: RenderContext }) {
   return (
