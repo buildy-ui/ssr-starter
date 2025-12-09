@@ -180,6 +180,9 @@ export const dbOperations = {
       pages: this.getPages(),
       site: this.getMeta('site', defaultRenderContext.site),
       menu: this.getMeta('menu', defaultRenderContext.menu),
+      assets: {
+        s3AssetsUrl: process.env.S3_ASSETS_URL!,
+      },
     };
   },
 };

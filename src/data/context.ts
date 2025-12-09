@@ -2,14 +2,16 @@ import { site, menu, page, posts as fallbackPosts } from './wpfasty/context';
 import type {
   RenderContext,
   PostData,
-  Feature,
-  HomeData,
-  AboutData,
   PageSummary,
   CategoryData,
   TagData,
   AuthorData,
 } from './types';
+
+const S3_ASSETS_URL = process.env.S3_ASSETS_URL;
+if (!S3_ASSETS_URL) {
+  throw new Error('S3_ASSETS_URL environment variable is required');
+}
 
 const mapLegacyPost = (source: any): PostData => ({
   id: source.id,
@@ -49,14 +51,6 @@ const mapLegacyPost = (source: any): PostData => ({
     : undefined,
 });
 
-const buildFeatures = (items: PostData[]): Feature[] =>
-  items.slice(0, 3).map((post) => ({
-    id: post.id,
-    title: post.title,
-    excerpt: post.excerpt,
-    featuredImage: post.featuredImage,
-  }));
-
 const fallbackPostsData = fallbackPosts.map(mapLegacyPost);
 const fallbackCategories: CategoryData[] = fallbackPostsData.flatMap((post) => post.categories).filter(Boolean);
 const fallbackTags: TagData[] = fallbackPostsData.flatMap((post) => post.tags).filter(Boolean);
@@ -78,25 +72,6 @@ const fallbackPages: PageSummary[] = [
   },
 ];
 
-const fallbackBlog = {
-  page: {
-    title: 'Blog',
-    excerpt: 'Latest posts and updates',
-    content: '',
-    slug: 'blog',
-  },
-};
-
-const fallbackAbout: AboutData = {
-  page: {
-    title: page.title,
-    excerpt: page.excerpt,
-    content: page.content,
-    slug: 'about',
-  },
-  features: [],
-};
-
 export const defaultRenderContext: RenderContext = {
   posts: { posts: fallbackPostsData },
   categories: fallbackCategories,
@@ -105,6 +80,9 @@ export const defaultRenderContext: RenderContext = {
   pages: fallbackPages,
   site,
   menu,
+  assets: {
+    s3AssetsUrl: S3_ASSETS_URL,
+  },
 };
 
 export type {

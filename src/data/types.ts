@@ -95,4 +95,7 @@ export interface RenderContext {
   pages: PageSummary[];
   site: WPFastyContext['site'];
   menu: WPFastyContext['menu'];
+  assets: {
+    s3AssetsUrl: string;
+  };
 }
