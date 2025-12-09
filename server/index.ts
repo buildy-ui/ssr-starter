@@ -3,8 +3,7 @@ import { html } from '@elysiajs/html';
 import { readFile } from 'fs/promises';
 import { extname } from 'path';
 import { renderPage } from './render';
-import { dbOperations } from './db';
-import { syncAllData } from './sync';
+import { getRouteContext, getBaseContext } from './sync';
 import { renderHtmlTemplate, STYLES_PATH } from './template';
 
 const PORT = Number(process.env.PORT ?? 3000);
@@ -58,28 +57,10 @@ const app = new Elysia()
       return new Response('Not found', { status: 404 });
     }
   })
-  .get('/api/posts', async ({ query }) => {
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
-
-    const allPosts = dbOperations.getPosts();
-    const start = (page - 1) * limit;
-    const end = start + limit;
-    const items = allPosts.slice(start, end);
-    const total = allPosts.length;
-    const hasMore = end < total;
-
-    return {
-      items,
-      page,
-      limit,
-      total,
-      hasMore
-    };
-  })
-
+  // Simple health endpoint (counts posts from cached context)
   .get('/health', async () => {
-    const posts = dbOperations.getPosts();
+    const base = await getBaseContext();
+    const posts = base.posts.posts;
     return {
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -91,7 +72,7 @@ const app = new Elysia()
     const path = url.pathname;
 
     try {
-      const context = dbOperations.getRouteContext(path);
+      const context = await getRouteContext(path);
       const { html, meta } = await renderPage(path, context);
       const body = renderHtmlTemplate({ html, meta, site: context.site, assets: context.assets });
       return body;
@@ -102,7 +83,7 @@ const app = new Elysia()
   });
 
 (async function bootstrap() {
-  await syncAllData();
+  await getBaseContext({ force: true }); // warm cache
   app.listen({ port: PORT });
   console.log(`🚀 SSR server running at http://localhost:${PORT}`);
 })();

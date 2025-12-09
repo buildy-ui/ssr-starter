@@ -1,8 +1,7 @@
 import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
-import { dbOperations } from '../server/db';
 import { renderPage } from '../server/render';
-import { syncAllData } from '../server/sync';
+import { fetchAllData, buildRenderContext, sliceRouteContext, collectRoutes, getBaseContext } from '../server/sync';
 import {
   ENTRY_CLIENT_MAP_PATH,
   ENTRY_CLIENT_PATH,
@@ -50,56 +49,34 @@ export class RouteToStatic {
       throw new Error('outputDir is required');
     }
 
-    if (cfg.syncBefore) {
-      try {
-        await syncAllData();
-      } catch (error) {
-        console.warn('⚠️  Sync before static generation failed, continuing with cached data.', error);
-      }
-    }
+    // Fetch fresh data from GraphQL (force) and build base context
+    const collections = cfg.syncBefore
+      ? await fetchAllData()
+      : await (async () => {
+          try {
+            return await fetchAllData();
+          } catch (error) {
+            console.warn('⚠️  Fetch before static generation failed, continuing with cached data if available.', error);
+            const cached = await getBaseContext().catch(() => null);
+            if (!cached) throw error;
+            return null;
+          }
+        })();
 
-    const context = await dbOperations.getRenderContext();
-    const routes = this.collectRoutes(context);
+    const baseContext = collections ? buildRenderContext(collections) : await getBaseContext();
+    const routes = collectRoutes(baseContext, this.config.blogPageSize ?? DEFAULT_CONFIG.blogPageSize ?? 3);
 
     this.prepareOutputDir(cfg.outputDir, cfg.cleanOutput ?? true);
 
     for (const route of routes) {
-      await this.renderAndWriteRoute(route, context, cfg.outputDir);
+      const routeContext = sliceRouteContext(route, baseContext);
+      await this.renderAndWriteRoute(route, routeContext, cfg.outputDir);
+      this.writeJsonSlice(route, routeContext);
     }
 
+    this.writeJsonSlice('full', baseContext);
     this.copyStaticAssets(cfg);
     console.log(`✅ Static HTML generated for ${routes.length} routes in ${resolve(cfg.outputDir)}`);
-  }
-
-  private collectRoutes(context: RenderContext): string[] {
-    const routes = new Set<string>([
-      '/',
-      '/about',
-      '/blog',
-      '/search',
-      '/categories',
-      '/tags',
-      '/authors',
-      '/test',
-    ]);
-
-    const posts = context.posts?.posts ?? [];
-    const categories = context.categories ?? [];
-    const tags = context.tags ?? [];
-    const authors = context.authors ?? [];
-
-    posts.forEach((p) => p?.slug && routes.add(`/posts/${p.slug}`));
-    categories.forEach((c) => c?.slug && routes.add(`/category/${c.slug}`));
-    tags.forEach((t) => t?.slug && routes.add(`/tag/${t.slug}`));
-    authors.forEach((a) => a?.slug && routes.add(`/author/${a.slug}`));
-
-    const perPage = Math.max(1, this.config.blogPageSize ?? DEFAULT_CONFIG.blogPageSize ?? 3);
-    const totalPages = Math.max(1, Math.ceil(posts.length / perPage));
-    for (let page = 2; page <= totalPages; page += 1) {
-      routes.add(`/blog/${page}`);
-    }
-
-    return Array.from(routes).sort();
   }
 
   private prepareOutputDir(outputDir: string, clean: boolean) {
@@ -132,6 +109,20 @@ export class RouteToStatic {
     }
     const clean = normalized.startsWith('/') ? normalized.slice(1) : normalized;
     return join(outputDir, clean, 'index.html');
+  }
+
+  private routeToJsonPath(route: string): string {
+    const baseDir = resolve('./src/data/json');
+    const normalized = route === '/' ? 'index' : route.replace(/^\//, '');
+    const target = route === 'full' ? 'full' : normalized;
+    return join(baseDir, `${target}.json`);
+  }
+
+  private writeJsonSlice(route: string, context: RenderContext) {
+    const jsonPath = this.routeToJsonPath(route);
+    mkdirSync(dirname(jsonPath), { recursive: true });
+    writeFileSync(jsonPath, JSON.stringify(context, null, 2), 'utf8');
+    console.log(`📝 JSON slice for ${route} -> ${jsonPath}`);
   }
 
   private copyStaticAssets(cfg: RouteToStaticConfig) {
