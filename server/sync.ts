@@ -13,22 +13,47 @@ async function graphqlQuery<T>(query: string, variables?: Record<string, any>): 
     throw new Error('GRAPHQL_ENDPOINT is not configured');
   }
 
-  const response = await fetch(GRAPHQL_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables }),
-  });
+  try {
+    const response = await fetch(GRAPHQL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+      // Добавляем verbose для детальной информации об ошибках
+      verbose: true
+    });
 
-  if (!response.ok) {
-    throw new Error(`GraphQL error ${response.status}: ${await response.text()}`);
+    if (!response.ok) {
+      throw new Error(`GraphQL error ${response.status}: ${await response.text()}`);
+    }
+
+    const payload = await response.json();
+    if (payload.errors) {
+      throw new Error(JSON.stringify(payload.errors));
+    }
+
+    return payload.data;
+  } catch (error) {
+    console.error('Ошибка подключения к GraphQL:', error);
+    // Если произошла ошибка, возвращаем данные из локальной БД
+    return getDataFromLocalDB(query);
   }
+}
 
-  const payload = await response.json();
-  if (payload.errors) {
-    throw new Error(JSON.stringify(payload.errors));
+async function getDataFromLocalDB(queryType: string): Promise<any> {
+  switch (queryType) {
+    case QUERIES.posts:
+      return dbOperations.getPosts();
+    case QUERIES.categories:
+      return dbOperations.getCategories();
+    case QUERIES.tags:
+      return dbOperations.getTags();
+    case QUERIES.users:
+        return dbOperations.getAuthors();
+    case QUERIES.pages:
+      return dbOperations.getPages();
+    default:
+      throw new Error('Неизвестный тип запроса');
   }
-
-  return payload.data;
 }
 
 const QUERIES = {
@@ -272,39 +297,45 @@ export async function syncAllData() {
 
   console.log('🔄 Syncing data from WordPress GraphQL...');
 
-  const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
-    graphqlQuery<{ posts: { nodes: any[] } }>(QUERIES.posts),
-    graphqlQuery<{ categories: { nodes: any[] } }>(QUERIES.categories),
-    graphqlQuery<{ tags: { nodes: any[] } }>(QUERIES.tags),
-    graphqlQuery<{ users: { nodes: any[] } }>(QUERIES.users),
-    graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages),
-  ]);
+  try {
+    const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
+      graphqlQuery<{ posts: { nodes: any[] } }>(QUERIES.posts),
+      graphqlQuery<{ categories: { nodes: any[] } }>(QUERIES.categories),
+      graphqlQuery<{ tags: { nodes: any[] } }>(QUERIES.tags),
+      graphqlQuery<{ users: { nodes: any[] } }>(QUERIES.users),
+      graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages)
+    ]);
 
-  const posts = (postsResult.posts.nodes || []).map(mapPost);
-  const categories: CategoryData[] = (categoriesResult.categories.nodes || []).map((cat: any) => ({
-    id: cat.categoryId,
-    name: cat.name,
-    slug: cat.slug,
-    description: cat.description,
-    count: cat.count,
-  }));
-  const tags: TagData[] = (tagsResult.tags.nodes || []).map((tag: any) => ({
-    id: tag.tagId,
-    name: tag.name,
-    slug: tag.slug,
-    count: tag.count,
-  }));
-  const authors = deriveAuthors(posts);
-  const pages = buildPageSummaries(pagesResult.pages.nodes || []);
+    // Обработка данных остается без изменений
+    const posts = (postsResult.posts.nodes || []).map(mapPost);
+    const categories: CategoryData[] = (categoriesResult.categories.nodes || []).map((cat: any) => ({
+      id: cat.categoryId,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+      count: cat.count,
+    }));
+    const tags: TagData[] = (tagsResult.tags.nodes || []).map((tag: any) => ({
+      id: tag.tagId,
+      name: tag.name,
+      slug: tag.slug,
+      count: tag.count,
+    }));
+    const authors = deriveAuthors(posts);
+    const pages = buildPageSummaries(pagesResult.pages.nodes || []);
 
-  dbOperations.savePosts(posts);
-  dbOperations.saveCategories(categories);
-  dbOperations.saveTags(tags);
-  dbOperations.saveAuthors(authors);
-  dbOperations.savePages(pages);
+    // Сохранение в локальную БД
+    dbOperations.savePosts(posts);
+    dbOperations.saveCategories(categories);
+    dbOperations.saveTags(tags);
+    dbOperations.saveAuthors(authors);
+    dbOperations.savePages(pages);
 
-  dbOperations.saveMeta('site', defaultRenderContext.site);
-  dbOperations.saveMeta('menu', defaultRenderContext.menu);
+    dbOperations.saveMeta('site', defaultRenderContext.site);
+    dbOperations.saveMeta('menu', defaultRenderContext.menu);
 
-  console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
+    console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
+  } catch (error) {
+    console.error('Ошибка синхронизации данных:', error);
+  }
 }
