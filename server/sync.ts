@@ -18,7 +18,6 @@ async function graphqlQuery<T>(query: string, variables?: Record<string, any>): 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, variables }),
-      // aded verbose detail errors
       verbose: true
     });
 
@@ -33,26 +32,28 @@ async function graphqlQuery<T>(query: string, variables?: Record<string, any>): 
 
     return payload.data;
   } catch (error) {
-    console.error('Ошибка подключения к GraphQL:', error);
-    // LmDB
+    console.error('Error connect to GraphQL:', error);
     return getDataFromLocalDB(query);
   }
 }
 
-async function getDataFromLocalDB(queryType: string): Promise<any> {
-  switch (queryType) {
-    case QUERIES.posts:
-      return dbOperations.getPosts();
-    case QUERIES.categories:
-      return dbOperations.getCategories();
-    case QUERIES.tags:
-      return dbOperations.getTags();
-    case QUERIES.users:
-        return dbOperations.getAuthors();
-    case QUERIES.pages:
-      return dbOperations.getPages();
-    default:
-      throw new Error('Неизвестный тип запроса');
+async function getDataFromLocalDB(): Promise<DataCollections> {
+  try {
+    const posts = await dbOperations.getPosts();
+    const categories = await dbOperations.getCategories();
+    const tags = await dbOperations.getTags();
+    const authors = await dbOperations.getAuthors();
+    const pages = await dbOperations.getPages();
+
+    // Добавляем проверку на наличие данных
+    if (!posts || !categories || !tags || !authors || !pages) {
+      throw new Error('Неполные данные в локальной БД');
+    }
+
+    return { posts, categories, tags, authors, pages };
+  } catch (error) {
+    console.error('Ошибка при чтении из локальной БД:', error);
+    throw error;
   }
 }
 
@@ -357,34 +358,39 @@ export async function fetchAllData(): Promise<DataCollections> {
 
   console.log('🔄 Fetching data from WordPress GraphQL...');
 
-  const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
-    graphqlQuery<{ posts: { nodes: any[] } }>(QUERIES.posts),
-    graphqlQuery<{ categories: { nodes: any[] } }>(QUERIES.categories),
-    graphqlQuery<{ tags: { nodes: any[] } }>(QUERIES.tags),
-    graphqlQuery<{ users: { nodes: any[] } }>(QUERIES.users),
-    graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages),
-  ]);
+  try {
+    const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
+      graphqlQuery<{ posts: { nodes: any[] } }>(QUERIES.posts),
+      graphqlQuery<{ categories: { nodes: any[] } }>(QUERIES.categories),
+      graphqlQuery<{ tags: { nodes: any[] } }>(QUERIES.tags),
+      graphqlQuery<{ users: { nodes: any[] } }>(QUERIES.users),
+      graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages)
+    ]);
+    
+    const posts = (postsResult?.posts?.nodes || []).map(mapPost);
+    const categories: CategoryData[] = (categoriesResult?.categories?.nodes || []).map((cat: any) => ({
+      id: cat.categoryId,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+      count: cat.count,
+    }));
+    const tags: TagData[] = (tagsResult?.tags?.nodes || []).map((tag: any) => ({
+      id: tag.tagId,
+      name: tag.name,
+      slug: tag.slug,
+      count: tag.count,
+    }));
+    const authors = deriveAuthors(posts);
+    const pages = buildPageSummaries(pagesResult?.pages?.nodes || []);
 
-  const posts = (postsResult.posts.nodes || []).map(mapPost);
-  const categories: CategoryData[] = (categoriesResult.categories.nodes || []).map((cat: any) => ({
-    id: cat.categoryId,
-    name: cat.name,
-    slug: cat.slug,
-    description: cat.description,
-    count: cat.count,
-  }));
-  const tags: TagData[] = (tagsResult.tags.nodes || []).map((tag: any) => ({
-    id: tag.tagId,
-    name: tag.name,
-    slug: tag.slug,
-    count: tag.count,
-  }));
-  const authors = deriveAuthors(posts);
-  const pages = buildPageSummaries(pagesResult.pages.nodes || []);
+    console.log(`✅ Fetched ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
 
-  console.log(`✅ Fetched ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
-
-  return { posts, categories, tags, authors, pages };
+    return { posts, categories, tags, authors, pages };
+  } catch (error) {
+    console.error('Error connect to LmDB:', error);
+    return getDataFromLocalDB();
+  }
 }
 
 export function buildRenderContext(collections: DataCollections): RenderContext {
@@ -408,12 +414,35 @@ let cached: { context: RenderContext; collections: DataCollections; ts: number }
 export async function getBaseContext(options?: { force?: boolean }): Promise<RenderContext> {
   const now = Date.now();
   const valid = cached && !options?.force && now - cached.ts < CACHE_TTL_MS;
-  if (valid && cached) return cached.context;
-
-  const collections = await fetchAllData();
-  const context = buildRenderContext(collections);
-  cached = { context, collections, ts: now };
-  return context;
+  
+  try {
+    if (valid && cached) {
+      return cached.context;
+    }
+    
+    try {
+      const collections = await fetchAllData();
+      const context = buildRenderContext(collections);
+      cached = { context, collections, ts: now };
+      return context;
+    } catch (error) {
+      console.error('Ошибка при получении данных из GraphQL:', error);
+      
+      try {
+        console.log('Попытка получить данные из локальной базы данных...');
+        const localCollections = await getDataFromLocalDB();
+        const context = buildRenderContext(localCollections);
+        cached = { context, collections: localCollections, ts: now };
+        return context;
+      } catch (localError) {
+        console.error('Ошибка при получении данных из локальной БД:', localError);
+        throw new Error('Не удалось получить данные ни из GraphQL, ни из локальной БД');
+      }
+    }
+  } catch (error) {
+    console.error('Критическая ошибка в getBaseContext:', error);
+    throw error;
+  }
 }
 
 function normalizePath(path: string) {
