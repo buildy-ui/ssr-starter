@@ -76,222 +76,63 @@ initializeDatabase()
 
 ## 🎨 Step 2: Building Your First Admin Interface
 
-### Basic Admin Layout
+### Use the built-in SSR Admin (`/admin`)
 
-Let's create a simple task management admin interface:
+SSR-Starter now ships with a **server-rendered** CMS admin panel:
+
+- Open: `/admin`
+- It works **without React hydration** (no client JS required for CRUD).
+- It uses only the local UI kit primitives from `src/components/ui8kit.ts`.
+- All CRUD actions are done via standard HTML forms (POST + redirect), so it stays offline-friendly.
+
+#### Storage priority (LMDB → JsonDB)
+
+Admin reads and writes follow this priority:
+
+- **Read**: try `MAINDB` first; if it fails or has no collections, fall back to `BACKUPDB`.
+- **Write**: try `MAINDB` first; if it fails, fall back to `BACKUPDB`.
+- **Write-through**: after a successful write, the server best-effort mirrors the same operation to the other adapter.
+
+Recommended offline env:
+
+```bash
+export MAINDB=LMDB
+export BACKUPDB=JsonDB
+```
+
+#### Admin actions (server routes)
+
+These are the endpoints used by the `/admin` page:
+
+- `POST /admin/actions/collection/create` (`name`)
+- `POST /admin/actions/collection/drop` (`name`)
+- `POST /admin/actions/document/create` (`collection`, `json`)
+- `POST /admin/actions/document/update` (`collection`, `id`, `json`)
+- `POST /admin/actions/document/delete` (`collection`, `id`)
+
+#### Form building with UI8Kit primitives
+
+The inputs are built using `Block`/`Box` polymorphism (see `docs/guides/create-form.md`):
 
 ```tsx
-// src/routes/TaskAdmin.tsx
-import React, { useState, useEffect } from 'react'
-import {
-  Block, Stack, Title, Text, Grid, Group, Button, Card, CardHeader, CardContent,
-  Input, Textarea, Select, Badge, Table, TableHeader, TableBody, TableRow, TableCell
-} from '@ui8kit/core'
-import { Plus, Edit, Trash2, CheckCircle, Circle } from 'lucide-react'
-import { FlexibleLmdbAdapter } from '../../server/storage/adapter.flexible.lmdb'
+import { Block, Box, Button } from '@/components/ui8kit'
 
-export default function TaskAdmin() {
-  const [adapter] = useState(() => new FlexibleLmdbAdapter('./data/tasks-db'))
-  const [tasks, setTasks] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    loadTasks()
-  }, [])
-
-  const loadTasks = async () => {
-    try {
-      const allTasks = await adapter.find('tasks', {}, { sort: { createdAt: -1 } })
-      setTasks(allTasks)
-    } catch (error) {
-      console.error('Failed to load tasks:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const toggleTask = async (taskId, completed) => {
-    await adapter.update('tasks', { _id: taskId }, { completed: !completed })
-    await loadTasks()
-  }
-
-  const deleteTask = async (taskId) => {
-    if (confirm('Delete this task?')) {
-      await adapter.delete('tasks', { _id: taskId })
-      await loadTasks()
-    }
-  }
-
-  if (loading) {
-    return (
-      <Block component="main" py="lg">
-        <Stack gap="lg" align="center">
-          <Title order={1} size="2xl">Loading Tasks...</Title>
-          <Text>Setting up your offline task manager</Text>
-        </Stack>
-      </Block>
-    )
-  }
-
+export function CreateCollectionForm() {
   return (
-    <Block component="main" py="lg">
-      <Stack gap="lg">
-        <Group justify="between" align="center">
-          <Title order={1} size="2xl">Task Manager</Title>
-          <Badge variant="secondary">{tasks.length} Tasks</Badge>
-        </Group>
-
-        <Group gap="sm">
-          <CreateTaskForm adapter={adapter} onTaskCreated={loadTasks} />
-        </Group>
-
-        <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableCell>Status</TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell>Priority</TableCell>
-                <TableCell>Created</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tasks.map(task => (
-                <TableRow key={task._id}>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleTask(task._id, task.completed)}
-                    >
-                      {task.completed ? (
-                        <CheckCircle className="text-green-500" size={20} />
-                      ) : (
-                        <Circle size={20} />
-                      )}
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Stack gap="sm">
-                      <Text className={task.completed ? 'line-through text-muted-foreground' : 'font-medium'}>
-                        {task.title}
-                      </Text>
-                      {task.description && (
-                        <Text className="text-sm text-muted-foreground">
-                          {task.description}
-                        </Text>
-                      )}
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={
-                      task.priority === 'high' ? 'destructive' :
-                      task.priority === 'medium' ? 'default' : 'secondary'
-                    }>
-                      {task.priority}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(task.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Group gap="sm">
-                      <Button variant="outline" size="sm">
-                        <Edit size={14} />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteTask(task._id)}
-                      >
-                        <Trash2 size={14} />
-                      </Button>
-                    </Group>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
-      </Stack>
+    <Block component="form" method="post" action="/admin/actions/collection/create" className="space-y-3">
+      <Box
+        component="input"
+        name="name"
+        placeholder="tasks"
+        w="full"
+        p="md"
+        rounded="md"
+        border="1px"
+        borderColor="border"
+        bg="background"
+      />
+      <Button type="submit">Create</Button>
     </Block>
-  )
-}
-
-// Task creation form component
-function CreateTaskForm({ adapter, onTaskCreated }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    priority: 'medium'
-  })
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    if (!formData.title.trim()) return
-
-    await adapter.insert('tasks', formData)
-
-    setFormData({ title: '', description: '', priority: 'medium' })
-    setIsOpen(false)
-    onTaskCreated()
-  }
-
-  if (!isOpen) {
-    return (
-      <Button onClick={() => setIsOpen(true)}>
-        <Plus size={16} />
-        Add Task
-      </Button>
-    )
-  }
-
-  return (
-    <Card className="w-96">
-      <CardHeader>
-        <Title order={3} size="lg">Create New Task</Title>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit}>
-          <Stack gap="md">
-            <Input
-              placeholder="Task title"
-              value={formData.title}
-              onChange={(e) => setFormData({...formData, title: e.target.value})}
-              required
-            />
-
-            <Textarea
-              placeholder="Task description (optional)"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              rows={3}
-            />
-
-            <Select
-              value={formData.priority}
-              onValueChange={(value) => setFormData({...formData, priority: value})}
-            >
-              <option value="low">Low Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="high">High Priority</option>
-            </Select>
-
-            <Group justify="end" gap="sm">
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">
-                Create Task
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-      </CardContent>
-    </Card>
   )
 }
 ```

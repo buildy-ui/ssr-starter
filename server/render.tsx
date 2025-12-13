@@ -18,6 +18,7 @@ import Categories from '../src/routes/Categories';
 import Tags from '../src/routes/Tags';
 import Search from '../src/routes/Search';
 import Test from '../src/routes/Test';
+import Admin from '../src/routes/Admin';
 import NotFound from '../src/exceptions/NotFound';
 
 const serverTheme = {
@@ -43,7 +44,8 @@ export interface MetaPayload {
 }
 
 function normalizePath(path: string) {
-  return path.replace(/\/+$/, '') || '/';
+  const pathname = path.split('?')[0] || '/';
+  return pathname.replace(/\/+$/, '') || '/';
 }
 
 function AppRouter({ path, context }: { path: string; context: RenderContext }) {
@@ -65,6 +67,7 @@ function AppRouter({ path, context }: { path: string; context: RenderContext }) 
             <Route path="/author/:slug" element={<MainLayout context={context}><Author /></MainLayout>} />
             <Route path="/posts/:slug" element={<MainLayout context={context}><Post /></MainLayout>} />
             <Route path="/test" element={<MainLayout context={context} sidebar="none"><Test /></MainLayout>} />
+            <Route path="/admin" element={<MainLayout context={context} sidebar="none"><Admin /></MainLayout>} />
             <Route path="*" element={<MainLayout context={context} sidebar="none"><NotFound /></MainLayout>} />
           </Routes>
         </StaticRouter>

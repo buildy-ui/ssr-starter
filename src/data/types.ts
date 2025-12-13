@@ -111,6 +111,7 @@ export interface RenderContext {
   assets: {
     s3AssetsUrl: string;
   };
+  admin?: AdminContext;
   route?: {
     type: 'home' | 'blog' | 'post' | 'category' | 'tag' | 'author' | 'search' | 'other';
     page?: number;
@@ -121,4 +122,24 @@ export interface RenderContext {
     tagSlug?: string;
     authorSlug?: string;
   };
+}
+
+export type AdminView = 'collections' | 'documents' | 'stats';
+
+export interface AdminContext {
+  view: AdminView;
+  source: 'MAINDB' | 'BACKUPDB' | 'none';
+  collections: string[];
+  currentCollection?: string;
+  documents: any[];
+  selectedDocument?: any | null;
+  stats?: {
+    collections: number;
+    documents: number;
+    indexes: number;
+    size: number;
+    lastModified: string;
+  };
+  notice?: string;
+  error?: string;
 }

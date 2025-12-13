@@ -5,9 +5,33 @@ import { extname } from 'path';
 import { renderPage } from './render';
 import { renderHtmlTemplate, STYLES_PATH } from './template';
 import { getBaseContext, getRouteContext, syncAllData } from './sync';
+import { buildAdminContext } from './admin/context';
+import { ensureCollection, insertJsonDocument, updateJsonDocument, deleteDocument, dropCollection } from './admin/storage';
 
 const PORT = Number(process.env.PORT ?? 3000);
 const SYNC_ON_BOOT = String(process.env.SYNC_ON_BOOT ?? 'true').toLowerCase() !== 'false';
+
+async function readFormFields(request: Request): Promise<Record<string, string>> {
+  const contentType = request.headers.get('content-type') || '';
+
+  // Prefer formData when available (multipart/form-data)
+  if (contentType.includes('multipart/form-data')) {
+    const fd = await request.formData();
+    const out: Record<string, string> = {};
+    for (const [k, v] of fd.entries()) out[k] = typeof v === 'string' ? v : v.name;
+    return out;
+  }
+
+  const text = await request.text();
+  const params = new URLSearchParams(text);
+  const out: Record<string, string> = {};
+  for (const [k, v] of params.entries()) out[k] = v;
+  return out;
+}
+
+function redirect(location: string) {
+  return new Response(null, { status: 303, headers: { location } });
+}
 
 const app = new Elysia()
   .use(html())
@@ -88,13 +112,92 @@ const app = new Elysia()
       posts: posts.length,
     };
   })
+
+  // Admin actions (SSR-friendly, no client JS required)
+  .post('/admin/actions/collection/create', async ({ request }) => {
+    const fields = await readFormFields(request);
+    const name = (fields.name || '').trim();
+    if (!name) return redirect('/admin?view=collections&error=Missing%20collection%20name');
+
+    try {
+      await ensureCollection(name);
+      return redirect(`/admin?view=collections&notice=${encodeURIComponent(`Collection "${name}" created`)}`);
+    } catch (e) {
+      console.error('Create collection failed:', e);
+      return redirect(`/admin?view=collections&error=${encodeURIComponent('Create collection failed')}`);
+    }
+  })
+  .post('/admin/actions/collection/drop', async ({ request }) => {
+    const fields = await readFormFields(request);
+    const name = (fields.name || '').trim();
+    if (!name) return redirect('/admin?view=collections&error=Missing%20collection%20name');
+
+    try {
+      await dropCollection(name);
+      return redirect(`/admin?view=collections&notice=${encodeURIComponent(`Collection "${name}" dropped`)}`);
+    } catch (e) {
+      console.error('Drop collection failed:', e);
+      return redirect(`/admin?view=collections&error=${encodeURIComponent('Drop collection failed')}`);
+    }
+  })
+  .post('/admin/actions/document/create', async ({ request }) => {
+    const fields = await readFormFields(request);
+    const collection = (fields.collection || '').trim();
+    const json = (fields.json || '').trim();
+    if (!collection || !json) return redirect('/admin?view=documents&error=Missing%20collection%20or%20json');
+
+    try {
+      const { id } = await insertJsonDocument({ collection, json });
+      return redirect(`/admin?view=documents&collection=${encodeURIComponent(collection)}&notice=${encodeURIComponent(`Document ${id} created`)}`);
+    } catch (e) {
+      console.error('Create document failed:', e);
+      return redirect(`/admin?view=documents&collection=${encodeURIComponent(collection)}&error=${encodeURIComponent('Create document failed (invalid JSON?)')}`);
+    }
+  })
+  .post('/admin/actions/document/update', async ({ request }) => {
+    const fields = await readFormFields(request);
+    const collection = (fields.collection || '').trim();
+    const id = (fields.id || '').trim();
+    const json = (fields.json || '').trim();
+    if (!collection || !id || !json) return redirect('/admin?view=documents&error=Missing%20collection%2Fid%2Fjson');
+
+    try {
+      await updateJsonDocument({ collection, id, json });
+      return redirect(`/admin?view=documents&collection=${encodeURIComponent(collection)}&edit=${encodeURIComponent(id)}&notice=${encodeURIComponent(`Document ${id} updated`)}`);
+    } catch (e) {
+      console.error('Update document failed:', e);
+      return redirect(`/admin?view=documents&collection=${encodeURIComponent(collection)}&edit=${encodeURIComponent(id)}&error=${encodeURIComponent('Update failed (invalid JSON?)')}`);
+    }
+  })
+  .post('/admin/actions/document/delete', async ({ request }) => {
+    const fields = await readFormFields(request);
+    const collection = (fields.collection || '').trim();
+    const id = (fields.id || '').trim();
+    if (!collection || !id) return redirect('/admin?view=documents&error=Missing%20collection%2Fid');
+
+    try {
+      await deleteDocument({ collection, id });
+      return redirect(`/admin?view=documents&collection=${encodeURIComponent(collection)}&notice=${encodeURIComponent(`Document ${id} deleted`)}`);
+    } catch (e) {
+      console.error('Delete document failed:', e);
+      return redirect(`/admin?view=documents&collection=${encodeURIComponent(collection)}&error=${encodeURIComponent('Delete failed')}`);
+    }
+  })
+
   .get('*', async ({ request }) => {
     const url = new URL(request.url);
     const path = url.pathname;
+    const location = `${url.pathname}${url.search}`;
 
     try {
       const context = await getRouteContext(path);
-      const { html, meta } = await renderPage(path, context);
+
+      // Attach admin context only for /admin
+      if (path === '/admin') {
+        context.admin = await buildAdminContext({ searchParams: url.searchParams });
+      }
+
+      const { html, meta } = await renderPage(location, context);
       const body = renderHtmlTemplate({ html, meta, site: context.site, assets: context.assets });
       return body;
     } catch (error) {

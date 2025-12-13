@@ -2,6 +2,7 @@ import { LmdbAdapter } from './adapter.lmdb';
 import { JsonAdapter } from './adapter.json';
 import { GraphQLAdapter } from './adapter.graphql';
 import { FlexibleLmdbAdapter } from './adapter.flexible.lmdb';
+import { FlexibleJsonAdapter } from './adapter.flexible.json';
 import type { StorageAdapter, FlexibleStorageAdapter } from './types';
 
 type AdapterName = 'LMDB' | 'IndexedDB' | 'ContextDB' | 'FALSE' | 'JsonDB';
@@ -29,9 +30,11 @@ function buildFlexibleAdapter(name?: string): FlexibleStorageAdapter | null {
   switch (upper) {
     case 'LMDB':
       return new FlexibleLmdbAdapter();
+    case 'INDEXEDDB':
+    case 'CONTEXTDB':
     case 'JSONDB':
-      // Use JSON adapter wrapped in flexible interface
-      return new FlexibleLmdbAdapter('./data/json-flexible-db');
+      // For server-side offline mode we map IndexedDB/ContextDB/JsonDB to JSON file persistence.
+      return new FlexibleJsonAdapter();
     default:
       return null;
   }
@@ -66,5 +69,12 @@ export function getFlexibleAdapters() {
   return { main, backup };
 }
 
-export { LmdbAdapter, JsonAdapter, GraphQLAdapter, FlexibleLmdbAdapter };
+// Local-only flexible adapters (no GraphQL wrapper). Useful for admin/offline CMS pages and actions.
+export function getLocalFlexibleAdapters() {
+  const main = buildFlexibleAdapter(process.env.MAINDB);
+  const backup = buildFlexibleAdapter(process.env.BACKUPDB);
+  return { main, backup };
+}
+
+export { LmdbAdapter, JsonAdapter, GraphQLAdapter, FlexibleLmdbAdapter, FlexibleJsonAdapter };
 
