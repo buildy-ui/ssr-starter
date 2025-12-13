@@ -5,6 +5,7 @@
 - [Quick Start](getting-started/quick-start.md)
 - [Installation](getting-started/installation.md)
 - [Project Structure](getting-started/project-structure.md)
+- [Offline Mode Testing](.project/test-offline-mode.md)
 
 ## Guides
 - [Offline CMS Development 101](guides/offline-cms-101.md)
