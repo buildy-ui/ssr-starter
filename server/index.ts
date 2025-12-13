@@ -7,6 +7,7 @@ import { renderHtmlTemplate, STYLES_PATH } from './template';
 import { getBaseContext, getRouteContext, syncAllData } from './sync';
 
 const PORT = Number(process.env.PORT ?? 3000);
+const SYNC_ON_BOOT = String(process.env.SYNC_ON_BOOT ?? 'true').toLowerCase() !== 'false';
 
 const app = new Elysia()
   .use(html())
@@ -104,7 +105,11 @@ const app = new Elysia()
 
 (async function bootstrap() {
   // Warm cache and persist to adapters if configured
-  await syncAllData().catch((error) => console.warn('Sync on bootstrap failed:', error));
+  if (SYNC_ON_BOOT) {
+    await syncAllData().catch((error) => console.warn('Sync on bootstrap failed:', error));
+  } else {
+    console.log('⏭️  SYNC_ON_BOOT=false: skipping initial GraphQL sync');
+  }
   await getBaseContext().catch((error) => console.warn('Warm cache failed:', error));
   app.listen({ port: PORT });
   console.log(`🚀 SSR server running at http://localhost:${PORT}`);

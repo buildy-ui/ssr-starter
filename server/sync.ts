@@ -33,26 +33,72 @@ async function graphqlQuery<T>(query: string, variables?: Record<string, any>): 
     return payload.data;
   } catch (error) {
     console.error('Error connect to GraphQL:', error);
-    // Fallback to adapters data if available
-    const fallback = await getDataFromAdapters().catch(() => null);
-    if (!fallback) {
-      throw error;
-    }
-    // graphqlQuery is generic; here we just return the fallback as-is
-    return fallback as unknown as T;
+    // IMPORTANT:
+    // Do NOT fallback to adapters here because graphqlQuery<T> is used for *typed* per-query payloads
+    // (e.g. { posts: { nodes } }). Returning DataCollections here corrupts the control flow and can
+    // lead to overwriting MAINDB/BACKUPDB with empty arrays when offline.
+    throw error;
   }
 }
 
 async function getDataFromAdapters(): Promise<DataCollections> {
   const { main, backup } = getAdapters();
-  const tryAdapters = [main, backup].filter(Boolean) as NonNullable<typeof main>[];
-  for (const adapter of tryAdapters) {
+
+  const countContent = (data: DataCollections | null | undefined) =>
+    (data?.posts?.length ?? 0) +
+    (data?.categories?.length ?? 0) +
+    (data?.tags?.length ?? 0) +
+    (data?.authors?.length ?? 0) +
+    (data?.pages?.length ?? 0);
+
+  const countSummary = (data: DataCollections | null | undefined) => ({
+    posts: data?.posts?.length ?? 0,
+    categories: data?.categories?.length ?? 0,
+    tags: data?.tags?.length ?? 0,
+    authors: data?.authors?.length ?? 0,
+    pages: data?.pages?.length ?? 0,
+  });
+
+  // Prefer MAINDB if it has content; otherwise fall back to BACKUPDB if it has content.
+  // If both exist but are empty, return MAINDB (or BACKUPDB) as a last resort to allow boot.
+  let mainEmpty: DataCollections | null = null;
+  let backupEmpty: DataCollections | null = null;
+
+  if (main) {
     try {
-      const data = await adapter.getAll();
-      if (data?.posts?.length) return data;
+      const data = await main.getAll();
+      if (countContent(data) > 0) {
+        lastDataSource = `MAINDB:${main.name}`;
+        return data;
+      }
+      mainEmpty = data;
     } catch (error) {
-      console.warn(`Adapter ${adapter.name} failed to read:`, error);
+      console.warn(`Adapter ${main.name} failed to read:`, error);
     }
+  }
+
+  if (backup) {
+    try {
+      const data = await backup.getAll();
+      if (countContent(data) > 0) {
+        lastDataSource = `BACKUPDB:${backup.name}`;
+        return data;
+      }
+      backupEmpty = data;
+    } catch (error) {
+      console.warn(`Adapter ${backup.name} failed to read:`, error);
+    }
+  }
+
+  if (mainEmpty) {
+    lastDataSource = main ? `MAINDB:${main.name}` : 'MAINDB:unknown';
+    console.warn('⚠️  MAINDB loaded but appears empty:', countSummary(mainEmpty));
+    return mainEmpty;
+  }
+  if (backupEmpty) {
+    lastDataSource = backup ? `BACKUPDB:${backup.name}` : 'BACKUPDB:unknown';
+    console.warn('⚠️  BACKUPDB loaded but appears empty:', countSummary(backupEmpty));
+    return backupEmpty;
   }
   throw new Error('No adapter data available');
 }
@@ -346,7 +392,8 @@ export async function syncAllData() {
 
     console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
   } catch (error) {
-    console.error('Ошибка синхронизации данных:', error);
+    // When offline / GraphQL is down: NEVER overwrite adapters with empty data.
+    console.error('Ошибка синхронизации данных (данные не сохранены):', error);
   }
 }
 
@@ -406,11 +453,18 @@ export async function fetchAllData(): Promise<DataCollections> {
       menu: defaultRenderContext.menu,
     };
 
-    // Persist to adapters
+    // Persist to adapters only when GraphQL fetch succeeded (we are in the try{} branch)
     const { main, backup } = getAdapters();
-    if (main) await main.saveAll(payload);
-    if (backup) await backup.saveAll(payload);
+    if (main) {
+      await main.saveAll(payload);
+      console.log(`💾 Saved to MAINDB adapter: ${main.name}`);
+    }
+    if (backup) {
+      await backup.saveAll(payload);
+      console.log(`🛟 Saved to BACKUP adapter: ${backup.name}`);
+    }
 
+    lastDataSource = 'GraphQL';
     console.log(`✅ Fetched ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
 
     return payload;
@@ -437,6 +491,8 @@ export function buildRenderContext(collections: DataCollections): RenderContext 
 
 const CACHE_TTL_MS = Number(process.env.DATA_CACHE_TTL ?? 60_000);
 let cached: { context: RenderContext; collections: DataCollections; ts: number } | null = null;
+let lastDataSource: string | null = null;
+let lastLoggedDataSource: string | null = null;
 
 export async function getBaseContext(options?: { force?: boolean }): Promise<RenderContext> {
   const now = Date.now();
@@ -450,6 +506,16 @@ export async function getBaseContext(options?: { force?: boolean }): Promise<Ren
     const collections = await fetchAllData();
     const context = buildRenderContext(collections);
     cached = { context, collections, ts: now };
+
+    // Log source once per change to keep terminal noise low.
+    const source = lastDataSource ?? 'unknown';
+    if (source !== lastLoggedDataSource) {
+      lastLoggedDataSource = source;
+      console.log(
+        `📦 Base context loaded from ${source} (posts=${collections.posts.length}, pages=${collections.pages.length}, categories=${collections.categories.length})`
+      );
+    }
+
     return context;
   } catch (error) {
     console.error('Критическая ошибка в getBaseContext:', error);

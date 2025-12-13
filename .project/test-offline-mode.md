@@ -19,6 +19,9 @@ BACKUPDB=JsonDB
 # GraphQL mode for testing
 GRAPHQL_MODE=GETMODE
 
+# Skip startup sync when testing offline boot
+SYNC_ON_BOOT=false
+
 # Development settings
 NODE_ENV=development
 ```

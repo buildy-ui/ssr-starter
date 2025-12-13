@@ -159,6 +159,20 @@ GRAPHQL_MODE=CRUDMODE
 
 **Current Status**: Only `GETMODE` is fully implemented. `SETMODE` and `CRUDMODE` are prepared for future GraphQL mutation support.
 
+### `SYNC_ON_BOOT` (опционально)
+Controls whether the server runs `syncAllData()` during bootstrap.
+
+```bash
+# Default behavior: try to sync from GraphQL on startup
+SYNC_ON_BOOT=true
+
+# Offline-friendly behavior: skip startup sync and just warm cache from MAINDB/BACKUPDB
+SYNC_ON_BOOT=false
+```
+
+**Default**: `true`
+**Recommended for offline development**: `false`
+
 ## WordPress Configuration
 
 ### `WP_USER`

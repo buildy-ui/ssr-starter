@@ -12,6 +12,8 @@ export class LmdbAdapter implements StorageAdapter {
       tags: dbOperations.getTags(),
       authors: dbOperations.getAuthors(),
       pages: dbOperations.getPages(),
+      site: dbOperations.getMeta('site', undefined),
+      menu: dbOperations.getMeta('menu', undefined),
     };
   }
 
