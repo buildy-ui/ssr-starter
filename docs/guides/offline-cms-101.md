@@ -100,6 +100,14 @@ export MAINDB=LMDB
 export BACKUPDB=JsonDB
 ```
 
+#### Note about `GRAPHQL_MODE=GETMODE`
+
+In **GETMODE** the app treats WordPress GraphQL as a **read-only upstream**:
+
+- The site data (`posts`, `categories`, `tags`, `authors`, `pages`) is fetched from GraphQL (when available) and persisted locally.
+- The Admin panel can also **seed** the flexible collections with these documents so you can browse/edit them locally.
+- Any new documents you create (for example `products`, or local drafts inside `posts`) are written **only to local flexible storage** (LMDB/JsonDB). They are **not** pushed to GraphQL in GETMODE.
+
 #### Admin actions (server routes)
 
 These are the endpoints used by the `/admin` page:
@@ -123,7 +131,7 @@ export function CreateCollectionForm() {
       <Box
         component="input"
         name="name"
-        placeholder="tasks"
+        placeholder="products"
         w="full"
         p="md"
         rounded="md"

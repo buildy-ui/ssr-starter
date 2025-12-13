@@ -3,6 +3,8 @@ import { Block, Box, Stack, Title, Text, Grid, Group, Button, Card } from '../co
 import { Database, FileText, BarChart3 } from 'lucide-react';
 import { useRenderContext } from '../providers/render-context';
 
+const RESERVED_SITE_COLLECTIONS = new Set(['posts', 'categories', 'tags', 'authors', 'pages']);
+
 function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
   return (
     <Box component="a" href={href} className="inline-block">
@@ -134,6 +136,9 @@ export default function Admin() {
 }
 
 function CollectionsView({ collections }: { collections: string[] }) {
+  const siteCollections = collections.filter((c) => RESERVED_SITE_COLLECTIONS.has(c));
+  const customCollections = collections.filter((c) => !RESERVED_SITE_COLLECTIONS.has(c));
+
   return (
     <Stack gap="lg">
       <Card>
@@ -143,7 +148,7 @@ function CollectionsView({ collections }: { collections: string[] }) {
         </Card.Header>
         <Card.Content>
           <Block component="form" method="post" action="/admin/actions/collection/create" className="space-y-4">
-            <Field label="Collection name" name="name" placeholder="tasks" />
+            <Field label="Collection name" name="name" placeholder="products" />
             <Group justify="end" gap="sm">
               <Button type="submit">Create</Button>
             </Group>
@@ -153,15 +158,15 @@ function CollectionsView({ collections }: { collections: string[] }) {
 
       <Card>
         <Card.Header>
-          <Card.Title order={2} size="lg">Existing collections</Card.Title>
-          <Card.Description>Click a collection to open documents view.</Card.Description>
+          <Card.Title order={2} size="lg">Site collections</Card.Title>
+          <Card.Description>These are synced from WordPress (GETMODE = read-only from GraphQL). You can still store local drafts here.</Card.Description>
         </Card.Header>
         <Card.Content>
-          {collections.length === 0 ? (
-            <Text c="secondary-foreground">No collections yet.</Text>
+          {siteCollections.length === 0 ? (
+            <Text c="secondary-foreground">No site collections yet (open /admin again after base context loads).</Text>
           ) : (
             <Grid cols="1-2-3-4" gap="md">
-              {collections.map((c) => (
+              {siteCollections.map((c) => (
                 <Card key={c} className="hover:shadow-md transition-shadow">
                   <Card.Content className="space-y-3">
                     <Group justify="between" align="center">
@@ -173,11 +178,40 @@ function CollectionsView({ collections }: { collections: string[] }) {
                         <Button size="sm" variant="ghost">Open</Button>
                       </Box>
                     </Group>
-                    <Block component="form" method="post" action="/admin/actions/collection/drop" onSubmit={(e) => {
-                      // SSR-only: keep a basic confirm without relying on JS; if JS isn't running, it just won't block.
-                      // eslint-disable-next-line no-alert
-                      if (!confirm(`Drop collection "${c}"? This removes all docs.`)) e.preventDefault();
-                    }}>
+                    <Text size="xs" c="secondary-foreground">
+                      Reserved collection
+                    </Text>
+                  </Card.Content>
+                </Card>
+              ))}
+            </Grid>
+          )}
+        </Card.Content>
+      </Card>
+
+      <Card>
+        <Card.Header>
+          <Card.Title order={2} size="lg">Custom collections</Card.Title>
+          <Card.Description>Create anything you need (e.g. products). These live only in local flexible storage.</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          {customCollections.length === 0 ? (
+            <Text c="secondary-foreground">No custom collections yet.</Text>
+          ) : (
+            <Grid cols="1-2-3-4" gap="md">
+              {customCollections.map((c) => (
+                <Card key={c} className="hover:shadow-md transition-shadow">
+                  <Card.Content className="space-y-3">
+                    <Group justify="between" align="center">
+                      <Group gap="sm" align="center">
+                        <Database size={18} />
+                        <Text className="font-medium">{c}</Text>
+                      </Group>
+                      <Box component="a" href={`/admin?view=documents&collection=${encodeURIComponent(c)}`}>
+                        <Button size="sm" variant="ghost">Open</Button>
+                      </Box>
+                    </Group>
+                    <Block component="form" method="post" action="/admin/actions/collection/drop">
                       <Box component="input" type="hidden" name="name" value={c} />
                       <Button type="submit" size="sm" variant="outline" className="w-full">
                         Drop

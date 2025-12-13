@@ -1,6 +1,8 @@
 import type { AdminContext, AdminView } from '../../src/data/types';
 import { getLocalFlexibleAdapters } from '../storage';
 import type { FlexibleStorageAdapter } from '../storage/types';
+import { getBaseContext } from '../sync';
+import { seedFlexibleSiteCollectionsFromRenderContext } from '../flexible-site-sync';
 
 type Source = AdminContext['source'];
 
@@ -43,6 +45,13 @@ export async function buildAdminContext(params: {
   const editId = params.searchParams.get('edit') || undefined;
   const notice = params.searchParams.get('notice') || undefined;
   const error = params.searchParams.get('error') || undefined;
+
+  // Ensure the flexible store is pre-populated with site collections in GETMODE.
+  // This does NOT delete anything; it only upserts docs by known WP IDs.
+  const base = await getBaseContext().catch(() => null);
+  if (base) {
+    await seedFlexibleSiteCollectionsFromRenderContext(base).catch(() => undefined);
+  }
 
   const { adapter, source } = await pickReadAdapter();
   if (!adapter) {

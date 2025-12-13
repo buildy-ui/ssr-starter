@@ -1,6 +1,7 @@
 import type { RenderContext, PostData, CategoryData, TagData, AuthorData, PageSummary } from '../src/data/types';
 import { defaultRenderContext } from '../src/data';
 import { getAdapters } from './storage';
+import { seedFlexibleSiteCollectionsFromRenderContext } from './flexible-site-sync';
 
 const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
 
@@ -389,6 +390,12 @@ export async function syncAllData() {
       await backup.saveAll(payload);
       console.log(`🛟 Saved to BACKUP adapter: ${backup.name}`);
     }
+
+    // Also seed the flexible store with site collections for the SSR admin panel.
+    // This is local-only and safe in GETMODE (no GraphQL writes).
+    await seedFlexibleSiteCollectionsFromRenderContext(buildRenderContext(payload)).catch((error) => {
+      console.warn('Flexible site collections seed failed (non-fatal):', error);
+    });
 
     console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
   } catch (error) {
