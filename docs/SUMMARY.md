@@ -7,6 +7,7 @@
 - [Project Structure](getting-started/project-structure.md)
 
 ## Guides
+- [Offline CMS Development 101](guides/offline-cms-101.md)
 - [SSR Architecture](guides/ssr-architecture.md)
 - [Data Flow](guides/data-flow.md)
 - [Storage Adapters](guides/storage-adapters.md)

@@ -40,7 +40,8 @@ This documentation is organized into the following sections:
 - [Installation](getting-started/installation.md) - Detailed installation instructions
 - [Project Structure](getting-started/project-structure.md) - Codebase organization
 
-### [Guides](guides/ssr-architecture.md)
+### [Guides](guides/offline-cms-101.md)
+- [Offline CMS Development 101](guides/offline-cms-101.md) - Complete beginner's guide to offline apps
 - [SSR Architecture](guides/ssr-architecture.md) - Deep dive into rendering pipeline
 - [Data Flow](guides/data-flow.md) - How data moves through the system
 - [Storage Adapters](guides/storage-adapters.md) - Database and caching options
