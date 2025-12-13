@@ -1,0 +1,177 @@
+---
+description: При любом упоминании `ui8kit` или `core ui` - опирайся на это правило
+alwaysApply: false
+---
+# UI8Kit Core — Minimal Component System
+
+## Philosophy
+
+**Zero className, zero style** — only props from a limited set of components.
+Goal: not a single extra line of code or classes.
+
+UI8Kit Core covers **80% of design needs** with just **13 components** and **12 variant modules**.
+
+---
+
+## Components (13)
+
+### Layout (5)
+| Component | Purpose | Key Props |
+|-----------|---------|-----------|
+| `Block` | Semantic sections (section, main, nav, article, header, footer) | `variant`, `py`, `w`, `minH`, `bg` |
+| `Container` | Width-constrained wrapper with auto-centering | `size`, `ta`, `centered`, `fluid` |
+| `Stack` | Vertical flex container | `gap`, `align`, `justify`, `direction` |
+| `Group` | Horizontal flex container | `gap`, `align`, `justify`, `wrap`, `grow` |
+| `Box` | Universal container with all variants | All spacing, color, layout, flex, border props |
+
+> **Note:** For CSS Grid layouts, use RSD with `twsx('grid grid-cols-3 gap-4')`
+
+### Typography (2)
+| Component | Purpose | Key Props |
+|-----------|---------|-----------|
+| `Title` | Headings h1-h6 | `order`, `size`, `fw`, `ta`, `leading`, `tracking` |
+| `Text` | Paragraphs and inline text | `size`, `fw`, `ta`, `leading`, `truncate`, `italic` |
+
+### Interactive (2)
+| Component | Purpose | Key Props |
+|-----------|---------|-----------|
+| `Button` | Buttons with variants | `variant`, `size`, `rounded`, `loading`, `leftSection`, `rightSection` |
+| `Badge` | Labels and status indicators | `variant`, `size`, `rounded`, `dot`, `leftSection`, `rightSection` |
+
+### Media (2)
+| Component | Purpose | Key Props |
+|-----------|---------|-----------|
+| `Image` | Images with fit/position control | `fit`, `position`, `aspect`, `rounded`, `fallbackSrc` |
+| `Icon` | Icon wrapper for Lucide icons | `lucideIcon`, `size`, `c` |
+
+### Composite (2)
+| Component | Purpose | Key Props |
+|-----------|---------|-----------|
+| `Card` | Card container with sub-components | `variant`, `rounded`, `shadow`, `border` + `.Header`, `.Title`, `.Description`, `.Content`, `.Footer` |
+| `Sheet` | Slide-out panel | - |
+
+---
+
+## Variants (12 modules)
+
+All variants are CVA-based and exported from `variants/index.ts`:
+
+| Module | Variants | Values |
+|--------|----------|--------|
+| **spacing** | `m`, `mx`, `my`, `mt`, `mb`, `ml`, `mr`, `p`, `px`, `py`, `pt`, `pb`, `pl`, `pr` | `none`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `auto` |
+| **flex** | `direction`, `align`, `justify`, `wrap`, `gap`, `grow`, `shrink`, `order` | See flex.ts |
+| **layout** | `display`, `w`, `h`, `minH`, `maxW`, `position`, `z`, `overflow` | See layout.ts |
+| **colors** | `bg`, `c`, `borderColor` | shadcn tokens: `background`, `foreground`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `card`, `popover` |
+| **rounded** | `rounded` | `none`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `full` |
+| **shadow** | `shadow` | `none`, `sm`, `md`, `lg`, `xl`, `2xl` |
+| **border** | `border`, `borderTop`, `borderBottom`, `borderLeft`, `borderRight` | `none`, `1px`, `2px` |
+| **typography** | `size`, `fw`, `ta`, `leading`, `tracking`, `truncate`, `italic`, `underline` | See typography.ts |
+| **button** | `variant`, `size`, `contentAlign` | `default`, `primary`, `secondary`, `destructive`, `outline`, `ghost`, `link` / `xs`, `sm`, `default`, `md`, `lg`, `xl`, `icon` |
+| **badge** | `variant`, `size` | `default`, `secondary`, `destructive`, `outline`, `success`, `warning`, `info` / `xs`, `sm`, `default`, `lg` |
+| **image** | `fit`, `position`, `aspect` | `cover`, `contain`, `fill`, `none` / `center`, `top`, `bottom`, `left`, `right` / `auto`, `square`, `video`, `wide` |
+| **sizing** | `iconSize`, `containerSize` | See sizing.ts |
+
+---
+
+## Rules
+
+### 1. No className / style
+```tsx
+// ❌ FORBIDDEN
+<Box className="mt-4 text-center" />
+<div style={{ padding: 16 }} />
+
+// ✅ CORRECT
+<Box mt="md" />
+<Stack gap="lg" align="center" />
+```
+
+### 2. Layout via Components Only
+```tsx
+// ❌ FORBIDDEN
+<div className="flex flex-col gap-4">
+
+// ✅ CORRECT
+<Stack gap="md">
+```
+
+### 3. Colors from shadcn Tokens
+```tsx
+// ❌ FORBIDDEN
+bg="blue-500"
+c="#333"
+
+// ✅ CORRECT
+bg="primary"
+c="foreground"
+bg="muted"
+```
+
+### 4. Icons via Icon Component
+```tsx
+// ❌ FORBIDDEN
+<Settings className="w-4 h-4" />
+
+// ✅ CORRECT
+<Icon lucideIcon={Settings} size="sm" />
+```
+
+### 5. Text Alignment Inherits
+`Title` and `Text` inherit `text-align` from parent. Set `ta` on `Container` or parent `Stack`/`Box`.
+
+```tsx
+<Container ta="center">
+  <Title>Centered Title</Title>
+  <Text>Centered text</Text>
+</Container>
+```
+
+### 6. Stack vs Group
+- `Stack` — vertical (column), default `direction="col"`
+- `Group` — horizontal (row), includes `flex` base class
+
+---
+
+## Quick Reference
+
+### Spacing Scale
+| Token | Tailwind | px |
+|-------|----------|-----|
+| `xs` | 1 | 4px |
+| `sm` | 2 | 8px |
+| `md` | 4 | 16px |
+| `lg` | 6 | 24px |
+| `xl` | 8 | 32px |
+| `2xl` | 12 | 48px |
+
+### Gap Scale (flex/grid)
+| Token | Tailwind | px |
+|-------|----------|-----|
+| `none` | 0 | 0 |
+| `xs` | 1 | 4px |
+| `sm` | 2 | 8px |
+| `md` | 4 | 16px |
+| `lg` | 6 | 24px |
+| `xl` | 8 | 32px |
+| `2xl` | 10 | 40px |
+| `3xl` | 12 | 48px |
+
+---
+
+## Checklist
+
+- [ ] Uses only UI8Kit components?
+- [ ] No `className` or `style` props?
+- [ ] Colors from shadcn tokens only?
+- [ ] Layout via `Stack`/`Group`/`Box`?
+- [ ] Grid layouts via RSD + `twsx`?
+- [ ] Icons via `Icon` + `lucideIcon`?
+- [ ] Text alignment set on parent container?
+
+---
+
+## File References
+
+- Components: `apps/web/src/components/ui/`
+- Variants: `apps/web/src/variants/`
+- Exports: `apps/web/src/components/ui/index.ts`

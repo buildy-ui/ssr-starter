@@ -1,0 +1,37 @@
+{
+  "name": "@buildy-ui/ssr",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "tailwind:build": "bunx @tailwindcss/cli -i src/assets/css/index.css -o dist/styles.css --minify",
+    "tailwind:watch": "bunx @tailwindcss/cli -i src/assets/css/index.css -o dist/styles.css -w",
+    "client:build": "bun build src/entry-client.tsx --outdir dist --minify --target=browser --sourcemap=inline --public-path=/",
+    "build": "bun run tailwind:build && bun run client:build",
+    "dev": "bun run build && bun --watch server/index.ts",
+    "dev:server": "bun --watch server/index.ts",
+    "start": "NODE_ENV=production bun run server/index.ts"
+  },
+  "dependencies": {
+    "@elysiajs/html": "^1.1.0",
+    "@tailwindcss/cli": "^4.1.17",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "elysia": "^1.1.0",
+    "lmdb": "^3.0.13",
+    "lucide-react": "^0.555.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^6.30.2",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss": "^4.1.17"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.0",
+    "postcss": "^8.4.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "autoprefixer": "^10.4.18",
+    "typescript": "^5.5.3"
+  }
+}
+

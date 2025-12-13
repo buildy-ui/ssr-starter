@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.server.tsbuildinfo",
+    "types": ["bun-types"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["ES2022"],
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["server", "scripts"],
+  "exclude": ["src", "dist", "data"]
+}
+
