@@ -1,6 +1,7 @@
 import { dbOperations } from './db';
 import type { RenderContext, PostData, CategoryData, TagData, AuthorData, PageSummary } from '../src/data/types';
 import { defaultRenderContext } from '../src/data';
+import { getAdapters } from './storage';
 
 const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
 
@@ -33,28 +34,28 @@ async function graphqlQuery<T>(query: string, variables?: Record<string, any>): 
     return payload.data;
   } catch (error) {
     console.error('Error connect to GraphQL:', error);
-    return getDataFromLocalDB(query);
+    // Fallback to adapters data if available
+    const fallback = await getDataFromAdapters().catch(() => null);
+    if (!fallback) {
+      throw error;
+    }
+    // graphqlQuery is generic; here we just return the fallback as-is
+    return fallback as unknown as T;
   }
 }
 
-async function getDataFromLocalDB(): Promise<DataCollections> {
-  try {
-    const posts = await dbOperations.getPosts();
-    const categories = await dbOperations.getCategories();
-    const tags = await dbOperations.getTags();
-    const authors = await dbOperations.getAuthors();
-    const pages = await dbOperations.getPages();
-
-    // Добавляем проверку на наличие данных
-    if (!posts || !categories || !tags || !authors || !pages) {
-      throw new Error('Неполные данные в локальной БД');
+async function getDataFromAdapters(): Promise<DataCollections> {
+  const { main, backup } = getAdapters();
+  const tryAdapters = [main, backup].filter(Boolean) as NonNullable<typeof main>[];
+  for (const adapter of tryAdapters) {
+    try {
+      const data = await adapter.getAll();
+      if (data?.posts?.length) return data;
+    } catch (error) {
+      console.warn(`Adapter ${adapter.name} failed to read:`, error);
     }
-
-    return { posts, categories, tags, authors, pages };
-  } catch (error) {
-    console.error('Ошибка при чтении из локальной БД:', error);
-    throw error;
   }
+  throw new Error('No adapter data available');
 }
 
 const QUERIES = {
@@ -307,7 +308,6 @@ export async function syncAllData() {
       graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages)
     ]);
 
-    // Обработка данных остается без изменений
     const posts = (postsResult.posts.nodes || []).map(mapPost);
     const categories: CategoryData[] = (categoriesResult.categories.nodes || []).map((cat: any) => ({
       id: cat.categoryId,
@@ -325,15 +325,35 @@ export async function syncAllData() {
     const authors = deriveAuthors(posts);
     const pages = buildPageSummaries(pagesResult.pages.nodes || []);
 
-    // Сохранение в локальную БД
-    dbOperations.savePosts(posts);
-    dbOperations.saveCategories(categories);
-    dbOperations.saveTags(tags);
-    dbOperations.saveAuthors(authors);
-    dbOperations.savePages(pages);
+    const payload: DataCollections = {
+      posts,
+      categories,
+      tags,
+      authors,
+      pages,
+      site: defaultRenderContext.site,
+      menu: defaultRenderContext.menu,
+    };
 
-    dbOperations.saveMeta('site', defaultRenderContext.site);
-    dbOperations.saveMeta('menu', defaultRenderContext.menu);
+    const { main, backup } = getAdapters();
+    if (main) {
+      await main.saveAll(payload);
+      console.log(`💾 Saved to MAINDB adapter: ${main.name}`);
+    }
+    if (backup) {
+      await backup.saveAll(payload);
+      console.log(`🛟 Saved to BACKUP adapter: ${backup.name}`);
+    }
+    if (!main && !backup) {
+      // fallback to legacy LMDB in-memory
+      dbOperations.savePosts(posts);
+      dbOperations.saveCategories(categories);
+      dbOperations.saveTags(tags);
+      dbOperations.saveAuthors(authors);
+      dbOperations.savePages(pages);
+      dbOperations.saveMeta('site', defaultRenderContext.site);
+      dbOperations.saveMeta('menu', defaultRenderContext.menu);
+    }
 
     console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
   } catch (error) {
@@ -349,11 +369,14 @@ export type DataCollections = {
   tags: TagData[];
   authors: AuthorData[];
   pages: PageSummary[];
+  site?: RenderContext['site'];
+  menu?: RenderContext['menu'];
 };
 
 export async function fetchAllData(): Promise<DataCollections> {
   if (!GRAPHQL_ENDPOINT) {
-    throw new Error('GRAPHQL_ENDPOINT is not configured');
+    console.warn('GRAPHQL_ENDPOINT is not configured, fallback to adapters.');
+    return getDataFromAdapters();
   }
 
   console.log('🔄 Fetching data from WordPress GraphQL...');
@@ -384,12 +407,27 @@ export async function fetchAllData(): Promise<DataCollections> {
     const authors = deriveAuthors(posts);
     const pages = buildPageSummaries(pagesResult?.pages?.nodes || []);
 
+    const payload: DataCollections = {
+      posts,
+      categories,
+      tags,
+      authors,
+      pages,
+      site: defaultRenderContext.site,
+      menu: defaultRenderContext.menu,
+    };
+
+    // Persist to adapters
+    const { main, backup } = getAdapters();
+    if (main) await main.saveAll(payload);
+    if (backup) await backup.saveAll(payload);
+
     console.log(`✅ Fetched ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
 
-    return { posts, categories, tags, authors, pages };
+    return payload;
   } catch (error) {
-    console.error('Error connect to LmDB:', error);
-    return getDataFromLocalDB();
+    console.error('Error connect to GraphQL, fallback to adapters:', error);
+    return getDataFromAdapters();
   }
 }
 
@@ -400,8 +438,8 @@ export function buildRenderContext(collections: DataCollections): RenderContext 
     tags: collections.tags,
     authors: collections.authors,
     pages: collections.pages,
-    site: defaultRenderContext.site,
-    menu: defaultRenderContext.menu,
+    site: collections.site ?? defaultRenderContext.site,
+    menu: collections.menu ?? defaultRenderContext.menu,
     assets: {
       s3AssetsUrl: process.env.S3_ASSETS_URL ?? '',
     },
@@ -420,25 +458,10 @@ export async function getBaseContext(options?: { force?: boolean }): Promise<Ren
       return cached.context;
     }
     
-    try {
-      const collections = await fetchAllData();
-      const context = buildRenderContext(collections);
-      cached = { context, collections, ts: now };
-      return context;
-    } catch (error) {
-      console.error('Ошибка при получении данных из GraphQL:', error);
-      
-      try {
-        console.log('Попытка получить данные из локальной базы данных...');
-        const localCollections = await getDataFromLocalDB();
-        const context = buildRenderContext(localCollections);
-        cached = { context, collections: localCollections, ts: now };
-        return context;
-      } catch (localError) {
-        console.error('Ошибка при получении данных из локальной БД:', localError);
-        throw new Error('Не удалось получить данные ни из GraphQL, ни из локальной БД');
-      }
-    }
+    const collections = await fetchAllData();
+    const context = buildRenderContext(collections);
+    cached = { context, collections, ts: now };
+    return context;
   } catch (error) {
     console.error('Критическая ошибка в getBaseContext:', error);
     throw error;

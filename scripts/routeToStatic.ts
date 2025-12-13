@@ -50,18 +50,10 @@ export class RouteToStatic {
     }
 
     // Fetch fresh data from GraphQL (force) and build base context
-    const collections = cfg.syncBefore
-      ? await fetchAllData()
-      : await (async () => {
-          try {
-            return await fetchAllData();
-          } catch (error) {
-            console.warn('⚠️  Fetch before static generation failed, continuing with cached data if available.', error);
-            const cached = await getBaseContext().catch(() => null);
-            if (!cached) throw error;
-            return null;
-          }
-        })();
+    const collections = await fetchAllData().catch(async (error) => {
+      console.warn('⚠️  Fetch before static generation failed, trying cached context.', error);
+      return null;
+    });
 
     const baseContext = collections ? buildRenderContext(collections) : await getBaseContext();
     const routes = collectRoutes(baseContext, this.config.blogPageSize ?? DEFAULT_CONFIG.blogPageSize ?? 3);
