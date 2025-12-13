@@ -10,3 +10,4 @@ bun.lock
 package-lock.json
 .env
 src/data/json/
+.turbo

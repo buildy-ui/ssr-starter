@@ -108,6 +108,44 @@ In **GETMODE** the app treats WordPress GraphQL as a **read-only upstream**:
 - The Admin panel can also **seed** the flexible collections with these documents so you can browse/edit them locally.
 - Any new documents you create (for example `products`, or local drafts inside `posts`) are written **only to local flexible storage** (LMDB/JsonDB). They are **not** pushed to GraphQL in GETMODE.
 
+#### Optional: local GraphQL proxy on `:5001/graphql` (monorepo)
+
+In this monorepo you can run a local reverse-proxy + disk cache for WordPress GraphQL:
+
+- App: `apps/api`
+- Endpoint: `http://localhost:5001/graphql`
+- Cache dir (default): `apps/api/data/graphql-cache`
+- Upstream env: `UPSTREAM_GRAPHQL_ENDPOINT` (or reuse `GRAPHQL_ENDPOINT`)
+
+**Important**: if the upstream is not configured (or is offline) and there is no cached response yet, the proxy will return:
+
+- `errors[0].extensions.code = OFFLINE_CACHE_MISS`
+
+That is expected. You must **warm the cache once** while the upstream WordPress GraphQL is reachable.
+
+Run it:
+
+```bash
+bun run dev:api
+```
+
+Point SSR to it:
+
+```bash
+GRAPHQL_ENDPOINT=http://localhost:5001/graphql
+GRAPHQL_MODE=GETMODE
+```
+
+Recommended env split:
+
+- **apps/api**:
+  - `UPSTREAM_GRAPHQL_ENDPOINT=https://your-wp/graphql`
+- **apps/ssr**:
+  - `GRAPHQL_ENDPOINT=http://localhost:5001/graphql`
+  - `MAINDB=LMDB`
+  - `BACKUPDB=JsonDB`
+  - `GRAPHQL_MODE=GETMODE`
+
 #### Admin actions (server routes)
 
 These are the endpoints used by the `/admin` page:

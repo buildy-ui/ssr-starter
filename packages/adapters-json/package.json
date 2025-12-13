@@ -1,0 +1,23 @@
+{
+  "name": "@buildy-ui/adapters-json",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@buildy-ui/adapters-core": "workspace:*"
+  },
+  "scripts": {
+    "build": "bunx tsc -p tsconfig.json",
+    "dev": "bunx tsc -p tsconfig.json --watch"
+  }
+}
+
+

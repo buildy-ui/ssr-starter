@@ -13,7 +13,7 @@ This file is intentionally concise but complete enough for a coding agent to con
   - BACKUPDB (fallback): `LMDB | SQLite | JsonDB | FALSE` (SQLite deferred for now)
   - Server-side mapping: `IndexedDB/ContextDB/JsonDB` → JSON file storage (`src/data/json/full.json`).
 - **Performance**: Route-specific context slicing so SSR renders only necessary data per route.
-- **Documentation-first**: Every meaningful change should be reflected in `docs/` and `.project/` guides.
+- **Documentation-first**: Every meaningful change should be reflected in `../docs/` and `../../project/` guides.
 
 ## Tech Stack
 
@@ -41,11 +41,11 @@ This file is intentionally concise but complete enough for a coding agent to con
   - `src/routes/*`: React routes.
   - `src/data/types.ts`: Shared data types (RenderContext etc).
 - **Docs**
-  - `docs/README.md`: Documentation entrypoint.
-  - `docs/SUMMARY.md`: GitBook navigation.
-  - `docs/guides/*`: Architecture & operational guides.
+  - `../docs/README.md`: Documentation entrypoint.
+  - `../docs/SUMMARY.md`: GitBook navigation.
+  - `../docs/guides/*`: Architecture & operational guides.
 - **Project operator docs**
-  - `.project/test-offline-mode.md`: Offline testing scenarios and command checklists.
+  - `../../project/test-offline-mode.md`: Offline testing scenarios and command checklists.
 
 ## Setup / Dev Commands (Bun)
 
@@ -108,7 +108,7 @@ When offline:
 
 ## Testing Checklists (Manual)
 
-See `.project/test-offline-mode.md` for step-by-step commands.
+See `../../project/test-offline-mode.md` for step-by-step commands.
 
 High-value smoke checks:
 
@@ -128,6 +128,6 @@ High-value smoke checks:
 - **Safety**:
   - Avoid side effects during error handling (especially data persistence).
   - Prefer deterministic logs (single “source of data” line per cold load).
-- **Docs-first**: update `docs/` and `.project/` files when behavior changes (env vars, flows, commands).
+- **Docs-first**: update `../docs/` and `../../project/` files when behavior changes (env vars, flows, commands).
 
 

@@ -1,0 +1,21 @@
+{
+  "name": "@buildy-ui/api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch server/index.ts",
+    "dev:server": "bun --watch server/index.ts",
+    "build": "echo \"no-build\"",
+    "preview": "bun run server/index.ts"
+  },
+  "dependencies": {
+    "elysia": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.0",
+    "typescript": "^5.5.3"
+  }
+}
+
+

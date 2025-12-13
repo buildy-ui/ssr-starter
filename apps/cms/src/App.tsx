@@ -1,5 +1,6 @@
-import { Block, Container, Button, Title, Text, Stack } from "@ui8kit/core"
+import { Block, Button, Group } from "@ui8kit/core"
 import { ThemeProvider, useTheme } from "@/providers/theme"
+import { GraphQLExplorer } from "@/components/GraphQLExplorer"
 
 // LesseUI Theme
 export const lesseUITheme = {
@@ -22,17 +23,16 @@ function AppContent() {
   const { toggleDarkMode, isDarkMode } = useTheme()
 
   return (
-    <Block variant="section" py="xl">
-      <Container ta="center">
-        <Stack gap="lg" align="center">
-          <Title size="5xl">Welcome to UI8Kit</Title>
-          <Text>Create beautiful web applications with ease using our UI components</Text>
+    <>
+      <Block component="nav" py="sm" className="border-b border-border bg-background">
+        <Group justify="end" align="center">
           <Button variant={isDarkMode ? "primary" : "secondary"} onClick={toggleDarkMode}>
-            {!isDarkMode ? "🌙 Dark Mode" : "☀️ Light Mode"}
+            {!isDarkMode ? "Dark Mode" : "Light Mode"}
           </Button>
-        </Stack>
-      </Container>
-    </Block>
+        </Group>
+      </Block>
+      <GraphQLExplorer />
+    </>
   )
 }
 

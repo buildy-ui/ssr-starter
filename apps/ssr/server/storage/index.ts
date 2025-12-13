@@ -1,9 +1,7 @@
-import { LmdbAdapter } from './adapter.lmdb';
-import { JsonAdapter } from './adapter.json';
+import { LegacyLmdbAdapter, FlexibleLmdbAdapter } from '@buildy-ui/adapters-lmdb';
+import { LegacyJsonAdapter, FlexibleJsonAdapter } from '@buildy-ui/adapters-json';
 import { GraphQLAdapter } from './adapter.graphql';
-import { FlexibleLmdbAdapter } from './adapter.flexible.lmdb';
-import { FlexibleJsonAdapter } from './adapter.flexible.json';
-import type { StorageAdapter, FlexibleStorageAdapter } from './types';
+import type { StorageAdapter, FlexibleStorageAdapter } from '@buildy-ui/adapters-core';
 
 type AdapterName = 'LMDB' | 'IndexedDB' | 'ContextDB' | 'FALSE' | 'JsonDB';
 type GraphQLMode = 'GETMODE' | 'SETMODE' | 'CRUDMODE';
@@ -12,13 +10,13 @@ function buildAdapter(name?: string): StorageAdapter | null {
   const upper = (name || '').toUpperCase() as AdapterName;
   switch (upper) {
     case 'LMDB':
-      return new LmdbAdapter();
+      return new LegacyLmdbAdapter();
     case 'INDEXEDDB':
       // For server-side offline mode we map IndexedDB to JSON file persistence.
-      return new JsonAdapter();
+      return new LegacyJsonAdapter();
     case 'CONTEXTDB':
     case 'JSONDB':
-      return new JsonAdapter();
+      return new LegacyJsonAdapter();
     case 'FALSE':
     default:
       return null;
@@ -76,5 +74,5 @@ export function getLocalFlexibleAdapters() {
   return { main, backup };
 }
 
-export { LmdbAdapter, JsonAdapter, GraphQLAdapter, FlexibleLmdbAdapter, FlexibleJsonAdapter };
+export { LegacyLmdbAdapter, LegacyJsonAdapter, GraphQLAdapter, FlexibleLmdbAdapter, FlexibleJsonAdapter };
 

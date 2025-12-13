@@ -14,10 +14,12 @@
   "dependencies": {
     "@elysiajs/html": "^1.1.0",
     "@tailwindcss/cli": "^4.1.17",
+    "@buildy-ui/adapters-core": "workspace:*",
+    "@buildy-ui/adapters-json": "workspace:*",
+    "@buildy-ui/adapters-lmdb": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "elysia": "^1.1.0",
-    "lmdb": "^3.0.13",
     "lucide-react": "^0.555.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
