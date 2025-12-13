@@ -91,6 +91,7 @@ This documentation is organized into the following sections:
 
 ### 🔧 Flexibility
 - **Multiple Storage Adapters**: LMDB, IndexedDB, JSON, ContextDB
+- **GraphQL Sync Modes**: GETMODE/SETMODE/CRUDMODE for different data flows
 - **Offline Mode**: Full functionality without network
 - **WordPress Integration**: Seamless headless CMS integration
 - **Progressive Enhancement**: Works without JavaScript

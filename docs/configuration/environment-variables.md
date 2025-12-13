@@ -135,6 +135,30 @@ BACKUPDB=FALSE
 **Default**: `FALSE`
 **Purpose**: Fallback when primary storage fails
 
+## GraphQL Configuration
+
+### `GRAPHQL_MODE` (опционально)
+GraphQL synchronization mode. Controls how data flows between GraphQL API and local storage.
+
+```bash
+# Only read from GraphQL, write to local storage (current implementation)
+GRAPHQL_MODE=GETMODE
+
+# Only write to GraphQL, read from local storage (future mutations)
+GRAPHQL_MODE=SETMODE
+
+# Full CRUD operations with GraphQL (when API supports mutations)
+GRAPHQL_MODE=CRUDMODE
+```
+
+**Default**: `GETMODE`
+**Options**:
+- `GETMODE`: Read from GraphQL → Store locally (current implementation)
+- `SETMODE`: Read locally → Write to GraphQL (for future mutations)
+- `CRUDMODE`: Full bidirectional sync (when GraphQL supports mutations)
+
+**Current Status**: Only `GETMODE` is fully implemented. `SETMODE` and `CRUDMODE` are prepared for future GraphQL mutation support.
+
 ## WordPress Configuration
 
 ### `WP_USER`

@@ -80,10 +80,50 @@ export async function syncAllData() {
 }
 ```
 
-### Incremental Updates
+### GraphQL Mode-Based Synchronization
+
+SSR-Starter supports different GraphQL synchronization modes through the `GRAPHQL_MODE` environment variable:
+
+#### GETMODE (Current Implementation)
+```typescript
+// Read from GraphQL, write to local storage
+GRAPHQL_MODE=GETMODE
+
+// Flow: GraphQL → Local Storage → Application
+const data = await graphqlAdapter.find('posts');
+// 1. Check local storage first
+// 2. If empty and online, sync from GraphQL
+// 3. Return local data for offline use
+```
+
+#### SETMODE (Future Implementation)
+```typescript
+// Read from local storage, write to GraphQL
+GRAPHQL_MODE=SETMODE
+
+// Flow: Local Storage → GraphQL → Confirmation
+await graphqlAdapter.insert('posts', newPost);
+// 1. Write to local storage immediately
+// 2. When online, sync to GraphQL
+// 3. Handle conflicts and confirmations
+```
+
+#### CRUDMODE (Future Implementation)
+```typescript
+// Full bidirectional sync
+GRAPHQL_MODE=CRUDMODE
+
+// Flow: Real-time sync between GraphQL and Local Storage
+await graphqlAdapter.update('posts', { _id: id }, updates);
+// 1. Update local storage
+// 2. Sync to GraphQL immediately if online
+// 3. Handle real-time conflicts
+```
+
+### Incremental Updates (Future)
 
 ```typescript
-// Future: Real-time updates
+// Planned: Incremental sync with change detection
 export async function syncIncremental() {
   const lastSync = await getLastSyncTime();
   const updates = await fetchUpdatesSince(lastSync);

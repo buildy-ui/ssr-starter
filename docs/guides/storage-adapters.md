@@ -511,6 +511,68 @@ MAINDB=ContextDB
    bun run build
    ```
 
+## Using Storage Adapters
+
+### Basic Storage Adapters
+
+```typescript
+import { getAdapters } from '../server/storage';
+
+// Get configured adapters
+const { main, backup } = getAdapters();
+
+// Use main adapter for primary operations
+await main.saveAllPosts(posts);
+
+// Use backup as fallback
+if (!main) {
+  await backup.saveAllPosts(posts);
+}
+```
+
+### GraphQL-Aware Flexible Adapters
+
+```typescript
+import { getFlexibleAdapters } from '../server/storage';
+
+// Get GraphQL-aware adapters
+const { main, backup } = getFlexibleAdapters();
+
+// These adapters automatically handle GraphQL sync based on GRAPHQL_MODE
+await main.insert('tasks', { title: 'New Task', completed: false });
+
+// In GETMODE: Reads from local, syncs from GraphQL when empty
+const tasks = await main.find('tasks', { completed: false });
+
+// Future-ready for mutations when GraphQL supports them
+// In SETMODE/CRUDMODE: Changes will sync to GraphQL automatically
+```
+
+### GraphQL Synchronization Modes
+
+#### GETMODE (Current - Recommended)
+```bash
+GRAPHQL_MODE=GETMODE
+```
+- ✅ Reads from GraphQL, writes to local storage
+- ✅ Perfect for current WordPress setup
+- ✅ Works completely offline
+- ✅ Easy to upgrade when GraphQL mutations ready
+
+#### SETMODE (Future)
+```bash
+GRAPHQL_MODE=SETMODE
+```
+- 🔄 Reads from local, writes to GraphQL
+- 📋 For when you want to push local changes to server
+
+#### CRUDMODE (Future)
+```bash
+GRAPHQL_MODE=CRUDMODE
+```
+- 🔄 Full bidirectional synchronization
+- ⚡ Real-time sync between local and GraphQL
+
 ## Troubleshooting
 
 ### Common Storage Issues

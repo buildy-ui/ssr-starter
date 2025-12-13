@@ -519,19 +519,39 @@ class SyncManager {
   }
 }
 
-// Usage
+// Usage with GraphQL modes
 const syncManager = new SyncManager(adapter, 'https://my-api.com')
 
 // Sync when online
 window.addEventListener('online', () => {
-  syncManager.syncToRemote()
+  // In GETMODE: Only sync from GraphQL
   syncManager.syncFromRemote()
+
+  // In SETMODE: Only sync to GraphQL
+  // syncManager.syncToRemote()
+
+  // In CRUDMODE: Bidirectional sync
+  // syncManager.syncFromRemote()
+  // syncManager.syncToRemote()
 })
 
-// Periodic sync
+// Periodic sync based on mode
 setInterval(() => {
   if (isOnline()) {
-    syncManager.syncToRemote()
+    const graphQLMode = process.env.GRAPHQL_MODE || 'GETMODE'
+
+    switch (graphQLMode) {
+      case 'GETMODE':
+        syncManager.syncFromRemote() // Update local from GraphQL
+        break
+      case 'SETMODE':
+        syncManager.syncToRemote() // Push local changes to GraphQL
+        break
+      case 'CRUDMODE':
+        syncManager.syncFromRemote()
+        syncManager.syncToRemote()
+        break
+    }
   }
 }, 5 * 60 * 1000) // Every 5 minutes
 ```
@@ -988,18 +1008,46 @@ function AddContactForm({ onAdd }) {
 
 ## 🚀 Step 6: Deployment and Production
 
-### Building for Production
+### Environment Configuration for Production
 
 ```bash
-# Configure for offline use
-export MAINDB=IndexedDB
-export BACKUPDB=LMDB
+# Basic offline setup
+export MAINDB=LMDB
+export BACKUPDB=JsonDB
+
+# GraphQL synchronization mode
+export GRAPHQL_MODE=GETMODE  # Read from GraphQL, write to local
+# export GRAPHQL_MODE=SETMODE # Future: Write to GraphQL, read from local
+# export GRAPHQL_MODE=CRUDMODE # Future: Full bidirectional sync
 
 # Build the application
 bun run build
 
 # Start production server
 bun run start
+```
+
+### Understanding GraphQL Modes
+
+#### GETMODE (Current - Recommended)
+```typescript
+// Perfect for current setup: WordPress GraphQL → Local Storage
+GRAPHQL_MODE=GETMODE
+
+// Behavior:
+// 1. Initial sync: Fetch from WordPress GraphQL → Store in LMDB/JSON
+// 2. Runtime: Use local storage for all reads
+// 3. Offline: Works completely offline
+// 4. Future: When GraphQL adds mutations, easy upgrade to CRUDMODE
+```
+
+#### Future Modes (When GraphQL API Supports Mutations)
+```typescript
+// SETMODE: Local changes sync to GraphQL
+GRAPHQL_MODE=SETMODE
+
+// CRUDMODE: Real-time bidirectional sync
+GRAPHQL_MODE=CRUDMODE
 ```
 
 ### Progressive Web App (PWA)
