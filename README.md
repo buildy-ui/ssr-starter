@@ -1,38 +1,185 @@
-# UI8Kit SSR Starter (Elysia + LMDB + GraphQL)
+# SSR-Starter Documentation
 
-A Bun-powered SSR starter that pairs an Elysia HTTP server with React, hydrated on the client, and an LMDB-backed cache fed by a WordPress GraphQL API.
+[![Documentation](https://img.shields.io/badge/docs-gitbook-blue)](https://your-org.gitbook.io/ssr-starter)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-org/ssr-starter)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## How it works
-- **Server-rendered React via Elysia:** `server/index.ts` streams pre-rendered HTML, serves the client bundle, styles, and static assets, and exposes `/health`.
-- **GraphQL → LMDB cache:** `server/sync.ts` pulls content from `GRAPHQL_ENDPOINT` (WordPress GraphQL), normalizes it, and stores posts, categories, tags, authors, and meta in `data/db` via LMDB. Cached data is read through `dbOperations` for fast render contexts.
-- **Hydration on the client:** The server serializes `window.__RENDER_CONTEXT__` into the HTML shell; `src/entry-client.tsx` hydrates the same tree with `hydrateRoot`, reusing the render context and theme providers.
-- **Client bundle:** Built with `bun build src/entry-client.tsx --outdir dist --minify --target=browser --sourcemap`. Served as `/entry-client.js` (+ source map) by the Elysia server.
-- **Tailwind CSS v4 CLI:** `bunx @tailwindcss/cli` compiles `src/assets/css/index.css` into `dist/styles.css`, which the server serves at `/styles.css`.
-- **Build pipeline:** `bun run build` runs `build.ts` (data sync), then Tailwind, then the browser bundle—everything required for production assets to live in `dist/`.
+Welcome to the comprehensive documentation for **SSR-Starter**, a modern SSR (Server-Side Rendering) and SSG (Static Site Generation) framework built with Bun, Elysia.js, React, and WordPress GraphQL integration.
 
-## Scripts (package.json)
-- `bun run tailwind:build` — one-off Tailwind compile to `dist/styles.css`.
-- `bun run tailwind:watch` — watch mode for Tailwind during local dev.
-- `bun run client:build` — bundle the hydrated client entry for the browser.
-- `bun run build` — sync data, build styles, and build the client bundle.
-- `bun run dev` — run `build`, then start the Elysia server with watch mode.
-- `bun run server:dev` — watch-only server (assumes assets are already built).
-- `bun run start` — production start (expects built assets in `dist/`).
+## 🚀 Quick Start
 
-## Environment
-Copy `env.example` and set `GRAPHQL_ENDPOINT` to your WordPress GraphQL URL. Without it, sync is skipped and defaults are used.
+Get up and running in 5 minutes:
 
-## Local development
-1) Install Bun (`curl -fsSL https://bun.sh/install | bash`), then `bun install`.
-2) Set `GRAPHQL_ENDPOINT` (e.g., via `.env`).
-3) Build once: `bun run build` (or `bun run tailwind:watch` + `bun run client:build` for incremental work).
-4) Start the server: `bun run dev` (watch) or `bun run server:dev` if assets are prebuilt.
+```bash
+# Install Bun
+curl -fsSL https://bun.sh/install | bash
 
-## Deployment
-Use the provided `docker-compose.yml` (and `Dockerfile`) to build and run with Bun:
-- Set `GRAPHQL_ENDPOINT` in your deployment UI.
-- Run `docker compose up --build` locally, or let your platform build from the repo. The image installs Bun deps, runs the full build pipeline, and starts `server/index.ts` on port 3000.
+# Clone and setup
+git clone https://github.com/your-org/ssr-starter.git
+cd ssr-starter
+bun install
 
-## More documentation
-See the `.project` directory for in-depth guides, including LMDB/GraphQL integration and migration notes.
+# Configure environment
+cp env.example .env
+# Edit .env with your WordPress GraphQL endpoint
 
+# Build and run
+bun run build
+bun run dev
+
+# Visit http://localhost:3000
+```
+
+## 📚 Documentation Overview
+
+This documentation is organized into the following sections:
+
+### [Getting Started](docs/getting-started/introduction.md)
+- [Introduction](docs/getting-started/introduction.md) - Framework overview and features
+- [Quick Start](docs/getting-started/quick-start.md) - 5-minute setup guide
+- [Installation](docs/getting-started/installation.md) - Detailed installation instructions
+- [Project Structure](docs/getting-started/project-structure.md) - Codebase organization
+
+### [Guides](docs/guides/ssr-architecture.md)
+- [SSR Architecture](docs/guides/ssr-architecture.md) - Deep dive into rendering pipeline
+- [Data Flow](docs/guides/data-flow.md) - How data moves through the system
+- [Storage Adapters](docs/guides/storage-adapters.md) - Database and caching options
+- [Static Generation](docs/guides/static-generation.md) - SSG workflow and optimization
+- [Theming & Styling](docs/guides/theming-styling.md) - UI customization guide
+- [Adding Pages](docs/guides/adding-pages.md) - Create new routes and components
+- [Working with Data](docs/guides/working-with-data.md) - Data fetching and manipulation
+- [Offline Mode](docs/guides/offline-mode.md) - Progressive Web App features
+
+### [API Reference](docs/api/server-api.md)
+- [Server API](docs/api/server-api.md) - HTTP endpoints and responses
+- [Client API](docs/api/client-api.md) - Browser-side JavaScript API
+- [Storage Adapters](docs/api/storage-adapters.md) - Storage interface specifications
+- [GraphQL Integration](docs/api/graphql-integration.md) - WordPress API integration
+- [Component Library](docs/api/component-library.md) - UI components reference
+
+### [Configuration](docs/configuration/environment-variables.md)
+- [Environment Variables](docs/configuration/environment-variables.md) - All configuration options
+- [WordPress Setup](docs/configuration/wordpress-setup.md) - CMS configuration guide
+- [Build Configuration](docs/configuration/build-config.md) - Build pipeline customization
+- [Docker Configuration](docs/configuration/docker-config.md) - Container setup
+
+### [Deployment](docs/deployment/docker.md)
+- [Docker Deployment](docs/deployment/docker.md) - Container deployment guide
+- [Railway/Nixpacks](docs/deployment/railway.md) - One-click cloud deployment
+- [Vercel/Netlify](docs/deployment/vercel-netlify.md) - Static hosting platforms
+- [Production Checklist](docs/deployment/production-checklist.md) - Go-live preparation
+
+### [Contributing](docs/contributing/development-workflow.md)
+- [Development Workflow](docs/contributing/development-workflow.md) - Contributing guidelines
+- [Testing Guide](docs/contributing/testing-guide.md) - Testing strategies and tools
+- [Adding Features](docs/contributing/adding-features.md) - Feature development process
+- [Code Style](docs/contributing/code-style.md) - Code formatting and standards
+
+### [Troubleshooting](docs/troubleshooting/common-issues.md)
+- [Common Issues](docs/troubleshooting/common-issues.md) - Solutions to frequent problems
+- [Debugging](docs/troubleshooting/debugging.md) - Debug tools and techniques
+- [Performance](docs/troubleshooting/performance.md) - Optimization strategies
+- [FAQ](docs/troubleshooting/faq.md) - Frequently asked questions
+
+## 🎯 Key Features
+
+### ⚡ Performance
+- **Server-Side Rendering**: SEO-optimized initial loads
+- **Static Site Generation**: CDN-ready static files
+- **Intelligent Caching**: Multi-level caching system
+- **Route-Based Optimization**: Minimal data per page
+
+### 🔧 Flexibility
+- **Multiple Storage Adapters**: LMDB, IndexedDB, JSON, ContextDB
+- **Offline Mode**: Full functionality without network
+- **WordPress Integration**: Seamless headless CMS integration
+- **Progressive Enhancement**: Works without JavaScript
+
+### 🛠 Developer Experience
+- **TypeScript**: Full type safety throughout
+- **Hot Reload**: Instant development feedback
+- **Modern Stack**: Bun runtime, Elysia.js server, React components
+- **Comprehensive Testing**: Unit, integration, and E2E tests
+
+### 📦 Production Ready
+- **Docker Support**: Containerized deployment
+- **Multi-Platform**: Railway, Vercel, Netlify, custom servers
+- **Monitoring**: Health checks and metrics
+- **Security**: Built-in security headers and validation
+
+## 🏗 Architecture
+
+```mermaid
+graph TB
+    A[WordPress GraphQL] --> B[SSR Server]
+    B --> C[Storage Adapters]
+    B --> D[React Components]
+    D --> E[HTML Output]
+
+    C --> F[LMDB]
+    C --> G[IndexedDB]
+    C --> H[JSON Files]
+    C --> I[ContextDB]
+
+    J[Static Generation] --> K[HTML Files]
+    K --> L[CDN/Hosting]
+```
+
+## 📋 Requirements
+
+- **Runtime**: Bun 1.0+ or Node.js 18+
+- **WordPress**: 5.0+ with WPGraphQL plugin
+- **Memory**: 512MB minimum, 2GB recommended
+- **Storage**: 500MB for dependencies, 1GB+ for data
+
+## 🌟 Use Cases
+
+- **Blog Platforms**: High-performance WordPress-powered blogs
+- **Content Management**: CMS-driven websites with SEO requirements
+- **E-commerce**: Product catalogs with server-side rendering
+- **Documentation Sites**: Static generation for developer docs
+- **Progressive Web Apps**: Offline-capable web applications
+- **Marketing Sites**: Fast-loading landing pages
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](docs/contributing/development-workflow.md) for details on:
+
+- Setting up a development environment
+- Coding standards and practices
+- Testing requirements
+- Pull request process
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE.md) file for details.
+
+## 🆘 Support
+
+- **Documentation**: You're reading it! 🎉
+- **Issues**: [GitHub Issues](https://github.com/your-org/ssr-starter/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-org/ssr-starter/discussions)
+- **Discord**: Join our community server
+- **Commercial Support**: [Book a consultation](https://calendly.com/your-org)
+
+## 📈 Roadmap
+
+### Current Version (1.0.x)
+- ✅ SSR with React
+- ✅ Multiple storage adapters
+- ✅ Static site generation
+- ✅ WordPress GraphQL integration
+- ✅ Docker deployment
+- ✅ Comprehensive documentation
+
+### Upcoming Features
+- 🔄 Redis adapter support
+- 🔄 Advanced caching strategies
+- 🔄 Real-time data synchronization
+- 🔄 Multi-language support (i18n)
+- 🔄 Advanced analytics integration
+- 🔄 Plugin system for extensions
+
+---
+
+**Ready to build something amazing?** Let's get started with the [Quick Start Guide](docs/getting-started/quick-start.md)! 🚀

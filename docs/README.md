@@ -1,597 +1,185 @@
-# SSR-Starter: WordPress GraphQL → SSR/SSG Framework
+# SSR-Starter Documentation
 
-**Уровень документации: 101** - Полное руководство для новичков и опытных разработчиков
+[![Documentation](https://img.shields.io/badge/docs-gitbook-blue)](https://your-org.gitbook.io/ssr-starter)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-org/ssr-starter)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Этот гайд поможет вам установить, настроить, разработать и протестировать SSR-приложение на базе WordPress GraphQL API с поддержкой оффлайн-режима и множественных адаптеров хранения данных.
+Welcome to the comprehensive documentation for **SSR-Starter**, a modern SSR (Server-Side Rendering) and SSG (Static Site Generation) framework built with Bun, Elysia.js, React, and WordPress GraphQL integration.
 
-## 📁 Содержание
+## 🚀 Quick Start
 
-- [Обзор приложения](#-обзор-приложения)
-- [Установка](#-установка)
-- [Настройка](#-настройка)
-- [Разработка](#-разработка)
-- [Тестирование](#-тестирование)
-- [Руководство разработчика](#-руководство-разработчика)
-- [API и адаптеры](#-api-и-адаптеры)
-- [Деплой](#-деплой)
-- [Troubleshooting](#-troubleshooting)
-
-## 🎯 Обзор приложения
-
-**SSR-Starter** - это фреймворк для создания SSR (Server-Side Rendering) и SSG (Static Site Generation) приложений на основе WordPress GraphQL API.
-
-### Архитектура
-
-```
-WordPress GraphQL API → SSR Server → React Components → HTML/CSS/JS
-                       ↓
-                   Storage Adapters (LMDB, IndexedDB, JSON, etc.)
-```
-
-### Ключевые возможности
-
-- **SSR**: Серверный рендеринг для быстрой загрузки
-- **SSG**: Статическая генерация для CDN-раздачи
-- **Оффлайн-режим**: Работа без интернета через локальные адаптеры
-- **Адаптеры хранения**: LMDB, IndexedDB, JSON, ContextDB
-- **Гибкая настройка**: Переключение между базами данных через ENV
-
-### Режимы работы
-
-| Режим | Описание | Использование |
-|-------|----------|---------------|
-| **GraphQL → In-Memory** | Без хранения, прямой запрос к API | Разработка, тестирование |
-| **MAINDB=IndexedDB** | Данные в браузере | Оффлайн PWA |
-| **MAINDB=LMDB** | Серверная база LMDB | Production с персистентностью |
-| **BACKUPDB=LMDB** | Резервная копия | Фолбек при сбое сети |
-
-## 🚀 Установка
-
-### Предварительные требования
-
-- **Node.js**: 18+ или **Bun** 1.0+
-- **WordPress** с плагином **WPGraphQL**
-- **Git**
-
-### 1. Клонирование репозитория
+Get up and running in 5 minutes:
 
 ```bash
-git clone https://github.com/your-repo/ssr-starter.git
+# Install Bun
+curl -fsSL https://bun.sh/install | bash
+
+# Clone and setup
+git clone https://github.com/your-org/ssr-starter.git
 cd ssr-starter
-```
-
-### 2. Установка зависимостей
-
-```bash
-# С Bun (рекомендуется)
 bun install
 
-# Или с npm
-npm install
-```
+# Configure environment
+cp env.example .env
+# Edit .env with your WordPress GraphQL endpoint
 
-### 3. Настройка переменных окружения
-
-Создайте файл `.env`:
-
-```bash
-# Обязательные
-GRAPHQL_ENDPOINT=https://your-wordpress.com/graphql
-S3_ASSETS_URL=https://your-assets.com
-
-# Опциональные
-PORT=3000
-MAINDB=IndexedDB        # LMDB | IndexedDB | ContextDB | JsonDB | FALSE
-BACKUPDB=LMDB          # LMDB | JsonDB | ContextDB | FALSE
-NODE_ENV=development
-```
-
-### 4. Проверка установки
-
-```bash
-# Сборка ассетов
+# Build and run
 bun run build
-
-# Запуск сервера
 bun run dev
+
+# Visit http://localhost:3000
 ```
 
-Откройте `http://localhost:3000` - должна загрузиться главная страница.
+## 📚 Documentation Overview
 
-## ⚙️ Настройка
+This documentation is organized into the following sections:
 
-### Основные переменные окружения
+### [Getting Started](getting-started/introduction.md)
+- [Introduction](getting-started/introduction.md) - Framework overview and features
+- [Quick Start](getting-started/quick-start.md) - 5-minute setup guide
+- [Installation](getting-started/installation.md) - Detailed installation instructions
+- [Project Structure](getting-started/project-structure.md) - Codebase organization
 
-#### `GRAPHQL_ENDPOINT` (обязательно)
-URL вашего WordPress GraphQL API.
-```bash
-GRAPHQL_ENDPOINT=https://myblog.com/graphql
+### [Guides](guides/ssr-architecture.md)
+- [SSR Architecture](guides/ssr-architecture.md) - Deep dive into rendering pipeline
+- [Data Flow](guides/data-flow.md) - How data moves through the system
+- [Storage Adapters](guides/storage-adapters.md) - Database and caching options
+- [Static Generation](guides/static-generation.md) - SSG workflow and optimization
+- [Theming & Styling](guides/theming-styling.md) - UI customization guide
+- [Adding Pages](guides/adding-pages.md) - Create new routes and components
+- [Working with Data](guides/working-with-data.md) - Data fetching and manipulation
+- [Offline Mode](guides/offline-mode.md) - Progressive Web App features
+
+### [API Reference](api/server-api.md)
+- [Server API](api/server-api.md) - HTTP endpoints and responses
+- [Client API](api/client-api.md) - Browser-side JavaScript API
+- [Storage Adapters](api/storage-adapters.md) - Storage interface specifications
+- [GraphQL Integration](api/graphql-integration.md) - WordPress API integration
+- [Component Library](api/component-library.md) - UI components reference
+
+### [Configuration](configuration/environment-variables.md)
+- [Environment Variables](configuration/environment-variables.md) - All configuration options
+- [WordPress Setup](configuration/wordpress-setup.md) - CMS configuration guide
+- [Build Configuration](configuration/build-config.md) - Build pipeline customization
+- [Docker Configuration](configuration/docker-config.md) - Container setup
+
+### [Deployment](deployment/docker.md)
+- [Docker Deployment](deployment/docker.md) - Container deployment guide
+- [Railway/Nixpacks](deployment/railway.md) - One-click cloud deployment
+- [Vercel/Netlify](deployment/vercel-netlify.md) - Static hosting platforms
+- [Production Checklist](deployment/production-checklist.md) - Go-live preparation
+
+### [Contributing](contributing/development-workflow.md)
+- [Development Workflow](contributing/development-workflow.md) - Contributing guidelines
+- [Testing Guide](contributing/testing-guide.md) - Testing strategies and tools
+- [Adding Features](contributing/adding-features.md) - Feature development process
+- [Code Style](contributing/code-style.md) - Code formatting and standards
+
+### [Troubleshooting](troubleshooting/common-issues.md)
+- [Common Issues](troubleshooting/common-issues.md) - Solutions to frequent problems
+- [Debugging](troubleshooting/debugging.md) - Debug tools and techniques
+- [Performance](troubleshooting/performance.md) - Optimization strategies
+- [FAQ](troubleshooting/faq.md) - Frequently asked questions
+
+## 🎯 Key Features
+
+### ⚡ Performance
+- **Server-Side Rendering**: SEO-optimized initial loads
+- **Static Site Generation**: CDN-ready static files
+- **Intelligent Caching**: Multi-level caching system
+- **Route-Based Optimization**: Minimal data per page
+
+### 🔧 Flexibility
+- **Multiple Storage Adapters**: LMDB, IndexedDB, JSON, ContextDB
+- **Offline Mode**: Full functionality without network
+- **WordPress Integration**: Seamless headless CMS integration
+- **Progressive Enhancement**: Works without JavaScript
+
+### 🛠 Developer Experience
+- **TypeScript**: Full type safety throughout
+- **Hot Reload**: Instant development feedback
+- **Modern Stack**: Bun runtime, Elysia.js server, React components
+- **Comprehensive Testing**: Unit, integration, and E2E tests
+
+### 📦 Production Ready
+- **Docker Support**: Containerized deployment
+- **Multi-Platform**: Railway, Vercel, Netlify, custom servers
+- **Monitoring**: Health checks and metrics
+- **Security**: Built-in security headers and validation
+
+## 🏗 Architecture
+
+```mermaid
+graph TB
+    A[WordPress GraphQL] --> B[SSR Server]
+    B --> C[Storage Adapters]
+    B --> D[React Components]
+    D --> E[HTML Output]
+
+    C --> F[LMDB]
+    C --> G[IndexedDB]
+    C --> H[JSON Files]
+    C --> I[ContextDB]
+
+    J[Static Generation] --> K[HTML Files]
+    K --> L[CDN/Hosting]
 ```
 
-#### `S3_ASSETS_URL` (обязательно)
-URL для статических ассетов (шрифты, изображения).
-```bash
-S3_ASSETS_URL=https://cdn.myblog.com
-```
-
-#### `MAINDB` (опционально)
-Основная база данных для хранения данных.
-
-| Значение | Хранение | Использование |
-|----------|----------|---------------|
-| `FALSE` | In-Memory | Только GraphQL, без хранения |
-| `IndexedDB` | `src/data/json/full.json` | Оффлайн в браузере |
-| `LMDB` | `./data/db/` | Быстрая серверная БД |
-| `ContextDB` | HTML контекст | Встраивание в страницы |
-
-#### `BACKUPDB` (опционально)
-Резервная база данных для оффлайн-режима.
-
-```bash
-MAINDB=IndexedDB    # Основная: браузер
-BACKUPDB=LMDB      # Резерв: сервер
-```
-
-### Настройка WordPress
-
-1. Установите плагин **WPGraphQL**
-2. Настройте CORS для вашего домена
-3. Проверьте доступность эндпоинта: `curl https://your-site.com/graphql`
-
-## 💻 Разработка
-
-### Структура проекта
-
-```
-├── src/                    # Клиентский код
-│   ├── components/         # React компоненты
-│   ├── routes/            # Страницы приложения
-│   ├── data/              # Типы и GraphQL запросы
-│   └── layouts/           # Макеты страниц
-├── server/                # Серверный код
-│   ├── storage/           # Адаптеры хранения
-│   ├── index.ts           # Главный сервер
-│   ├── sync.ts            # Синхронизация данных
-│   └── render.tsx         # SSR рендеринг
-├── scripts/               # Скрипты сборки
-├── dist/                  # Собранные ассеты
-└── data/                  # Данные (LMDB, JSON)
-```
-
-### Основные команды
-
-```bash
-# Разработка
-bun run dev              # Полная разработка (сборка + сервер)
-bun run server:dev       # Только сервер (горячая перезагрузка)
-bun run tailwind:watch   # Слежение за стилями
-
-# Сборка
-bun run build            # Сборка для production
-bun run tailwind:build   # Сборка стилей
-bun run client:build     # Сборка клиентского JS
-
-# Статическая генерация
-bun run scripts/generate # Генерация статических HTML
-```
-
-### Добавление новой страницы
-
-1. Создайте компонент в `src/routes/NewPage.tsx`:
-
-```tsx
-import { useRenderContext } from '@/data'
-
-export default function NewPage() {
-  const { context } = useRenderContext()
-
-  return (
-    <div>
-      <h1>Новая страница</h1>
-      {/* Ваш код */}
-    </div>
-  )
-}
-```
-
-2. Добавьте маршрут в `server/render.tsx`:
-
-```tsx
-import NewPage from '../src/routes/NewPage'
-
-// В AppRouter добавьте:
-<Route path="/new-page" element={<MainLayout context={context}><NewPage /></MainLayout>} />
-```
-
-3. Добавьте в статическую генерацию в `scripts/routeToStatic.ts`:
-
-```tsx
-routes.add('/new-page')
-```
-
-### Работа с данными
-
-```tsx
-import { useRenderContext } from '@/data'
-
-function MyComponent() {
-  const { context, loading, error } = useRenderContext()
-
-  if (loading) return <div>Загрузка...</div>
-  if (error) return <div>Ошибка: {error}</div>
-
-  // Доступ к данным
-  const { posts, categories, tags, authors } = context
-
-  return (
-    <div>
-      {/* Ваш код с данными */}
-    </div>
-  )
-}
-```
-
-## 🧪 Тестирование
-
-### Режимы тестирования
-
-#### 1. GraphQL → In-Memory (по умолчанию)
-
-```bash
-# Без дополнительных переменных
-bun run dev
-```
-
-**Что проверять:**
-- Страницы загружаются
-- Данные приходят из GraphQL
-- `/health` показывает количество постов
-- При отключении интернета: ошибка 500
-
-#### 2. IndexedDB + LMDB Backup
-
-```bash
-MAINDB=IndexedDB BACKUPDB=LMDB bun run dev
-```
-
-**Что проверять:**
-- После первого запроса создается `src/data/json/full.json`
-- При отключении GraphQL данные берутся из IndexedDB
-- При повторном запуске данные восстанавливаются
-
-#### 3. Только LMDB
-
-```bash
-MAINDB=LMDB bun run dev
-```
-
-**Что проверять:**
-- Данные сохраняются в `./data/db/`
-- Быстрая загрузка при повторных запросах
-
-#### 4. Статическая генерация
-
-```bash
-bun run scripts/generate
-```
-
-**Что проверять:**
-- Создается папка `www/html/` с HTML файлами
-- Каждая страница содержит правильные данные
-- Создаются JSON-срезы в `src/data/json/`
-
-### API эндпоинты для тестирования
-
-```bash
-# Здоровье приложения
-curl http://localhost:3000/health
-
-# API постов
-curl "http://localhost:3000/api/posts?page=1&limit=5"
-
-# Проверка страниц
-curl http://localhost:3000/
-curl http://localhost:3000/blog
-curl http://localhost:3000/posts/your-post-slug
-```
-
-## 👨‍💻 Руководство разработчика
-
-### Проверки перед коммитом
-
-#### 1. Линтинг и типы
-
-```bash
-# TypeScript проверки
-bun run tsc --noEmit
-
-# Если есть ESLint
-bun run lint
-```
-
-#### 2. Сборка проекта
-
-```bash
-bun run build
-```
-
-#### 3. Тестирование в разных режимах
-
-```bash
-# Тест 1: In-Memory режим
-MAINDB=FALSE bun run build && timeout 10s bun run start
-
-# Тест 2: IndexedDB режим
-MAINDB=IndexedDB bun run build && timeout 10s bun run start
-
-# Тест 3: LMDB режим
-MAINDB=LMDB BACKUPDB=FALSE bun run build && timeout 10s bun run start
-
-# Тест 4: Статическая генерация
-bun run scripts/generate
-ls -la www/html/
-```
-
-#### 4. Проверка файловой структуры
-
-```bash
-# Проверить наличие всех необходимых файлов
-ls -la dist/           # entry-client.js, styles.css
-ls -la src/assets/     # Шрифты и ассеты
-ls -la data/db/        # LMDB файлы (если используются)
-ls -la src/data/json/  # JSON данные (если используются)
-```
-
-### Отладка проблем
-
-#### GraphQL ошибки
-
-```bash
-# Проверить доступность API
-curl $GRAPHQL_ENDPOINT -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"query": "{ posts { nodes { id } } }"}'
-```
-
-#### Проблемы с адаптерами
-
-```bash
-# Проверить JSON адаптер
-cat src/data/json/full.json | head -20
-
-# Проверить LMDB (если установлен lmdb-tools)
-lmdb_dump data/db/
-```
-
-#### Ошибки сборки
-
-```bash
-# Очистить кэш
-rm -rf node_modules/.cache dist/ data/db/
-
-# Переустановить зависимости
-rm -rf node_modules bun.lock
-bun install
-
-# Собрать заново
-bun run build
-```
-
-### Добавление нового адаптера хранения
-
-1. Создайте файл в `server/storage/adapter.new.ts`:
-
-```typescript
-import type { StorageAdapter, DataCollections } from './types'
-
-export class NewAdapter implements StorageAdapter {
-  async save(collections: DataCollections): Promise<void> {
-    // Сохранение данных
-  }
-
-  async load(): Promise<DataCollections | null> {
-    // Загрузка данных
-    return null
-  }
-
-  async clear(): Promise<void> {
-    // Очистка данных
-  }
-}
-```
-
-2. Добавьте в `server/storage/index.ts`:
-
-```typescript
-case 'newdb':
-  return new NewAdapter()
-```
-
-## 🔧 API и адаптеры
-
-### Интерфейс StorageAdapter
-
-```typescript
-interface StorageAdapter {
-  save(collections: DataCollections): Promise<void>
-  load(): Promise<DataCollections | null>
-  clear(): Promise<void>
-}
-```
-
-### Типы данных
-
-#### DataCollections
-```typescript
-interface DataCollections {
-  posts: PostData[]
-  categories: CategoryData[]
-  tags: TagData[]
-  authors: AuthorData[]
-  pages: PageSummary[]
-  site?: any
-  menu?: any
-}
-```
-
-### CRUD операции
-
-#### Создание поста (в GraphQL)
-```graphql
-mutation CreatePost($input: CreatePostInput!) {
-  createPost(input: $input) {
-    post {
-      id
-      title
-      content
-    }
-  }
-}
-```
-
-#### Чтение данных
-```typescript
-import { getBaseContext } from '../server/sync'
-
-const context = await getBaseContext()
-// context.posts, context.categories, etc.
-```
-
-#### Обновление данных
-```typescript
-import { fetchAllData } from '../server/sync'
-
-await fetchAllData() // Синхронизация с GraphQL
-```
-
-### Генерация статических страниц
-
-```typescript
-import { RouteToStatic } from './scripts/routeToStatic'
-
-const generator = new RouteToStatic({
-  outputDir: './www/html',
-  syncBefore: true,  // Синхронизировать данные перед генерацией
-  blogPageSize: 5    // Постов на странице блога
-})
-
-await generator.generateAll()
-```
-
-## 🚀 Деплой
-
-### Docker
-
-#### Сборка образа
-
-```bash
-docker build \
-  --build-arg GRAPHQL_ENDPOINT=https://your-site.com/graphql \
-  --build-arg S3_ASSETS_URL=https://cdn.your-site.com \
-  -t ssr-starter .
-```
-
-#### Запуск контейнера
-
-```bash
-docker run \
-  -e GRAPHQL_ENDPOINT=https://your-site.com/graphql \
-  -e S3_ASSETS_URL=https://cdn.your-site.com \
-  -e MAINDB=LMDB \
-  -p 3000:3000 \
-  ssr-starter
-```
-
-### Railway/Nixpacks
-
-Файл `nixpacks.toml` настроен для автоматического деплоя:
-
-```toml
-[phases.install]
-cmds = ["bun install --frozen-lockfile"]
-
-[phases.build]
-cmds = ["bun run build"]
-
-[start]
-cmd = "bun run start"
-```
-
-### Vercel/Netlify (SSG)
-
-```bash
-# Генерация статических файлов
-bun run scripts/generate
-
-# Деплой папки www/html/
-# На Vercel: указать root directory как www/html
-# На Netlify: publish directory как www/html
-```
-
-### Переменные окружения для production
-
-```bash
-NODE_ENV=production
-PORT=3000
-GRAPHQL_ENDPOINT=https://your-production-site.com/graphql
-S3_ASSETS_URL=https://cdn.your-production-site.com
-MAINDB=LMDB
-BACKUPDB=FALSE
-```
-
-## 🔍 Troubleshooting
-
-### "GraphQL endpoint not configured"
-
-**Решение:** Установите переменную окружения `GRAPHQL_ENDPOINT`
-
-```bash
-export GRAPHQL_ENDPOINT=https://your-site.com/graphql
-```
-
-### "Cannot find module 'lmdb'"
-
-**Решение:** Установите зависимости или отключите LMDB
-
-```bash
-# Отключить LMDB
-export MAINDB=IndexedDB
-export BACKUPDB=FALSE
-```
-
-### "Port 3000 already in use"
-
-**Решение:** Измените порт
-
-```bash
-export PORT=3001
-```
-
-### "Static generation fails"
-
-**Решение:** Проверьте доступность GraphQL API
-
-```bash
-curl $GRAPHQL_ENDPOINT -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"query": "{ posts { nodes { id } } }"}'
-```
-
-### "Styles not loading"
-
-**Решение:** Соберите Tailwind
-
-```bash
-bun run tailwind:build
-```
+## 📋 Requirements
+
+- **Runtime**: Bun 1.0+ or Node.js 18+
+- **WordPress**: 5.0+ with WPGraphQL plugin
+- **Memory**: 512MB minimum, 2GB recommended
+- **Storage**: 500MB for dependencies, 1GB+ for data
+
+## 🌟 Use Cases
+
+- **Blog Platforms**: High-performance WordPress-powered blogs
+- **Content Management**: CMS-driven websites with SEO requirements
+- **E-commerce**: Product catalogs with server-side rendering
+- **Documentation Sites**: Static generation for developer docs
+- **Progressive Web Apps**: Offline-capable web applications
+- **Marketing Sites**: Fast-loading landing pages
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](contributing/development-workflow.md) for details on:
+
+- Setting up a development environment
+- Coding standards and practices
+- Testing requirements
+- Pull request process
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE.md) file for details.
+
+## 🆘 Support
+
+- **Documentation**: You're reading it! 🎉
+- **Issues**: [GitHub Issues](https://github.com/your-org/ssr-starter/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-org/ssr-starter/discussions)
+- **Discord**: Join our community server
+- **Commercial Support**: [Book a consultation](https://calendly.com/your-org)
+
+## 📈 Roadmap
+
+### Current Version (1.0.x)
+- ✅ SSR with React
+- ✅ Multiple storage adapters
+- ✅ Static site generation
+- ✅ WordPress GraphQL integration
+- ✅ Docker deployment
+- ✅ Comprehensive documentation
+
+### Upcoming Features
+- 🔄 Redis adapter support
+- 🔄 Advanced caching strategies
+- 🔄 Real-time data synchronization
+- 🔄 Multi-language support (i18n)
+- 🔄 Advanced analytics integration
+- 🔄 Plugin system for extensions
 
 ---
 
-## 📚 Дополнительные ресурсы
-
-- [WPGraphQL Documentation](https://docs.wpgraphql.com/)
-- [Elysia.js Guide](https://elysiajs.com/)
-- [React Router Documentation](https://reactrouter.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-
-Для вопросов и предложений: [GitHub Issues](https://github.com/your-repo/ssr-starter/issues)
+**Ready to build something amazing?** Let's get started with the [Quick Start Guide](getting-started/quick-start.md)! 🚀
