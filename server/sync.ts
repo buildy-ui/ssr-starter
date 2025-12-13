@@ -1,4 +1,3 @@
-import { dbOperations } from './db';
 import type { RenderContext, PostData, CategoryData, TagData, AuthorData, PageSummary } from '../src/data/types';
 import { defaultRenderContext } from '../src/data';
 import { getAdapters } from './storage';
@@ -343,16 +342,6 @@ export async function syncAllData() {
     if (backup) {
       await backup.saveAll(payload);
       console.log(`🛟 Saved to BACKUP adapter: ${backup.name}`);
-    }
-    if (!main && !backup) {
-      // fallback to legacy LMDB in-memory
-      dbOperations.savePosts(posts);
-      dbOperations.saveCategories(categories);
-      dbOperations.saveTags(tags);
-      dbOperations.saveAuthors(authors);
-      dbOperations.savePages(pages);
-      dbOperations.saveMeta('site', defaultRenderContext.site);
-      dbOperations.saveMeta('menu', defaultRenderContext.menu);
     }
 
     console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);

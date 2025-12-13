@@ -3,9 +3,8 @@ import { html } from '@elysiajs/html';
 import { readFile } from 'fs/promises';
 import { extname } from 'path';
 import { renderPage } from './render';
-import { dbOperations } from './db';
-import { syncAllData } from './sync';
 import { renderHtmlTemplate, STYLES_PATH } from './template';
+import { getBaseContext, getRouteContext, syncAllData } from './sync';
 
 const PORT = Number(process.env.PORT ?? 3000);
 
@@ -62,7 +61,8 @@ const app = new Elysia()
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 10;
 
-    const allPosts = dbOperations.getPosts();
+    const base = await getBaseContext();
+    const allPosts = base.posts.posts;
     const start = (page - 1) * limit;
     const end = start + limit;
     const items = allPosts.slice(start, end);
@@ -79,7 +79,8 @@ const app = new Elysia()
   })
 
   .get('/health', async () => {
-    const posts = dbOperations.getPosts();
+    const base = await getBaseContext();
+    const posts = base.posts.posts;
     return {
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -91,7 +92,7 @@ const app = new Elysia()
     const path = url.pathname;
 
     try {
-      const context = dbOperations.getRouteContext(path);
+      const context = await getRouteContext(path);
       const { html, meta } = await renderPage(path, context);
       const body = renderHtmlTemplate({ html, meta, site: context.site, assets: context.assets });
       return body;
@@ -102,7 +103,9 @@ const app = new Elysia()
   });
 
 (async function bootstrap() {
-  await syncAllData();
+  // Warm cache and persist to adapters if configured
+  await syncAllData().catch((error) => console.warn('Sync on bootstrap failed:', error));
+  await getBaseContext().catch((error) => console.warn('Warm cache failed:', error));
   app.listen({ port: PORT });
   console.log(`🚀 SSR server running at http://localhost:${PORT}`);
 })();
