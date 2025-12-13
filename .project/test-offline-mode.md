@@ -22,6 +22,9 @@ GRAPHQL_MODE=GETMODE
 # Skip startup sync when testing offline boot
 SYNC_ON_BOOT=false
 
+# Optional: silence data source logs
+LOG_DATA_SOURCE=false
+
 # Development settings
 NODE_ENV=development
 ```

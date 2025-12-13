@@ -173,6 +173,19 @@ SYNC_ON_BOOT=false
 **Default**: `true`
 **Recommended for offline development**: `false`
 
+### `LOG_DATA_SOURCE` (опционально)
+Controls whether the server prints which data source was used to build the base context (GraphQL vs MAINDB vs BACKUPDB).
+
+```bash
+# Default behavior: print one line when the base context is loaded
+LOG_DATA_SOURCE=true
+
+# Quiet mode: do not print data source logs
+LOG_DATA_SOURCE=false
+```
+
+**Default**: `true`
+
 ## WordPress Configuration
 
 ### `WP_USER`

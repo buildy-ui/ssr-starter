@@ -490,6 +490,7 @@ export function buildRenderContext(collections: DataCollections): RenderContext 
 }
 
 const CACHE_TTL_MS = Number(process.env.DATA_CACHE_TTL ?? 60_000);
+const LOG_DATA_SOURCE = String(process.env.LOG_DATA_SOURCE ?? 'true').toLowerCase() !== 'false';
 let cached: { context: RenderContext; collections: DataCollections; ts: number } | null = null;
 let lastDataSource: string | null = null;
 let lastLoggedDataSource: string | null = null;
@@ -508,12 +509,14 @@ export async function getBaseContext(options?: { force?: boolean }): Promise<Ren
     cached = { context, collections, ts: now };
 
     // Log source once per change to keep terminal noise low.
-    const source = lastDataSource ?? 'unknown';
-    if (source !== lastLoggedDataSource) {
-      lastLoggedDataSource = source;
-      console.log(
-        `📦 Base context loaded from ${source} (posts=${collections.posts.length}, pages=${collections.pages.length}, categories=${collections.categories.length})`
-      );
+    if (LOG_DATA_SOURCE) {
+      const source = lastDataSource ?? 'unknown';
+      if (source !== lastLoggedDataSource) {
+        lastLoggedDataSource = source;
+        console.log(
+          `📦 Base context loaded from ${source} (posts=${collections.posts.length}, pages=${collections.pages.length}, categories=${collections.categories.length})`
+        );
+      }
     }
 
     return context;
