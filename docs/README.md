@@ -34,52 +34,53 @@ bun run dev
 
 This documentation is organized into the following sections:
 
-### [Getting Started](docs/getting-started/introduction.md)
-- [Introduction](docs/getting-started/introduction.md) - Framework overview and features
-- [Quick Start](docs/getting-started/quick-start.md) - 5-minute setup guide
-- [Installation](docs/getting-started/installation.md) - Detailed installation instructions
-- [Project Structure](docs/getting-started/project-structure.md) - Codebase organization
+### [Getting Started](getting-started/introduction.md)
+- [Introduction](getting-started/introduction.md) - Framework overview and features
+- [Quick Start](getting-started/quick-start.md) - 5-minute setup guide
+- [Installation](getting-started/installation.md) - Detailed installation instructions
+- [Project Structure](getting-started/project-structure.md) - Codebase organization
 
-### [Guides](docs/guides/ssr-architecture.md)
-- [SSR Architecture](docs/guides/ssr-architecture.md) - Deep dive into rendering pipeline
-- [Data Flow](docs/guides/data-flow.md) - How data moves through the system
-- [Storage Adapters](docs/guides/storage-adapters.md) - Database and caching options
-- [Static Generation](docs/guides/static-generation.md) - SSG workflow and optimization
-- [Theming & Styling](docs/guides/theming-styling.md) - UI customization guide
-- [Adding Pages](docs/guides/adding-pages.md) - Create new routes and components
-- [Working with Data](docs/guides/working-with-data.md) - Data fetching and manipulation
-- [Offline Mode](docs/guides/offline-mode.md) - Progressive Web App features
+### [Guides](guides/offline-cms-101.md)
+- [Offline CMS Development 101](guides/offline-cms-101.md) - Complete beginner's guide to offline apps
+- [SSR Architecture](guides/ssr-architecture.md) - Deep dive into rendering pipeline
+- [Data Flow](guides/data-flow.md) - How data moves through the system
+- [Storage Adapters](guides/storage-adapters.md) - Database and caching options
+- [Static Generation](guides/static-generation.md) - SSG workflow and optimization
+- [Theming & Styling](guides/theming-styling.md) - UI customization guide
+- [Adding Pages](guides/adding-pages.md) - Create new routes and components
+- [Working with Data](guides/working-with-data.md) - Data fetching and manipulation
+- [Offline Mode](guides/offline-mode.md) - Progressive Web App features
 
-### [API Reference](docs/api/server-api.md)
-- [Server API](docs/api/server-api.md) - HTTP endpoints and responses
-- [Client API](docs/api/client-api.md) - Browser-side JavaScript API
-- [Storage Adapters](docs/api/storage-adapters.md) - Storage interface specifications
-- [GraphQL Integration](docs/api/graphql-integration.md) - WordPress API integration
-- [Component Library](docs/api/component-library.md) - UI components reference
+### [API Reference](api/server-api.md)
+- [Server API](api/server-api.md) - HTTP endpoints and responses
+- [Client API](api/client-api.md) - Browser-side JavaScript API
+- [Storage Adapters](api/storage-adapters.md) - Storage interface specifications
+- [GraphQL Integration](api/graphql-integration.md) - WordPress API integration
+- [Component Library](api/component-library.md) - UI components reference
 
-### [Configuration](docs/configuration/environment-variables.md)
-- [Environment Variables](docs/configuration/environment-variables.md) - All configuration options
-- [WordPress Setup](docs/configuration/wordpress-setup.md) - CMS configuration guide
-- [Build Configuration](docs/configuration/build-config.md) - Build pipeline customization
-- [Docker Configuration](docs/configuration/docker-config.md) - Container setup
+### [Configuration](configuration/environment-variables.md)
+- [Environment Variables](configuration/environment-variables.md) - All configuration options
+- [WordPress Setup](configuration/wordpress-setup.md) - CMS configuration guide
+- [Build Configuration](configuration/build-config.md) - Build pipeline customization
+- [Docker Configuration](configuration/docker-config.md) - Container setup
 
-### [Deployment](docs/deployment/docker.md)
-- [Docker Deployment](docs/deployment/docker.md) - Container deployment guide
-- [Railway/Nixpacks](docs/deployment/railway.md) - One-click cloud deployment
-- [Vercel/Netlify](docs/deployment/vercel-netlify.md) - Static hosting platforms
-- [Production Checklist](docs/deployment/production-checklist.md) - Go-live preparation
+### [Deployment](deployment/docker.md)
+- [Docker Deployment](deployment/docker.md) - Container deployment guide
+- [Railway/Nixpacks](deployment/railway.md) - One-click cloud deployment
+- [Vercel/Netlify](deployment/vercel-netlify.md) - Static hosting platforms
+- [Production Checklist](deployment/production-checklist.md) - Go-live preparation
 
-### [Contributing](docs/contributing/development-workflow.md)
-- [Development Workflow](docs/contributing/development-workflow.md) - Contributing guidelines
-- [Testing Guide](docs/contributing/testing-guide.md) - Testing strategies and tools
-- [Adding Features](docs/contributing/adding-features.md) - Feature development process
-- [Code Style](docs/contributing/code-style.md) - Code formatting and standards
+### [Contributing](contributing/development-workflow.md)
+- [Development Workflow](contributing/development-workflow.md) - Contributing guidelines
+- [Testing Guide](contributing/testing-guide.md) - Testing strategies and tools
+- [Adding Features](contributing/adding-features.md) - Feature development process
+- [Code Style](contributing/code-style.md) - Code formatting and standards
 
-### [Troubleshooting](docs/troubleshooting/common-issues.md)
-- [Common Issues](docs/troubleshooting/common-issues.md) - Solutions to frequent problems
-- [Debugging](docs/troubleshooting/debugging.md) - Debug tools and techniques
-- [Performance](docs/troubleshooting/performance.md) - Optimization strategies
-- [FAQ](docs/troubleshooting/faq.md) - Frequently asked questions
+### [Troubleshooting](troubleshooting/common-issues.md)
+- [Common Issues](troubleshooting/common-issues.md) - Solutions to frequent problems
+- [Debugging](troubleshooting/debugging.md) - Debug tools and techniques
+- [Performance](troubleshooting/performance.md) - Optimization strategies
+- [FAQ](troubleshooting/faq.md) - Frequently asked questions
 
 ## 🎯 Key Features
 
@@ -91,7 +92,6 @@ This documentation is organized into the following sections:
 
 ### 🔧 Flexibility
 - **Multiple Storage Adapters**: LMDB, IndexedDB, JSON, ContextDB
-- **GraphQL Sync Modes**: GETMODE/SETMODE/CRUDMODE for different data flows
 - **Offline Mode**: Full functionality without network
 - **WordPress Integration**: Seamless headless CMS integration
 - **Progressive Enhancement**: Works without JavaScript
@@ -144,7 +144,7 @@ graph TB
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](docs/contributing/development-workflow.md) for details on:
+We welcome contributions! Please see our [Contributing Guide](contributing/development-workflow.md) for details on:
 
 - Setting up a development environment
 - Coding standards and practices
@@ -183,4 +183,4 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE.md
 
 ---
 
-**Ready to build something amazing?** Let's get started with the [Quick Start Guide](docs/getting-started/quick-start.md)! 🚀
+**Ready to build something amazing?** Let's get started with the [Quick Start Guide](getting-started/quick-start.md)! 🚀

@@ -1,10 +1,11 @@
-import { defaultRenderContext } from '../src/data';
 import type { RenderContext, PostData, CategoryData, TagData, AuthorData, PageSummary } from '../src/data/types';
+import { defaultRenderContext } from '../src/data';
+import { getAdapters } from './storage';
 
 const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;
 
 if (!GRAPHQL_ENDPOINT) {
-  console.warn('GRAPHQL_ENDPOINT is not set. Data fetch will fail without it.');
+  console.warn('GRAPHQL_ENDPOINT is not set. Sync will not run without a configured endpoint.');
 }
 
 async function graphqlQuery<T>(query: string, variables?: Record<string, any>): Promise<T> {
@@ -12,22 +13,94 @@ async function graphqlQuery<T>(query: string, variables?: Record<string, any>): 
     throw new Error('GRAPHQL_ENDPOINT is not configured');
   }
 
-  const response = await fetch(GRAPHQL_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables }),
+  try {
+    const response = await fetch(GRAPHQL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+      verbose: true
+    });
+
+    if (!response.ok) {
+      throw new Error(`GraphQL error ${response.status}: ${await response.text()}`);
+    }
+
+    const payload = await response.json();
+    if (payload.errors) {
+      throw new Error(JSON.stringify(payload.errors));
+    }
+
+    return payload.data;
+  } catch (error) {
+    console.error('Error connect to GraphQL:', error);
+    // IMPORTANT:
+    // Do NOT fallback to adapters here because graphqlQuery<T> is used for *typed* per-query payloads
+    // (e.g. { posts: { nodes } }). Returning DataCollections here corrupts the control flow and can
+    // lead to overwriting MAINDB/BACKUPDB with empty arrays when offline.
+    throw error;
+  }
+}
+
+async function getDataFromAdapters(): Promise<DataCollections> {
+  const { main, backup } = getAdapters();
+
+  const countContent = (data: DataCollections | null | undefined) =>
+    (data?.posts?.length ?? 0) +
+    (data?.categories?.length ?? 0) +
+    (data?.tags?.length ?? 0) +
+    (data?.authors?.length ?? 0) +
+    (data?.pages?.length ?? 0);
+
+  const countSummary = (data: DataCollections | null | undefined) => ({
+    posts: data?.posts?.length ?? 0,
+    categories: data?.categories?.length ?? 0,
+    tags: data?.tags?.length ?? 0,
+    authors: data?.authors?.length ?? 0,
+    pages: data?.pages?.length ?? 0,
   });
 
-  if (!response.ok) {
-    throw new Error(`GraphQL error ${response.status}: ${await response.text()}`);
+  // Prefer MAINDB if it has content; otherwise fall back to BACKUPDB if it has content.
+  // If both exist but are empty, return MAINDB (or BACKUPDB) as a last resort to allow boot.
+  let mainEmpty: DataCollections | null = null;
+  let backupEmpty: DataCollections | null = null;
+
+  if (main) {
+    try {
+      const data = await main.getAll();
+      if (countContent(data) > 0) {
+        lastDataSource = `MAINDB:${main.name}`;
+        return data;
+      }
+      mainEmpty = data;
+    } catch (error) {
+      console.warn(`Adapter ${main.name} failed to read:`, error);
+    }
   }
 
-  const payload = await response.json();
-  if (payload.errors) {
-    throw new Error(JSON.stringify(payload.errors));
+  if (backup) {
+    try {
+      const data = await backup.getAll();
+      if (countContent(data) > 0) {
+        lastDataSource = `BACKUPDB:${backup.name}`;
+        return data;
+      }
+      backupEmpty = data;
+    } catch (error) {
+      console.warn(`Adapter ${backup.name} failed to read:`, error);
+    }
   }
 
-  return payload.data;
+  if (mainEmpty) {
+    lastDataSource = main ? `MAINDB:${main.name}` : 'MAINDB:unknown';
+    console.warn('⚠️  MAINDB loaded but appears empty:', countSummary(mainEmpty));
+    return mainEmpty;
+  }
+  if (backupEmpty) {
+    lastDataSource = backup ? `BACKUPDB:${backup.name}` : 'BACKUPDB:unknown';
+    console.warn('⚠️  BACKUPDB loaded but appears empty:', countSummary(backupEmpty));
+    return backupEmpty;
+  }
+  throw new Error('No adapter data available');
 }
 
 const QUERIES = {
@@ -263,49 +336,142 @@ function buildPageSummaries(pages: any[]): PageSummary[] {
   }));
 }
 
+export async function syncAllData() {
+  if (!GRAPHQL_ENDPOINT) {
+    console.warn('Skipping sync because GRAPHQL_ENDPOINT is not configured.');
+    return;
+  }
+
+  console.log('🔄 Syncing data from WordPress GraphQL...');
+
+  try {
+    const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
+      graphqlQuery<{ posts: { nodes: any[] } }>(QUERIES.posts),
+      graphqlQuery<{ categories: { nodes: any[] } }>(QUERIES.categories),
+      graphqlQuery<{ tags: { nodes: any[] } }>(QUERIES.tags),
+      graphqlQuery<{ users: { nodes: any[] } }>(QUERIES.users),
+      graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages)
+    ]);
+
+    const posts = (postsResult.posts.nodes || []).map(mapPost);
+    const categories: CategoryData[] = (categoriesResult.categories.nodes || []).map((cat: any) => ({
+      id: cat.categoryId,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+      count: cat.count,
+    }));
+    const tags: TagData[] = (tagsResult.tags.nodes || []).map((tag: any) => ({
+      id: tag.tagId,
+      name: tag.name,
+      slug: tag.slug,
+      count: tag.count,
+    }));
+    const authors = deriveAuthors(posts);
+    const pages = buildPageSummaries(pagesResult.pages.nodes || []);
+
+    const payload: DataCollections = {
+      posts,
+      categories,
+      tags,
+      authors,
+      pages,
+      site: defaultRenderContext.site,
+      menu: defaultRenderContext.menu,
+    };
+
+    const { main, backup } = getAdapters();
+    if (main) {
+      await main.saveAll(payload);
+      console.log(`💾 Saved to MAINDB adapter: ${main.name}`);
+    }
+    if (backup) {
+      await backup.saveAll(payload);
+      console.log(`🛟 Saved to BACKUP adapter: ${backup.name}`);
+    }
+
+    console.log(`✅ Synced ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
+  } catch (error) {
+    // When offline / GraphQL is down: NEVER overwrite adapters with empty data.
+    console.error('Ошибка синхронизации данных (данные не сохранены):', error);
+  }
+}
+
+/* To json data */
+
 export type DataCollections = {
   posts: PostData[];
   categories: CategoryData[];
   tags: TagData[];
   authors: AuthorData[];
   pages: PageSummary[];
+  site?: RenderContext['site'];
+  menu?: RenderContext['menu'];
 };
 
 export async function fetchAllData(): Promise<DataCollections> {
   if (!GRAPHQL_ENDPOINT) {
-    throw new Error('GRAPHQL_ENDPOINT is not configured');
+    console.warn('GRAPHQL_ENDPOINT is not configured, fallback to adapters.');
+    return getDataFromAdapters();
   }
 
   console.log('🔄 Fetching data from WordPress GraphQL...');
 
-  const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
-    graphqlQuery<{ posts: { nodes: any[] } }>(QUERIES.posts),
-    graphqlQuery<{ categories: { nodes: any[] } }>(QUERIES.categories),
-    graphqlQuery<{ tags: { nodes: any[] } }>(QUERIES.tags),
-    graphqlQuery<{ users: { nodes: any[] } }>(QUERIES.users),
-    graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages),
-  ]);
+  try {
+    const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
+      graphqlQuery<{ posts: { nodes: any[] } }>(QUERIES.posts),
+      graphqlQuery<{ categories: { nodes: any[] } }>(QUERIES.categories),
+      graphqlQuery<{ tags: { nodes: any[] } }>(QUERIES.tags),
+      graphqlQuery<{ users: { nodes: any[] } }>(QUERIES.users),
+      graphqlQuery<{ pages: { nodes: any[] } }>(QUERIES.pages)
+    ]);
+    
+    const posts = (postsResult?.posts?.nodes || []).map(mapPost);
+    const categories: CategoryData[] = (categoriesResult?.categories?.nodes || []).map((cat: any) => ({
+      id: cat.categoryId,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+      count: cat.count,
+    }));
+    const tags: TagData[] = (tagsResult?.tags?.nodes || []).map((tag: any) => ({
+      id: tag.tagId,
+      name: tag.name,
+      slug: tag.slug,
+      count: tag.count,
+    }));
+    const authors = deriveAuthors(posts);
+    const pages = buildPageSummaries(pagesResult?.pages?.nodes || []);
 
-  const posts = (postsResult.posts.nodes || []).map(mapPost);
-  const categories: CategoryData[] = (categoriesResult.categories.nodes || []).map((cat: any) => ({
-    id: cat.categoryId,
-    name: cat.name,
-    slug: cat.slug,
-    description: cat.description,
-    count: cat.count,
-  }));
-  const tags: TagData[] = (tagsResult.tags.nodes || []).map((tag: any) => ({
-    id: tag.tagId,
-    name: tag.name,
-    slug: tag.slug,
-    count: tag.count,
-  }));
-  const authors = deriveAuthors(posts);
-  const pages = buildPageSummaries(pagesResult.pages.nodes || []);
+    const payload: DataCollections = {
+      posts,
+      categories,
+      tags,
+      authors,
+      pages,
+      site: defaultRenderContext.site,
+      menu: defaultRenderContext.menu,
+    };
 
-  console.log(`✅ Fetched ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
+    // Persist to adapters only when GraphQL fetch succeeded (we are in the try{} branch)
+    const { main, backup } = getAdapters();
+    if (main) {
+      await main.saveAll(payload);
+      console.log(`💾 Saved to MAINDB adapter: ${main.name}`);
+    }
+    if (backup) {
+      await backup.saveAll(payload);
+      console.log(`🛟 Saved to BACKUP adapter: ${backup.name}`);
+    }
 
-  return { posts, categories, tags, authors, pages };
+    lastDataSource = 'GraphQL';
+    console.log(`✅ Fetched ${posts.length} posts, ${categories.length} categories, ${tags.length} tags, ${authors.length} authors, ${pages.length} pages.`);
+
+    return payload;
+  } catch (error) {
+    console.error('Error connect to GraphQL, fallback to adapters:', error);
+    return getDataFromAdapters();
+  }
 }
 
 export function buildRenderContext(collections: DataCollections): RenderContext {
@@ -315,8 +481,8 @@ export function buildRenderContext(collections: DataCollections): RenderContext 
     tags: collections.tags,
     authors: collections.authors,
     pages: collections.pages,
-    site: defaultRenderContext.site,
-    menu: defaultRenderContext.menu,
+    site: collections.site ?? defaultRenderContext.site,
+    menu: collections.menu ?? defaultRenderContext.menu,
     assets: {
       s3AssetsUrl: process.env.S3_ASSETS_URL ?? '',
     },
@@ -324,17 +490,40 @@ export function buildRenderContext(collections: DataCollections): RenderContext 
 }
 
 const CACHE_TTL_MS = Number(process.env.DATA_CACHE_TTL ?? 60_000);
+const LOG_DATA_SOURCE = String(process.env.LOG_DATA_SOURCE ?? 'true').toLowerCase() !== 'false';
 let cached: { context: RenderContext; collections: DataCollections; ts: number } | null = null;
+let lastDataSource: string | null = null;
+let lastLoggedDataSource: string | null = null;
 
 export async function getBaseContext(options?: { force?: boolean }): Promise<RenderContext> {
   const now = Date.now();
   const valid = cached && !options?.force && now - cached.ts < CACHE_TTL_MS;
-  if (valid && cached) return cached.context;
+  
+  try {
+    if (valid && cached) {
+      return cached.context;
+    }
+    
+    const collections = await fetchAllData();
+    const context = buildRenderContext(collections);
+    cached = { context, collections, ts: now };
 
-  const collections = await fetchAllData();
-  const context = buildRenderContext(collections);
-  cached = { context, collections, ts: now };
-  return context;
+    // Log source once per change to keep terminal noise low.
+    if (LOG_DATA_SOURCE) {
+      const source = lastDataSource ?? 'unknown';
+      if (source !== lastLoggedDataSource) {
+        lastLoggedDataSource = source;
+        console.log(
+          `📦 Base context loaded from ${source} (posts=${collections.posts.length}, pages=${collections.pages.length}, categories=${collections.categories.length})`
+        );
+      }
+    }
+
+    return context;
+  } catch (error) {
+    console.error('Критическая ошибка в getBaseContext:', error);
+    throw error;
+  }
 }
 
 function normalizePath(path: string) {

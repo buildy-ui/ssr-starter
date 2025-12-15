@@ -3,10 +3,11 @@ import { html } from '@elysiajs/html';
 import { readFile } from 'fs/promises';
 import { extname } from 'path';
 import { renderPage } from './render';
-import { getRouteContext, getBaseContext } from './sync';
 import { renderHtmlTemplate, STYLES_PATH } from './template';
+import { getBaseContext, getRouteContext, syncAllData } from './sync';
 
 const PORT = Number(process.env.PORT ?? 3000);
+const SYNC_ON_BOOT = String(process.env.SYNC_ON_BOOT ?? 'true').toLowerCase() !== 'false';
 
 const app = new Elysia()
   .use(html())
@@ -57,7 +58,27 @@ const app = new Elysia()
       return new Response('Not found', { status: 404 });
     }
   })
-  // Simple health endpoint (counts posts from cached context)
+  .get('/api/posts', async ({ query }) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+
+    const base = await getBaseContext();
+    const allPosts = base.posts.posts;
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const items = allPosts.slice(start, end);
+    const total = allPosts.length;
+    const hasMore = end < total;
+
+    return {
+      items,
+      page,
+      limit,
+      total,
+      hasMore
+    };
+  })
+
   .get('/health', async () => {
     const base = await getBaseContext();
     const posts = base.posts.posts;
@@ -83,7 +104,13 @@ const app = new Elysia()
   });
 
 (async function bootstrap() {
-  await getBaseContext({ force: true }); // warm cache
+  // Warm cache and persist to adapters if configured
+  if (SYNC_ON_BOOT) {
+    await syncAllData().catch((error) => console.warn('Sync on bootstrap failed:', error));
+  } else {
+    console.log('⏭️  SYNC_ON_BOOT=false: skipping initial GraphQL sync');
+  }
+  await getBaseContext().catch((error) => console.warn('Warm cache failed:', error));
   app.listen({ port: PORT });
   console.log(`🚀 SSR server running at http://localhost:${PORT}`);
 })();
