@@ -9,7 +9,7 @@ Complete installation guide for SSR-Starter with all prerequisites and configura
 - **Operating System**: Linux, macOS, or Windows 10+
 - **Memory**: 512MB RAM (2GB recommended for development)
 - **Disk Space**: 500MB free space
-- **Network**: Internet connection for WordPress GraphQL API
+- **Network**: Internet connection for GraphQL API
 
 ### Recommended Setup
 
@@ -53,7 +53,7 @@ npm --version
 
 ```bash
 # Clone the project
-git clone https://github.com/your-org/ssr-starter.git
+git clone https://github.com/buildy-ui/ssr-starter.git
 cd ssr-starter
 
 # Verify files
@@ -144,7 +144,7 @@ nano .env  # or use your preferred editor
 ### 2. Required Variables
 
 ```bash
-# WordPress GraphQL API endpoint
+# GraphQL API endpoint
 GRAPHQL_ENDPOINT=https://your-wordpress-site.com/graphql
 
 # CDN URL for static assets (fonts, images)
@@ -174,7 +174,7 @@ NODE_ENV=development
 bun run build
 
 # This will:
-# - Sync data from WordPress GraphQL
+# - Sync data from GraphQL
 # - Build TailwindCSS styles
 # - Bundle client JavaScript
 ```
@@ -257,7 +257,7 @@ curl -fsSL https://bun.sh/install | bash -s -- --path ~/.bun
 export PATH="$HOME/.bun/bin:$PATH"
 ```
 
-**WordPress GraphQL not accessible**
+**GraphQL not accessible**
 ```bash
 # Check WordPress site
 curl https://your-wordpress-site.com/wp-json/wp/v2/posts
@@ -290,7 +290,7 @@ kill -9 <PID>
 
 - Check [Troubleshooting Guide](../troubleshooting/common-issues.md)
 - Review [FAQ](../troubleshooting/faq.md)
-- Open an [issue](https://github.com/your-org/ssr-starter/issues)
+- Open an [issue](https://github.com/buildy-ui/ssr-starter/issues)
 
 ## Next Steps
 

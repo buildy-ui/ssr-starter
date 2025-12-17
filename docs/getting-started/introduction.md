@@ -1,6 +1,6 @@
 # Introduction
 
-Welcome to **SSR-Starter**, a modern SSR (Server-Side Rendering) application built with Bun, Elysia.js, React, and WordPress GraphQL integration.
+Welcome to **SSR-Starter**, a modern SSR (Server-Side Rendering) application built with Bun, Elysia.js, React, and GraphQL integration.
 
 ## What is SSR-Starter?
 
@@ -14,7 +14,7 @@ SSR-Starter is a production-ready framework for building fast, SEO-friendly webs
 - **Clean Architecture**: Simple and efficient data flow
 
 ### 🔧 Simplicity
-- **WordPress Integration**: Seamless GraphQL API integration
+- **GraphQL Integration**: Seamless GraphQL API integration
 - **TypeScript**: Full type safety throughout the application
 - **Modern Stack**: Bun runtime, Elysia.js server, React components
 
@@ -31,14 +31,14 @@ SSR-Starter is a production-ready framework for building fast, SEO-friendly webs
 
 ```mermaid
 graph TB
-    A[WordPress GraphQL] --> B[SSR Server]
+    A[GraphQL] --> B[SSR Server]
     B --> C[React Components]
     C --> D[HTML Output]
 ```
 
 ## Use Cases
 
-- **Blog Platforms**: High-performance WordPress-powered blogs
+- **Blog Platforms**: High-performance GraphQL-powered blogs
 - **Content Management**: CMS-driven websites with SEO requirements
 - **Documentation Sites**: Static generation for developer docs
 - **Corporate Websites**: Business websites with dynamic content
@@ -51,7 +51,7 @@ graph TB
 | Server | Elysia.js | HTTP server with TypeScript |
 | Frontend | React | Component library |
 | Styling | TailwindCSS | Utility-first CSS framework |
-| API | WordPress GraphQL | Content management |
+| API | GraphQL | Content management |
 | Build | Bun Build | Asset bundling |
 | Deployment | Docker | Containerization |
 

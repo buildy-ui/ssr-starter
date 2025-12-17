@@ -342,7 +342,7 @@ export async function syncAllData() {
     return;
   }
 
-  console.log('🔄 Syncing data from WordPress GraphQL...');
+  console.log('🔄 Syncing data from GraphQL...');
 
   try {
     const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([
@@ -415,7 +415,7 @@ export async function fetchAllData(): Promise<DataCollections> {
     return getDataFromAdapters();
   }
 
-  console.log('🔄 Fetching data from WordPress GraphQL...');
+  console.log('🔄 Fetching data from GraphQL...');
 
   try {
     const [postsResult, categoriesResult, tagsResult, usersResult, pagesResult] = await Promise.all([

@@ -28,7 +28,7 @@ graph TB
     I --> J[HTML Template]
     J --> K[HTTP Response]
 
-    L[WordPress GraphQL] --> M[syncAllData]
+    L[GraphQL] --> M[syncAllData]
     M --> E
 ```
 

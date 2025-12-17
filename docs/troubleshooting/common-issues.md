@@ -33,18 +33,18 @@ npm run build  # instead of bun run build
 
 ```bash
 # Set environment variable
-export GRAPHQL_ENDPOINT=https://your-wordpress.com/graphql
+export GRAPHQL_ENDPOINT=https://your-site.com/graphql
 
 # Or create .env file
-echo "GRAPHQL_ENDPOINT=https://your-wordpress.com/graphql" > .env
+echo "GRAPHQL_ENDPOINT=https://your-site.com/graphql" > .env
 
 # Or inline with command
-GRAPHQL_ENDPOINT=https://your-wordpress.com/graphql bun run dev
+GRAPHQL_ENDPOINT=https://your-site.com/graphql bun run dev
 ```
 
-### "WordPress GraphQL API not accessible"
+### "GraphQL API not accessible"
 
-**Problem**: Cannot connect to WordPress GraphQL endpoint.
+**Problem**: Cannot connect to GraphQL endpoint.
 
 **Check WordPress setup**:
 
@@ -351,7 +351,7 @@ curl -I http://your-domain.com/styles.css
 
 ### "GraphQL query failed"
 
-**Problem**: WordPress GraphQL returns errors.
+**Problem**: GraphQL returns errors.
 
 **Debug GraphQL**:
 
@@ -550,13 +550,13 @@ curl http://localhost:3000/health
 5. **Network connectivity**:
    ```bash
    curl -I $GRAPHQL_ENDPOINT
-   ping your-wordpress.com
+   ping your-site.com
    ```
 
 ### Community Support
 
-- **GitHub Issues**: [Report bugs](https://github.com/your-org/ssr-starter/issues)
-- **Discussions**: [Ask questions](https://github.com/your-org/ssr-starter/discussions)
+- **GitHub Issues**: [Report bugs](https://github.com/buildy-ui/ssr-starter/issues)
+- **Discussions**: [Ask questions](https://github.com/buildy-ui/ssr-starter/discussions)
 - **Discord**: Join our community server
 
 ### Commercial Support

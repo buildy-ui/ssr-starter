@@ -6,7 +6,7 @@ This file is intentionally concise but complete enough for a coding agent to con
 
 ## Project Goals
 
-- **Simple SSR**: Server-side rendering with React and WordPress GraphQL integration
+- **Simple SSR**: Server-side rendering with React and GraphQL integration
 - **HTML Generation**: Static HTML generation for pages using scripts
 - **Clean Architecture**: Simple data flow from GraphQL to SSR rendering
 - **Documentation-first**: Every meaningful change should be reflected in `docs/` guides
@@ -17,14 +17,14 @@ This file is intentionally concise but complete enough for a coding agent to con
 - **Server**: Elysia
 - **UI**: React + React Router
 - **Rendering**: SSR + static HTML generation
-- **Data Source**: WordPress GraphQL
+- **Data Source**: GraphQL
 - **UI Kit**: UI8Kit (see `src/components/ui8kit.ts` and component usage throughout routes)
 
 ## Repository Map (High-Signal)
 
 - **Server**
   - `server/index.ts`: Elysia server bootstrap and routes.
-  - `server/sync.ts`: Data fetching from WordPress GraphQL and render context build.
+  - `server/sync.ts`: Data fetching from GraphQL and render context build.
   - `server/render.tsx`: React SSR rendering utilities.
 - **Client/UI**
   - `src/routes/*`: React routes.
@@ -49,14 +49,14 @@ The authoritative scripts are in `package.json`.
 
 ## Configuration (ENV)
 
-- `GRAPHQL_ENDPOINT`: WordPress GraphQL endpoint (required)
+- `GRAPHQL_ENDPOINT`: GraphQL endpoint (required)
 - `S3_ASSETS_URL`: Base URL for static assets (fonts, images)
 - `PORT`: Server port (default: 3000)
 - `NODE_ENV`: Environment mode (development/production)
 
 ## Data Flow
 
-- Server fetches data from WordPress GraphQL on startup
+- Server fetches data from GraphQL on startup
 - Data is stored in memory for fast SSR rendering
 - Each route receives optimized render context
 
@@ -64,7 +64,7 @@ The authoritative scripts are in `package.json`.
 
 - Verify server starts and renders pages correctly
 - Test static HTML generation scripts
-- Check GraphQL integration with WordPress
+- Check GraphQL integration
 
 ## Coding Conventions
 

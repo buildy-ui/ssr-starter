@@ -1,7 +1,19 @@
 {
-  "name": "ui8kit-ssr-starter",
-  "version": "0.1.0",
+  "name": "@buildy-ui/ssr-starter",
+  "version": "0.0.1",
   "type": "module",
+  "author": "Buildy UI",
+  "license": "MIT",
+  "homepage": "https://buildy.tw",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/buildy-ui/ssr-starter"
+  },
+  "keywords": [
+    "ssr",
+    "starter",
+    "buildy-ui"
+  ],
   "scripts": {
     "tailwind:build": "bunx @tailwindcss/cli -i src/assets/css/index.css -o dist/styles.css --minify",
     "tailwind:watch": "bunx @tailwindcss/cli -i src/assets/css/index.css -o dist/styles.css -w",

@@ -21,7 +21,7 @@ source ~/.bashrc
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/ssr-starter.git
+git clone https://github.com/buildy-ui/ssr-starter.git
 cd ssr-starter
 
 # Install dependencies
@@ -111,7 +111,7 @@ PORT=3001 bun run dev
 
 **GraphQL connection failed?**
 ```bash
-# Check your WordPress GraphQL endpoint
+# Check your GraphQL endpoint
 curl $GRAPHQL_ENDPOINT -X POST \
   -H "Content-Type: application/json" \
   -d '{"query": "{ posts { nodes { id } } }"}'
@@ -119,4 +119,4 @@ curl $GRAPHQL_ENDPOINT -X POST \
 
 **Need help?**
 - Check [Troubleshooting](../troubleshooting/common-issues.md)
-- Open an [issue](https://github.com/your-org/ssr-starter/issues)
+- Open an [issue](https://github.com/buildy-ui/ssr-starter/issues)

@@ -62,7 +62,7 @@ bunx serve www/html
 
 ```bash
 # Required
-GRAPHQL_ENDPOINT=https://your-wordpress.com/graphql
+GRAPHQL_ENDPOINT=https://your-site.com/graphql
 S3_ASSETS_URL=https://your-assets.com
 
 # Optional
@@ -194,7 +194,7 @@ Static pages can embed data directly in HTML:
 # 1. Install dependencies
 bun install
 
-# 2. Sync data from WordPress
+# 2. Sync data from GraphQL
 bun run build  # Runs data sync + asset compilation
 
 # 3. Generate static HTML
@@ -266,7 +266,7 @@ https://example.com/posts/my-post → www/html/posts/my-post/index.html
   publish = "www/html"
 
 [build.environment]
-  GRAPHQL_ENDPOINT = "https://your-wordpress.com/graphql"
+  GRAPHQL_ENDPOINT = "https://your-site.com/graphql"
   S3_ASSETS_URL = "https://assets.netlify.com"
 ```
 
@@ -278,7 +278,7 @@ https://example.com/posts/my-post → www/html/posts/my-post/index.html
   "buildCommand": "bun run build && bun run scripts/generate",
   "outputDirectory": "www/html",
   "env": {
-    "GRAPHQL_ENDPOINT": "https://your-wordpress.com/graphql",
+    "GRAPHQL_ENDPOINT": "https://your-site.com/graphql",
     "S3_ASSETS_URL": "https://assets.vercel.com"
   }
 }

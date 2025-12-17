@@ -165,7 +165,7 @@ const blogContext = getRouteContext('/blog?page=2');
 
 ### `syncAllData()`
 
-Synchronizes data from WordPress GraphQL API.
+Synchronizes data from GraphQL API.
 
 **Returns**: Promise<void>
 

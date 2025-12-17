@@ -4,11 +4,11 @@ Guide to how data flows through the SSR application.
 
 ## Overview
 
-The application follows a simple data flow: fetch data from WordPress GraphQL API and render it server-side.
+The application follows a simple data flow: fetch data from GraphQL API and render it server-side.
 
 ```mermaid
 graph TD
-    A[WordPress GraphQL API] --> B[SSR Server]
+    A[GraphQL API] --> B[SSR Server]
     B --> C[Render Context]
     C --> D[React Components]
     D --> E[HTML Output]
@@ -16,7 +16,7 @@ graph TD
 
 ## Data Sources
 
-### Primary Data Source: WordPress GraphQL
+### Primary Data Source: GraphQL
 
 **Endpoint**: `GRAPHQL_ENDPOINT` environment variable
 
@@ -31,12 +31,12 @@ graph TD
 
 ### Initial Data Load
 
-The application fetches data from WordPress GraphQL API on server startup:
+The application fetches data from GraphQL API on server startup:
 
 ```typescript
 // server/sync.ts
 export async function syncAllData() {
-  // Fetch from WordPress GraphQL endpoints
+  // Fetch from GraphQL endpoints
   const [posts, categories, tags, authors, pages] = await Promise.all([
     getPosts(),
     getCategories(),

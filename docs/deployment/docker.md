@@ -16,10 +16,10 @@ Complete guide to deploying SSR-Starter using Docker and containerization.
 docker run -d \
   --name ssr-starter \
   -p 3000:3000 \
-  -e GRAPHQL_ENDPOINT=https://your-wordpress.com/graphql \
+  -e GRAPHQL_ENDPOINT=https://your-site.com/graphql \
   -e S3_ASSETS_URL=https://your-assets.com \
   -e MAINDB=LMDB \
-  ghcr.io/your-org/ssr-starter:latest
+  ghcr.io/buildy-ui/ssr-starter:latest
 ```
 
 ### Using Docker Compose
@@ -30,11 +30,11 @@ Create `docker-compose.yml`:
 version: '3.8'
 services:
   ssr-starter:
-    image: ghcr.io/your-org/ssr-starter:latest
+    image: ghcr.io/buildy-ui/ssr-starter:latest
     ports:
       - "3000:3000"
     environment:
-      - GRAPHQL_ENDPOINT=https://your-wordpress.com/graphql
+      - GRAPHQL_ENDPOINT=https://your-site.com/graphql
       - S3_ASSETS_URL=https://your-assets.com
       - MAINDB=LMDB
       - BACKUPDB=IndexedDB
@@ -101,7 +101,7 @@ docker build \
 version: '3.8'
 services:
   ssr-starter:
-    image: ghcr.io/your-org/ssr-starter:latest
+    image: ghcr.io/buildy-ui/ssr-starter:latest
     container_name: ssr-starter-prod
     ports:
       - "80:3000"
@@ -321,7 +321,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/your-org/ssr-starter:latest
+          tags: ghcr.io/buildy-ui/ssr-starter:latest
           build-args: |
             GRAPHQL_ENDPOINT=${{ secrets.GRAPHQL_ENDPOINT }}
             S3_ASSETS_URL=${{ secrets.S3_ASSETS_URL }}
@@ -440,7 +440,7 @@ USER nextjs
   uses: aquasecurity/trivy-action@master
   with:
     scan-type: 'image'
-    scan-ref: 'ghcr.io/your-org/ssr-starter:latest'
+    scan-ref: 'ghcr.io/buildy-ui/ssr-starter:latest'
 ```
 
 ### Secrets Management
@@ -560,7 +560,7 @@ docker volume rm $(docker volume ls -q)
 version: '3.8'
 services:
   ssr-starter:
-    image: ghcr.io/your-org/ssr-starter:latest
+    image: ghcr.io/buildy-ui/ssr-starter:latest
     ports:
       - "80:3000"
     environment:
@@ -594,7 +594,7 @@ spec:
     spec:
       containers:
       - name: ssr-starter
-        image: ghcr.io/your-org/ssr-starter:latest
+        image: ghcr.io/buildy-ui/ssr-starter:latest
         ports:
         - containerPort: 3000
         env:
@@ -628,7 +628,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-org/ssr-starter
+    repoURL: https://github.com/buildy-ui/ssr-starter
     path: k8s
     targetRevision: HEAD
   destination:

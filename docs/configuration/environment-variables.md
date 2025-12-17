@@ -6,7 +6,7 @@ Configuration options for the SSR application.
 
 ### `GRAPHQL_ENDPOINT`
 
-WordPress GraphQL API endpoint URL.
+GraphQL API endpoint URL.
 
 ```bash
 # Production
@@ -15,7 +15,7 @@ GRAPHQL_ENDPOINT=https://myblog.com/graphql
 # Development
 GRAPHQL_ENDPOINT=https://dev.myblog.com/graphql
 
-# Local WordPress
+# Local GraphQL
 GRAPHQL_ENDPOINT=http://localhost:8080/graphql
 ```
 

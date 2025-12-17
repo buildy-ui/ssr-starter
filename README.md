@@ -1,9 +1,9 @@
 # SSR-Starter
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-org/ssr-starter)
+[![Version](https://img.shields.io/badge/version-0.0.1-blue.svg)](https://github.com/buildy-ui/ssr-starter)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-A modern SSR (Server-Side Rendering) application built with Bun, Elysia.js, React, and WordPress GraphQL integration. Includes static HTML generation capabilities.
+A modern SSR (Server-Side Rendering) application built with Bun, Elysia.js, React, and GraphQL integration. Includes static HTML generation capabilities.
 
 ## 🚀 Quick Start
 
@@ -14,13 +14,13 @@ Get up and running in 5 minutes:
 curl -fsSL https://bun.sh/install | bash
 
 # Clone and setup
-git clone https://github.com/your-org/ssr-starter.git
+git clone https://github.com/buildy-ui/ssr-starter.git
 cd ssr-starter
 bun install
 
 # Configure environment
 cp env.example .env
-# Edit .env with your WordPress GraphQL endpoint
+# Edit .env with your GraphQL endpoint
 
 # Run development server
 bun run dev
@@ -65,7 +65,7 @@ bun run dev
 - **Fast Rendering**: Optimized React rendering pipeline
 
 ### 🔧 Simplicity
-- **WordPress Integration**: Seamless GraphQL API integration
+- **GraphQL Integration**: Seamless GraphQL API integration
 - **TypeScript**: Full type safety throughout
 - **Modern Stack**: Bun runtime, Elysia.js server, React components
 
@@ -83,7 +83,7 @@ bun run dev
 
 ```mermaid
 graph TB
-    A[WordPress GraphQL] --> B[SSR Server]
+    A[GraphQL] --> B[SSR Server]
     B --> C[React Components]
     C --> D[HTML Output]
 
@@ -99,7 +99,7 @@ graph TB
 
 ## 🌟 Use Cases
 
-- **Blog Platforms**: High-performance WordPress-powered blogs
+- **Blog Platforms**: High-performance GraphQL-powered blogs
 - **Content Management**: CMS-driven websites with SEO requirements
 - **Documentation Sites**: Static generation for developer docs
 - **Corporate Websites**: Business websites with dynamic content
@@ -112,20 +112,20 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE.md
 ## 🆘 Support
 
 - **Documentation**: You're reading it! 🎉
-- **Issues**: [GitHub Issues](https://github.com/your-org/ssr-starter/issues)
+- **Issues**: [GitHub Issues](https://github.com/buildy-ui/ssr-starter/issues)
 
 ## 📈 Roadmap
 
 ### Current Version (1.0.x)
 - ✅ SSR with React
 - ✅ Static HTML generation
-- ✅ WordPress GraphQL integration
+- ✅ GraphQL integration
 - ✅ Docker deployment
 - ✅ Clean documentation
 
 ### Upcoming Features
 - 🔄 Enhanced static generation options
-- 🔄 Additional WordPress integration features
+- 🔄 Additional GraphQL integration features
 - 🔄 Performance optimizations
 
 ---

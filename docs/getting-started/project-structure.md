@@ -178,7 +178,7 @@ scripts/
 cache = true
 
 // env.example - Environment variables template
-GRAPHQL_ENDPOINT=https://your-wordpress.com/graphql
+GRAPHQL_ENDPOINT=https://your-site.com/graphql
 S3_ASSETS_URL=https://your-assets.com
 MAINDB=LMDB
 BACKUPDB=IndexedDB
@@ -234,7 +234,7 @@ docs/
 ### 2. Data Flow
 
 ```
-WordPress GraphQL → Storage Adapter → Render Context → React Components → HTML
+GraphQL → Storage Adapter → Render Context → React Components → HTML
 ```
 
 ### 3. Storage Abstraction
@@ -274,7 +274,7 @@ getRouteContext(path: string): RenderContext {
 1. **Client Changes**: `src/` → `dist/entry-client.js`
 2. **Server Changes**: `server/` → Hot reload
 3. **Styles**: `src/assets/css/` → `dist/styles.css`
-4. **Data**: WordPress → `data/` via adapters
+4. **Data**: GraphQL → `data/` via adapters
 5. **Static Generation**: `scripts/` → `www/html/`
 
 ## Build Pipeline
@@ -282,7 +282,7 @@ getRouteContext(path: string): RenderContext {
 ```mermaid
 graph LR
     A[src/] --> B[bun build]
-    C[server/sync.ts] --> D[WordPress API]
+    C[server/sync.ts] --> D[GraphQL API]
     E[src/assets/css/] --> F[TailwindCSS]
     B --> G[dist/entry-client.js]
     D --> H[data/]

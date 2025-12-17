@@ -1,7 +1,7 @@
 # SSR-Starter Documentation
 
-[![Documentation](https://img.shields.io/badge/docs-gitbook-blue)](https://your-org.gitbook.io/ssr-starter)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-org/ssr-starter)
+[![Documentation](https://img.shields.io/badge/docs-gitbook-blue)](https://docs.buildy.tw/)
+[![Version](https://img.shields.io/badge/version-0.0.1-blue.svg)](https://github.com/buildy-ui/ssr-starter)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Welcome to the documentation for **SSR-Starter**, a modern SSR (Server-Side Rendering) application built with Bun, Elysia.js, and React, with support for generating static HTML versions of pages.
@@ -15,13 +15,13 @@ Get up and running in 5 minutes:
 curl -fsSL https://bun.sh/install | bash
 
 # Clone and setup
-git clone https://github.com/your-org/ssr-starter.git
+git clone https://github.com/buildy-ui/ssr-starter.git
 cd ssr-starter
 bun install
 
 # Configure environment
 cp env.example .env
-# Edit .env with your WordPress GraphQL endpoint
+# Edit .env with your GraphQL endpoint
 
 # Build and run
 bun run build
@@ -72,7 +72,7 @@ This documentation is organized into the following sections:
 - **Fast Rendering**: Optimized React rendering pipeline
 
 ### 🔧 Simplicity
-- **WordPress Integration**: Seamless headless CMS integration
+- **GraphQL Integration**: Seamless headless CMS integration
 - **TypeScript**: Full type safety throughout
 - **Modern Stack**: Bun runtime, Elysia.js server, React components
 
@@ -90,7 +90,7 @@ This documentation is organized into the following sections:
 
 ```mermaid
 graph TB
-    A[WordPress GraphQL] --> B[SSR Server]
+    A[GraphQL] --> B[SSR Server]
     B --> C[React Components]
     C --> D[HTML Output]
 
@@ -106,7 +106,7 @@ graph TB
 
 ## 🌟 Use Cases
 
-- **Blog Platforms**: High-performance WordPress-powered blogs
+- **Blog Platforms**: High-performance GraphQL-powered blogs
 - **Content Management**: CMS-driven websites with SEO requirements
 - **Documentation Sites**: Static generation for developer docs
 - **Marketing Sites**: Fast-loading landing pages
@@ -128,23 +128,22 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE.md
 ## 🆘 Support
 
 - **Documentation**: You're reading it! 🎉
-- **Issues**: [GitHub Issues](https://github.com/your-org/ssr-starter/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/ssr-starter/discussions)
-- **Discord**: Join our community server
-- **Commercial Support**: [Book a consultation](https://calendly.com/your-org)
+- **Issues**: [GitHub Issues](https://github.com/buildy-ui/ssr-starter/issues)
+- **Discord**: Join our community server - later
+- **Commercial Support**: [Book a consultation](https://calendly.com/your-org) - later
 
 ## 📈 Roadmap
 
 ### Current Version (1.0.x)
 - ✅ SSR with React
 - ✅ Static HTML generation
-- ✅ WordPress GraphQL integration
+- ✅ GraphQL integration
 - ✅ Docker deployment
 - ✅ Clean documentation
 
 ### Upcoming Features
 - 🔄 Enhanced static generation options
-- 🔄 Additional WordPress integration features
+- 🔄 Additional GraphQL integration features
 - 🔄 Performance optimizations
 
 ---
