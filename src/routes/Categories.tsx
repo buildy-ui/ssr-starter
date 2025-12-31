@@ -10,9 +10,9 @@ export default function Categories() {
   if (loading) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Categories' }]} />
-          <Title order={1} size="2xl">Loading Categories...</Title>
+          <Title order={1} text="2xl">Loading Categories...</Title>
         </Stack>
       </Block>
     )
@@ -21,9 +21,9 @@ export default function Categories() {
   if (error) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Categories' }]} />
-          <Title order={1} size="2xl">Categories Error</Title>
+          <Title order={1} text="2xl">Categories Error</Title>
           <Text>Failed to load categories: {error}</Text>
         </Stack>
       </Block>
@@ -33,14 +33,14 @@ export default function Categories() {
   const { categories } = context!
   return (
     <Block component="main" py="8">
-      <Stack gap="lg">
+      <Stack gap="6">
         <SEO title="Categories" description="Browse all categories." />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Categories' }]} />
-        <Stack gap="md">
-          <Title order={1} size="2xl">Categories</Title>
-          <Text c="secondary-foreground">Browse all categories.</Text>
+        <Stack gap="4">
+          <Title order={1} text="2xl" font="bold">Categories</Title>
+          <Text bg="secondary-foreground">Browse all categories.</Text>
         </Stack>
-        <Grid cols="1-2-3" gap="lg">
+        <Grid cols="1-2-3" gap="6">
           {categories.map(c => <CategoryCard key={c.id} item={c as any} />)}
         </Grid>
       </Stack>

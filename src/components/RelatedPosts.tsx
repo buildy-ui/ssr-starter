@@ -9,9 +9,9 @@ export function RelatedPosts({ currentId, posts }: { currentId: number; posts: P
   const related = posts.filter(p => p.id !== currentId && p.categories?.some(c => tags.has(c.slug))).slice(0, 3)
   if (!related.length) return null
   return (
-    <Stack gap="md">
-      <Title order={2} size="xl">Related Posts</Title>
-      <Stack gap="lg">
+    <Stack gap="4">
+      <Title order={2} text="xl">Related Posts</Title>
+      <Stack gap="6">
         {related.map(p => (
           <SmallMediaCard key={p.id} item={p as any} />
         ))}

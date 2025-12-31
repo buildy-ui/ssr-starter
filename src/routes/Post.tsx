@@ -18,9 +18,9 @@ export default function Post() {
   if (loading) {
     return (
       <Block component="article">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Loading...' }]} />
-          <Title order={1} size="3xl">Loading Post...</Title>
+          <Title order={1} text="3xl">Loading Post...</Title>
           <Text>Fetching post from CMS...</Text>
         </Stack>
       </Block>
@@ -31,9 +31,9 @@ export default function Post() {
   if (error) {
     return (
       <Block component="article">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Error' }]} />
-          <Title order={1} size="3xl">Post Error</Title>
+          <Title order={1} text="3xl">Post Error</Title>
           <Text>Failed to load post: {error}</Text>
           <Link to="/blog"><Button>Return to blog</Button></Link>
         </Stack>
@@ -45,9 +45,9 @@ export default function Post() {
   if (!context) {
     return (
       <Block component="article">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Not Found' }]} />
-          <Title order={1} size="3xl">Post Not Available</Title>
+          <Title order={1} text="3xl">Post Not Available</Title>
           <Text>No posts data available.</Text>
           <Link to="/blog"><Button>Return to blog</Button></Link>
         </Stack>
@@ -60,8 +60,8 @@ export default function Post() {
   if (!post) {
     return (
       <Block component="main" py="8">
-        <Stack gap="md">
-          <Title order={1} size="2xl">Post Not Found</Title>
+        <Stack gap="4">
+          <Title order={1} text="2xl">Post Not Found</Title>
           <Text>The post you're looking for doesn't exist.</Text>
           <Link to="/"><Button>Return to homepage</Button></Link>
         </Stack>
@@ -71,7 +71,7 @@ export default function Post() {
 
   return (
     <Block component="article">
-      <Stack gap="lg">
+      <Stack gap="6">
         <SEO title={post.title} description={post.excerpt} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: post.title }]} />
         {post.featuredImage?.url && (
@@ -85,17 +85,17 @@ export default function Post() {
           />
         )}
 
-        <Stack gap="md">
-          <Title order={1} size="3xl">{post.title}</Title>
+        <Stack gap="4">
+          <Title order={1} text="3xl">{post.title}</Title>
           <PostMeta date={post.date.display} categories={post.categories as any} tags={post.tags as any} />
         </Stack>
         
         <HtmlContent html={post.content} className="prose" />
 
-        <Grid cols="1-2" gap="lg">
-          <Stack gap="lg">
+        <Grid cols="1-2" gap="6">
+          <Stack gap="6">
             {post.categories?.length ? (
-              <Group gap="md" align="center">
+              <Group gap="4" text="center">
                 {post.categories.map((cat: any) => (
                   <Badge key={cat.id} variant="secondary" rounded="full">{cat.name}</Badge>
                 ))}

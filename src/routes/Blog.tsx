@@ -26,29 +26,29 @@ export default function Blog() {
 
   return (
     <Block component="main" py="8">
-      <Stack gap="lg">
+      <Stack gap="6">
         <SEO
           title={`Blog${currentPage > 1 ? ` - Page ${currentPage}` : ''}`}
           description="Latest posts"
         />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog' }]} />
-        <Title order={1} size="2xl">
+        <Title order={1} text="2xl">
           Blog {currentPage > 1 && `- Page ${currentPage}`}
         </Title>
 
-        <Grid cols="1-2-3" gap="lg">
+        <Grid cols="1-2-3" gap="6">
           {pageItems.map((p: any) => (
             <PostCard key={p.id} post={p as any} />
           ))}
         </Grid>
 
-        <Group align="center" justify="center" gap="sm">
+        <Group text="center" justify="center" gap="2">
           {hasPrev && (
             <a href={prevHref}>
               <Button variant="secondary">← Prev</Button>
             </a>
           )}
-          <Text size="sm" c="secondary-foreground">
+          <Text text="sm" bg="secondary-foreground">
             Page {currentPage} of {totalPages}
           </Text>
           {hasNext && (

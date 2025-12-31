@@ -11,36 +11,36 @@ export function HomeLatest() {
 
   if (loading) {
     return (
-      <Stack gap="md">
-        <Title order={2} size="2xl">Latest Posts</Title>
-        <Text c="secondary-foreground">Loading posts...</Text>
+      <Stack gap="4">
+        <Title order={2} text="2xl">Latest Posts</Title>
+        <Text bg="secondary-foreground">Loading posts...</Text>
       </Stack>
     )
   }
 
   if (error) {
     return (
-      <Stack gap="md">
-        <Title order={2} size="2xl">Latest Posts</Title>
-        <Text c="secondary-foreground">Failed to load posts</Text>
+      <Stack gap="4">
+        <Title order={2} text="2xl">Latest Posts</Title>
+        <Text bg="secondary-foreground">Failed to load posts</Text>
       </Stack>
     )
   }
 
   if (!context) {
     return (
-      <Stack gap="md">
-        <Title order={2} size="2xl">Latest Posts</Title>
-        <Text c="secondary-foreground">No posts available</Text>
+      <Stack gap="4">
+        <Title order={2} text="2xl">Latest Posts</Title>
+        <Text bg="secondary-foreground">No posts available</Text>
       </Stack>
     )
   }
 
   return (
-    <Stack gap="md">
-      <Title order={2} size="2xl">Latest Posts</Title>
-      <Text c="secondary-foreground">Fresh insights from the blog</Text>
-      <Grid cols="1-2-4" gap="lg">
+    <Stack gap="4">
+      <Title order={2} text="2xl">Latest Posts</Title>
+      <Text bg="secondary-foreground">Fresh insights from the blog</Text>
+      <Grid cols="1-2-4" gap="6">
         {latest.map(p => <PostCard key={p.id} post={p as any} media="top" />)}
       </Grid>
     </Stack>

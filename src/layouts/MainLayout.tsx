@@ -19,17 +19,17 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
       <Block component="nav" py="2" bg="background" data-class="nav-bar" border="b" shadow="lg">
         <Container max="w-6xl"> 
           <Group justify="between" object="center">
-            <Group object="center" gap="md">
+            <Group object="center" gap="4">
               <a href="/">
                 <Title order={2} text="2xl" font="bold" bg="primary">UI8Kit</Title>
               </a>
               <Text text="sm" bg="secondary-foreground">Design System</Text>
             </Group>
 
-            <Group object="center" gap="sm">
+            <Group object="center" gap="2">
 
               <nav className="hidden md:flex">
-                <Group object="center" gap="sm" data-class="nav">
+                <Group object="center" gap="2" data-class="nav">
                   {menu.primary.items.map(item => (
                     <a key={item.id} href={item.url}>
                       <Button variant="ghost" size="sm">
@@ -55,7 +55,7 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
                 triggerVariant="ghost"
                 className="md:hidden"
               >
-                <Stack gap="sm">
+                <Stack gap="2">
                   <SearchBar />
                   {menu.primary.items.map(item => (
                     <a key={item.id} href={item.url} className="block w-full">
@@ -74,13 +74,13 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
       <Block component="main" py="8" data-class="main-page">
         <Container max="w-6xl">
           {sidebar === 'none' ? (
-            <Stack gap="lg">
+            <Stack gap="6">
               {children}
             </Stack>
           ) : (
-            <Grid cols="1-4" gap={defaultGap}>
+            <Grid cols="1-4" gap="6">
               <Grid.Col span={3} data-class="main-content" className={sidebar === 'left' ? 'md:order-2 order-1' : 'order-1'}>
-                <Stack gap="lg">
+                <Stack gap="6">
                   {children}
                 </Stack>
               </Grid.Col>
@@ -94,9 +94,9 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
 
       <Block component="footer" py="4" border="t" bg="card" data-class="site-footer">
         <Container max="w-6xl">
-          <Stack gap="lg" object="center">
+          <Stack gap="6" object="center">
             <Text text="sm" bg="secondary-foreground">© 2025 UI8Kit Design System</Text>
-            <Group gap="md" justify="center">
+            <Group gap="4" justify="center">
               <a href="/"><Text text="xs" bg="secondary-foreground">Home</Text></a>
               <a href="/blog"><Text text="xs" bg="secondary-foreground">Blog</Text></a>
               <a href="/about"><Text text="xs" bg="secondary-foreground">About</Text></a>
@@ -110,7 +110,7 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
 
 const Aside = ({ context }: { context: RenderContext }) => (
   <Block component="aside">
-    <Stack gap="lg">
+    <Stack gap="6">
       <SearchBar />
       <CategoryList items={context.categories as any} />
       <a href="/categories"><Text text="sm" bg="secondary-foreground">View all categories</Text></a>

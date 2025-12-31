@@ -10,9 +10,9 @@ export default function Tags() {
   if (loading) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Tags' }]} />
-          <Title order={1} size="2xl">Loading Tags...</Title>
+          <Title order={1} text="2xl">Loading Tags...</Title>
         </Stack>
       </Block>
     )
@@ -21,9 +21,9 @@ export default function Tags() {
   if (error) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Tags' }]} />
-          <Title order={1} size="2xl">Tags Error</Title>
+          <Title order={1} text="2xl">Tags Error</Title>
           <Text>Failed to load tags: {error}</Text>
         </Stack>
       </Block>
@@ -33,14 +33,14 @@ export default function Tags() {
   const { tags } = context!
   return (
     <Block component="main" py="8">
-      <Stack gap="lg">
+      <Stack gap="6">
         <SEO title="Tags" description="Browse all tags." />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Tags' }]} />
-        <Stack gap="md">
-          <Title order={1} size="2xl">Tags</Title>
-          <Text c="secondary-foreground">Browse all tags.</Text>
+        <Stack gap="4">
+          <Title order={1} text="2xl">Tags</Title>
+          <Text bg="secondary-foreground">Browse all tags.</Text>
         </Stack>
-        <Grid cols="1-2-3" gap="lg">
+        <Grid cols="1-2-3" gap="6">
           {tags.map(t => <TagCard key={t.id} item={t as any} />)}
         </Grid>
       </Stack>

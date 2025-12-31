@@ -11,17 +11,17 @@ export function PopularPosts() {
 
   if (loading) {
     return (
-      <Stack gap="md">
-        <Title order={3} size="lg">Popular Posts</Title>
-        <Stack gap="sm">Loading...</Stack>
+      <Stack gap="4">
+        <Title order={3} text="lg">Popular Posts</Title>
+        <Stack gap="2">Loading...</Stack>
       </Stack>
     )
   }
 
   return (
-    <Stack gap="md">
-      <Title order={3} size="lg">Popular Posts</Title>
-      <Stack gap="lg">
+    <Stack gap="4">
+      <Title order={3} text="lg">Popular Posts</Title>
+      <Stack gap="6">
         {popular.map(p => <SmallMediaCard key={p.id} item={p as any} />)}
       </Stack>
     </Stack>

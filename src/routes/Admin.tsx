@@ -74,8 +74,8 @@ export default function AdminPanel() {
   if (loading) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg" align="center">
-          <Title order={1} size="2xl">Loading CMS...</Title>
+        <Stack gap="6" text="center">
+          <Title order={1} text="2xl">Loading CMS...</Title>
           <Text>Initializing database connection...</Text>
         </Stack>
       </Block>
@@ -84,10 +84,10 @@ export default function AdminPanel() {
 
   return (
     <Block component="main" py="8">
-      <Stack gap="lg">
-        <Group justify="between" align="center">
-          <Title order={1} size="2xl">CMS Admin Panel</Title>
-          <Group gap="sm">
+      <Stack gap="6">
+        <Group justify="between" text="center">
+          <Title order={1} text="2xl">CMS Admin Panel</Title>
+          <Group gap="2">
             <Badge variant="secondary">
               <Database size={14} />
               {collections.length} Collections
@@ -166,9 +166,9 @@ function CollectionsTab({
   }
 
   return (
-    <Stack gap="lg">
-      <Group justify="between" align="center">
-        <Title order={2} size="xl">Collections</Title>
+    <Stack gap="6">
+      <Group justify="between" text="center">
+        <Title order={2} text="xl">Collections</Title>
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>
             <Button>
@@ -180,13 +180,13 @@ function CollectionsTab({
             <DialogHeader>
               <DialogTitle>Create New Collection</DialogTitle>
             </DialogHeader>
-            <Stack gap="md">
+            <Stack gap="4">
               <Input
                 placeholder="Collection name"
                 value={newCollectionName}
                 onChange={(e) => setNewCollectionName(e.target.value)}
               />
-              <Group justify="end" gap="sm">
+              <Group justify="end" gap="2">
                 <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
                   Cancel
                 </Button>
@@ -199,7 +199,7 @@ function CollectionsTab({
         </Dialog>
       </Group>
 
-      <Grid cols="1-2-3-4" gap="md">
+      <Grid cols="1-2-3-4" gap="4">
         {collections.map(collection => (
           <Card
             key={collection}
@@ -207,7 +207,7 @@ function CollectionsTab({
             onClick={() => onCollectionChange(collection)}
           >
             <CardContent className="p-4">
-              <Stack gap="sm" align="center">
+              <Stack gap="2" text="center">
                 <Database size={24} />
                 <Text className="font-medium">{collection}</Text>
               </Stack>
@@ -243,9 +243,9 @@ function DocumentsTab({
 
   if (!collection) {
     return (
-      <Stack gap="lg" align="center">
+      <Stack gap="6" text="center">
         <Database size={48} className="text-muted-foreground" />
-        <Title order={2} size="xl">No Collection Selected</Title>
+        <Title order={2} text="xl">No Collection Selected</Title>
         <Text className="text-muted-foreground">
           Select a collection from the Collections tab to manage documents.
         </Text>
@@ -254,10 +254,10 @@ function DocumentsTab({
   }
 
   return (
-    <Stack gap="lg">
-      <Group justify="between" align="center">
-        <Title order={2} size="xl">Documents in "{collection}"</Title>
-        <Group gap="sm">
+    <Stack gap="6">
+      <Group justify="between" text="center">
+        <Title order={2} text="xl">Documents in "{collection}"</Title>
+        <Group gap="2">
           <Button variant="outline" onClick={onRefresh}>
             <Search size={16} />
             Refresh
@@ -269,7 +269,7 @@ function DocumentsTab({
         </Group>
       </Group>
 
-      <Group gap="sm">
+      <Group gap="2">
         <Input
           placeholder="Search documents..."
           value={searchQuery}
@@ -307,7 +307,7 @@ function DocumentsTab({
                   {doc.createdAt ? new Date(doc.createdAt).toLocaleDateString() : 'N/A'}
                 </TableCell>
                 <TableCell>
-                  <Group gap="sm">
+                  <Group gap="2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -334,9 +334,9 @@ function DocumentsTab({
       </Card>
 
       {filteredDocuments.length === 0 && (
-        <Stack gap="lg" align="center">
+        <Stack gap="6" text="center">
           <FileText size={48} className="text-muted-foreground" />
-          <Title order={3} size="lg">No Documents Found</Title>
+          <Title order={3} text="lg">No Documents Found</Title>
           <Text className="text-muted-foreground">
             {searchQuery ? 'No documents match your search.' : 'This collection is empty.'}
           </Text>
@@ -402,7 +402,7 @@ function DocumentEditor({
   }
 
   return (
-    <Stack gap="md">
+    <Stack gap="4">
       <Textarea
         value={editedDoc}
         onChange={(e) => handleJsonChange(e.target.value)}
@@ -414,7 +414,7 @@ function DocumentEditor({
           Invalid JSON format
         </Text>
       )}
-      <Group justify="end" gap="sm">
+      <Group justify="end" gap="2">
         <Button variant="outline" onClick={() => setEditedDoc(JSON.stringify(document, null, 2))}>
           Reset
         </Button>
@@ -439,12 +439,12 @@ function AnalyticsTab({ adapter }: { adapter: FlexibleLmdbAdapter }) {
   }
 
   return (
-    <Grid cols="1-2-3" gap="lg">
+    <Grid cols="1-2-3" gap="6">
       <Card>
         <CardContent className="p-6">
-          <Stack gap="sm">
+          <Stack gap="2">
             <Database size={24} />
-            <Title order={3} size="lg">{stats.collections}</Title>
+            <Title order={3} text="lg">{stats.collections}</Title>
             <Text className="text-muted-foreground">Collections</Text>
           </Stack>
         </CardContent>
@@ -452,9 +452,9 @@ function AnalyticsTab({ adapter }: { adapter: FlexibleLmdbAdapter }) {
 
       <Card>
         <CardContent className="p-6">
-          <Stack gap="sm">
+          <Stack gap="2">
             <FileText size={24} />
-            <Title order={3} size="lg">{stats.documents}</Title>
+            <Title order={3} text="lg">{stats.documents}</Title>
             <Text className="text-muted-foreground">Documents</Text>
           </Stack>
         </CardContent>
@@ -462,9 +462,9 @@ function AnalyticsTab({ adapter }: { adapter: FlexibleLmdbAdapter }) {
 
       <Card>
         <CardContent className="p-6">
-          <Stack gap="sm">
+          <Stack gap="2">
             <BarChart3 size={24} />
-            <Title order={3} size="lg">{stats.indexes}</Title>
+            <Title order={3} text="lg">{stats.indexes}</Title>
             <Text className="text-muted-foreground">Indexes</Text>
           </Stack>
         </CardContent>
@@ -501,19 +501,19 @@ function SettingsTab({ adapter }: { adapter: FlexibleLmdbAdapter }) {
   }
 
   return (
-    <Stack gap="lg">
+    <Stack gap="6">
       <Card>
         <CardHeader>
-          <Title order={3} size="lg">Backup & Restore</Title>
+          <Title order={3} text="lg">Backup & Restore</Title>
         </CardHeader>
         <CardContent>
-          <Stack gap="md">
+          <Stack gap="4">
             <Input
               value={backupPath}
               onChange={(e) => setBackupPath(e.target.value)}
               placeholder="Backup file path"
             />
-            <Group gap="sm">
+            <Group gap="2">
               <Button onClick={handleBackup}>
                 Create Backup
               </Button>
@@ -527,14 +527,14 @@ function SettingsTab({ adapter }: { adapter: FlexibleLmdbAdapter }) {
 
       <Card>
         <CardHeader>
-          <Title order={3} size="lg">Database Maintenance</Title>
+          <Title order={3} text="lg">Database Maintenance</Title>
         </CardHeader>
         <CardContent>
-          <Stack gap="md">
+          <Stack gap="4">
             <Text className="text-sm text-muted-foreground">
               Perform maintenance operations on the database.
             </Text>
-            <Group gap="sm">
+            <Group gap="2">
               <Button variant="outline">
                 Optimize Database
               </Button>

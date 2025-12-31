@@ -9,14 +9,14 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
   const ldItems = items.map(({ label, to }) => ({ name: label, url: to }))
   return (
     <>
-      <Group align="center" gap="sm" aria-label="Breadcrumb">
+      <Group text="center" gap="2" aria-label="Breadcrumb">
         {items.map((item, idx) => (
-          <Group key={idx} align="center" gap="sm">
-            {idx > 0 && <Icon lucideIcon={ChevronRight} c="muted" />}
+          <Group key={idx} text="center" gap="2">
+            {idx > 0 && <Icon lucideIcon={ChevronRight} bg="muted" />}
             {item.to ? (
-              <Link to={item.to}><Text size="sm" c="secondary-foreground">{item.label}</Text></Link>
+              <Link to={item.to}><Text text="sm" bg="secondary-foreground">{item.label}</Text></Link>
             ) : (
-              <Text size="sm">{item.label}</Text>
+              <Text text="sm">{item.label}</Text>
             )}
           </Group>
         ))}

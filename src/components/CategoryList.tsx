@@ -5,12 +5,12 @@ type Category = { id: number; name: string; slug: string; count?: number }
 
 export function CategoryList({ items }: { items: Category[] }) {
   return (
-    <Stack gap="md">
-      <Title order={3} size="lg">Categories</Title>
-      <Stack gap="sm">
+    <Stack gap="4">
+      <Title order={3} text="lg">Categories</Title>
+      <Stack gap="2">
         {items.map(c => (
           <Link key={c.id} to={`/category/${c.slug}`}>
-            <Text size="sm" c="secondary-foreground">{c.name}{typeof c.count === 'number' ? ` (${c.count})` : ''}</Text>
+            <Text text="sm" bg="secondary-foreground">{c.name}{typeof c.count === 'number' ? ` (${c.count})` : ''}</Text>
           </Link>
         ))}
       </Stack>

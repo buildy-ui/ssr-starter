@@ -8,9 +8,9 @@ export default function ErrorBoundary() {
   const message = isRouteErrorResponse(error) ? error.statusText : 'Something went wrong'
   return (
     <Block component="main" py="8">
-      <Stack gap="md">
-        <Title order={1} size="2xl">{status} {message}</Title>
-        <Text c="secondary-foreground">Try searching or go back to the homepage.</Text>
+      <Stack gap="4">
+        <Title order={1} text="2xl">{status} {message}</Title>
+        <Text bg="secondary-foreground">Try searching or go back to the homepage.</Text>
         <SearchBar />
         <Link to="/"><Button>Go Home</Button></Link>
       </Stack>

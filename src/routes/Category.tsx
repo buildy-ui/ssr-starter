@@ -12,9 +12,9 @@ export default function Category() {
   if (loading) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Loading...' }]} />
-          <Title order={1} size="2xl">Loading Category...</Title>
+          <Title order={1} text="2xl">Loading Category...</Title>
         </Stack>
       </Block>
     )
@@ -23,9 +23,9 @@ export default function Category() {
   if (error) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Error' }]} />
-          <Title order={1} size="2xl">Category Error</Title>
+          <Title order={1} text="2xl">Category Error</Title>
           <Text>Failed to load category: {error}</Text>
         </Stack>
       </Block>
@@ -38,20 +38,20 @@ export default function Category() {
 
   return (
     <Block component="main" py="8">
-      <Stack gap="lg">
+      <Stack gap="6">
         <SEO title={`Category: ${categoryName}`} description={`Posts categorized under ${categoryName}.`} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: categoryName }]} />
-        <Stack gap="md">
-          <Title order={1} size="2xl">{categoryName}</Title>
-          <Text c="secondary-foreground">Posts categorized under “{categoryName}”.</Text>
+        <Stack gap="4">
+          <Title order={1} text="2xl">{categoryName}</Title>
+          <Text bg="secondary-foreground">Posts categorized under “{categoryName}”.</Text>
         </Stack>
         {filtered.length === 0 ? (
-          <Stack gap="md">
+          <Stack gap="4">
             <Text>No posts found in this category.</Text>
             <Link to="/blog"><Button>Back to blog</Button></Link>
           </Stack>
         ) : (
-          <Grid cols="1-2-3" gap="lg">
+          <Grid cols="1-2-3" gap="6">
             {filtered.map(p => <PostCard key={p.id} post={p as any} />)}
           </Grid>
         )}

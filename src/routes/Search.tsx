@@ -17,9 +17,9 @@ export default function Search() {
   if (loading) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Search' }]} />
-          <Title order={1} size="2xl">Loading Search...</Title>
+          <Title order={1} text="2xl">Loading Search...</Title>
         </Stack>
       </Block>
     )
@@ -28,9 +28,9 @@ export default function Search() {
   if (error) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Search' }]} />
-          <Title order={1} size="2xl">Search Error</Title>
+          <Title order={1} text="2xl">Search Error</Title>
           <Text>Failed to load search data: {error}</Text>
         </Stack>
       </Block>
@@ -46,48 +46,48 @@ export default function Search() {
 
   return (
     <Block component="main" py="8">
-      <Stack gap="lg">
+      <Stack gap="6">
         <SEO title={q ? `Search: ${q}` : 'Search'} description={q ? `Search results for "${q}"` : 'Search for posts, categories, tags and authors.'} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Search' }]} />
-        <Stack gap="md">
-          <Title order={1} size="2xl">Search</Title>
+        <Stack gap="4">
+          <Title order={1} text="2xl">Search</Title>
           <SearchBar initial={q} />
         </Stack>
 
-        <Stack gap="md">
-          <Title order={2} size="xl">Posts ({postHits.length})</Title>
+        <Stack gap="4">
+          <Title order={2} text="xl">Posts ({postHits.length})</Title>
           {postHits.length ? (
-            <Grid cols="1-2-3" gap="lg">
+            <Grid cols="1-2-3" gap="6">
               {postHits.map(p => <PostCard key={p.id} post={p as any} />)}
             </Grid>
-          ) : <Text c="secondary-foreground">No posts found.</Text>}
+          ) : <Text bg="secondary-foreground">No posts found.</Text>}
         </Stack>
 
-        <Stack gap="md">
-          <Title order={2} size="xl">Categories ({catHits.length})</Title>
+        <Stack gap="4">
+          <Title order={2} text="xl">Categories ({catHits.length})</Title>
           {catHits.length ? (
-            <Grid cols="1-2-3" gap="lg">
+            <Grid cols="1-2-3" gap="6">
               {catHits.map(c => <CategoryCard key={c.id} item={c as any} />)}
             </Grid>
-          ) : <Text c="secondary-foreground">No categories found.</Text>}
+          ) : <Text bg="secondary-foreground">No categories found.</Text>}
         </Stack>
 
-        <Stack gap="md">
-          <Title order={2} size="xl">Tags ({tagHits.length})</Title>
+        <Stack gap="4">
+          <Title order={2} text="xl">Tags ({tagHits.length})</Title>
           {tagHits.length ? (
-            <Grid cols="1-2-3" gap="lg">
+            <Grid cols="1-2-3" gap="6">
               {tagHits.map(t => <TagCard key={t.id} item={t as any} />)}
             </Grid>
-          ) : <Text c="secondary-foreground">No tags found.</Text>}
+          ) : <Text bg="secondary-foreground">No tags found.</Text>}
         </Stack>
 
-        <Stack gap="md">
-          <Title order={2} size="xl">Authors ({authorHits.length})</Title>
+        <Stack gap="4">
+          <Title order={2} text="xl">Authors ({authorHits.length})</Title>
           {authorHits.length ? (
-            <Grid cols="1-2-3" gap="lg">
+            <Grid cols="1-2-3" gap="6">
               {authorHits.map(a => <AuthorCard key={a.id} item={{ ...(a as any), avatarUrl: 'https://i.pravatar.cc/96?img=' + a.id }} />)}
             </Grid>
-          ) : <Text c="secondary-foreground">No authors found.</Text>}
+          ) : <Text bg="secondary-foreground">No authors found.</Text>}
         </Stack>
       </Stack>
     </Block>

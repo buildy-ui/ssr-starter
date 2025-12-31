@@ -15,16 +15,16 @@ type Item = {
 export function SmallMediaCard({ item }: { item: Item }) {
   const { rounded } = useTheme()
   return (
-    <Card p="md" rounded={rounded.default} shadow="none" bg="card" data-class="small-media-card">
-      <Group gap="md" align="start">
+    <Card p="4" rounded={rounded.default} shadow="none" bg="card" data-class="small-media-card">
+      <Group gap="4" justify="start">
         {item.thumbnail?.url && (
           <Link to={postPath(item.slug)}>
             <Image src={item.thumbnail.url} alt={item.title} rounded={rounded.default} width={72} height={72} aspect="square" fit="cover" />
           </Link>
         )}
-        <Stack gap="sm">
+        <Stack gap="2">
           <Link to={postPath(item.slug)}>
-            <Title order={4} size="sm" fw="bold" c="foreground">{item.title}</Title>
+            <Title order={4} text="sm" font="bold" bg="foreground">{item.title}</Title>
           </Link>
           {item.excerpt && <HtmlContent html={item.excerpt.slice(0, 80)} className="text-sm text-secondary-foreground leading-relaxed" />}
         </Stack>

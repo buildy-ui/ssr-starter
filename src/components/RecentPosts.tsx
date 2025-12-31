@@ -11,18 +11,18 @@ export function RecentPosts() {
 
   if (loading) {
     return (
-      <Stack gap="md">
-        <Title order={2} size="2xl">Recent Posts</Title>
-        <Text c="secondary-foreground">Loading...</Text>
+      <Stack gap="4">
+        <Title order={2} text="2xl">Recent Posts</Title>
+        <Text bg="secondary-foreground">Loading...</Text>
       </Stack>
     )
   }
 
   return (
-    <Stack gap="md">
-      <Title order={2} size="2xl">Recent Posts</Title>
-      <Text c="secondary-foreground">Fresh insights from the blog</Text>
-      <Grid cols="1-2-3" gap="lg">
+    <Stack gap="4">
+      <Title order={2} text="2xl">Recent Posts</Title>
+      <Text bg="secondary-foreground">Fresh insights from the blog</Text>
+      <Grid cols="1-2-3" gap="6">
         {recent.map(p => <PostCard key={p.id} post={p as any} />)}
       </Grid>
     </Stack>

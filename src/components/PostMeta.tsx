@@ -11,27 +11,27 @@ type Meta = {
 
 export function PostMeta({ date, categories, tags }: Meta) {
   return (
-    <Group gap="md" align="center">
-      <Group gap="sm" align="center">
-        <Icon lucideIcon={Calendar} c="muted" />
-        <Text size="sm" c="secondary-foreground">{date}</Text>
+    <Group gap="4" text="center">
+      <Group gap="2" text="center">
+        <Icon lucideIcon={Calendar} bg="muted" />
+        <Text text="sm" bg="secondary-foreground">{date}</Text>
       </Group>
       {categories?.length ? (
-        <Group gap="sm" align="center">
-          <Icon lucideIcon={Tag} c="muted" />
-          <Group gap="sm" align="center">
+        <Group gap="2" text="center">
+          <Icon lucideIcon={Tag} bg="muted" />
+          <Group gap="2" text="center">
             {categories.map((c, idx) => (
-              <Link key={c.id} to={c.slug ? categoryPath(c.slug) : '#'}><Text size="sm" c="secondary-foreground">{c.name}{idx < (categories.length - 1) ? ',' : ''}</Text></Link>
+              <Link key={c.id} to={c.slug ? categoryPath(c.slug) : '#'}><Text text="sm" bg="secondary-foreground">{c.name}{idx < (categories.length - 1) ? ',' : ''}</Text></Link>
             ))}
           </Group>
         </Group>
       ) : null}
       {tags?.length ? (
-        <Group gap="sm" align="center">
-          <Icon lucideIcon={Tag} c="muted" />
-          <Group gap="sm" align="center">
+        <Group gap="2" text="center">
+          <Icon lucideIcon={Tag} bg="muted" />
+          <Group gap="2" text="center">
             {tags.map((t, idx) => (
-              <Link key={t.id} to={t.slug ? tagPath(t.slug) : '#'}><Text size="sm" c="secondary-foreground">{t.name}{idx < (tags.length - 1) ? ',' : ''}</Text></Link>
+              <Link key={t.id} to={t.slug ? tagPath(t.slug) : '#'}><Text text="sm" bg="secondary-foreground">{t.name}{idx < (tags.length - 1) ? ',' : ''}</Text></Link>
             ))}
           </Group>
         </Group>

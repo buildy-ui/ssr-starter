@@ -8,16 +8,16 @@ type Author = { id: number; name: string; slug: string; count?: number; avatarUr
 export function AuthorCard({ item }: { item: Author }) {
   const { rounded } = useTheme()
   return (
-    <Card p="lg" rounded={rounded.default} shadow="sm" bg="card">
-      <Group gap="md" align="center">
+    <Card p="6" rounded={rounded.default} shadow="sm" bg="card">
+      <Group gap="4" text="center">
         {item.avatarUrl && <Image src={item.avatarUrl} alt={item.name} rounded="full" w={"auto"} height={48} />}
-        <Stack gap="sm">
-          <Title order={3} size="lg">{item.name}</Title>
-          {typeof item.count === 'number' && <Text size="sm" c="secondary-foreground">{item.count} posts</Text>}
+        <Stack gap="2">
+          <Title order={3} text="lg">{item.name}</Title>
+          {typeof item.count === 'number' && <Text text="sm" bg="secondary-foreground">{item.count} posts</Text>}
         </Stack>
       </Group>
       <Link to={authorPath(item.slug)}>
-        <Button m="sm">View posts</Button>
+        <Button size="sm">View posts</Button>
       </Link>
     </Card>
   )

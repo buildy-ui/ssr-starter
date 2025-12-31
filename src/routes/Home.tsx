@@ -48,7 +48,7 @@ export default function Home() {
     <Block component="main" py="8">
       <SEO title={homePage.title} description={homePage.excerpt} />
 
-      <Stack gap="lg">
+      <Stack gap="6">
         <HtmlContent html={homePage.content || homePage.excerpt} className="prose prose-lg max-w-none" />
 
         <HomeLatest />

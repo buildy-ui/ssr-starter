@@ -12,9 +12,9 @@ export default function Tag() {
   if (loading) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Loading...' }]} />
-          <Title order={1} size="2xl">Loading Tag...</Title>
+          <Title order={1} text="2xl">Loading Tag...</Title>
         </Stack>
       </Block>
     )
@@ -23,9 +23,9 @@ export default function Tag() {
   if (error) {
     return (
       <Block component="main" py="8">
-        <Stack gap="lg">
+        <Stack gap="6">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Error' }]} />
-          <Title order={1} size="2xl">Tag Error</Title>
+          <Title order={1} text="2xl">Tag Error</Title>
           <Text>Failed to load tag: {error}</Text>
         </Stack>
       </Block>
@@ -38,20 +38,20 @@ export default function Tag() {
 
   return (
     <Block component="main" py="8">
-      <Stack gap="lg">
+      <Stack gap="6">
         <SEO title={`Tag: ${tagName}`} description={`Posts tagged with ${tagName}.`} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: tagName }]} />
-        <Stack gap="md">
-          <Title order={1} size="2xl">Tag: {tagName}</Title>
-          <Text c="secondary-foreground">Posts tagged with “{tagName}”.</Text>
+        <Stack gap="4">
+          <Title order={1} text="2xl">Tag: {tagName}</Title>
+          <Text bg="secondary-foreground">Posts tagged with “{tagName}”.</Text>
         </Stack>
         {filtered.length === 0 ? (
-          <Stack gap="md">
+          <Stack gap="4">
             <Text>No posts found for this tag.</Text>
             <Link to="/blog"><Button>Back to blog</Button></Link>
           </Stack>
         ) : (
-          <Grid cols="1-2-3" gap="lg">
+          <Grid cols="1-2-3" gap="6">
             {filtered.map(p => <PostCard key={p.id} post={p as any} />)}
           </Grid>
         )}

@@ -46,7 +46,7 @@ export default function About() {
 
   return (
     <Block component="main" py="8">
-      <Stack gap="lg">
+      <Stack gap="6">
         <SEO title={aboutPage.title} description={aboutPage.excerpt} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'About' }]} />
         <HtmlContent html={aboutPage.content || aboutPage.excerpt} className="prose prose-lg max-w-none" />
