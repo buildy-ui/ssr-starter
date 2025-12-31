@@ -17,7 +17,7 @@ export type ImageProps
 };
 
 const defaultProps = ux({
-  max: 'full',    // max-width: 100%
+  max: 'w-full',   // max-width: 100%
   h: 'auto'        // height: auto
 });
 

@@ -3,13 +3,33 @@ import { utilityPropsMap } from "./utility-props.map";
 
 export type UtilityPropPrefix = keyof typeof utilityPropsMap;
 
-export type UtilityPropBag = Partial<Record<UtilityPropPrefix, string | number | boolean | null | undefined>>;
+type UtilityMap = typeof utilityPropsMap;
+
+type UtilityAllowed<P extends UtilityPropPrefix> = UtilityMap[P][number];
+
+type NumericFromString<S> = S extends `${infer N extends number}` ? N : never;
+type UtilityNumeric<P extends UtilityPropPrefix> = NumericFromString<UtilityAllowed<P>>;
+
+type HasBareToken<P extends UtilityPropPrefix> = "" extends UtilityAllowed<P> ? true : false;
+
+/**
+ * Strict utility-prop value:
+ * - allows only values listed in `utilityPropsMap` for the given prefix
+ * - additionally allows numeric literals when the map contains numeric strings (e.g. "8" -> 8)
+ * - allows `true` / "" only when the map contains a bare token "" (e.g. flex, block, absolute)
+ * - allows false/null/undefined to omit the class
+ */
+export type UtilityPropInput<P extends UtilityPropPrefix> =
+  | Exclude<UtilityAllowed<P>, "">
+  | UtilityNumeric<P>
+  | (HasBareToken<P> extends true ? "" | true : never);
+
+export type UtilityPropBag = {
+  [P in UtilityPropPrefix]?: UtilityPropInput<P> | false | null | undefined;
+};
 
 export type UtilityPropValue<P extends UtilityPropPrefix> =
-  | (typeof utilityPropsMap)[P][number]
-  | string
-  | number
-  | boolean
+  | UtilityPropInput<P>
   | null
   | undefined;
 

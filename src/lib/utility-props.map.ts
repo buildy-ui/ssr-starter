@@ -13,6 +13,7 @@ export const utilityPropsMap = {
     "inherit"
   ],
   "aspect": [
+    "auto",
     "square",
     "video"
   ],
@@ -224,6 +225,11 @@ export const utilityPropsMap = {
     "0"
   ],
   "h": [
+    "3",
+    "4",
+    "5",
+    "6",
+    "8",
     "auto",
     "fit",
     "full",
@@ -394,8 +400,12 @@ export const utilityPropsMap = {
     "cover",
     "fill",
     "left",
+    "left-bottom",
+    "left-top",
     "none",
     "right",
+    "right-bottom",
+    "right-top",
     "scale-down",
     "top"
   ],
@@ -656,6 +666,11 @@ export const utilityPropsMap = {
     ""
   ],
   "w": [
+    "3",
+    "4",
+    "5",
+    "6",
+    "8",
     "auto",
     "fit",
     "full",
