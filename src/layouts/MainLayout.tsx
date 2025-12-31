@@ -16,20 +16,20 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
 
   return (
     <>
-      <Block component="nav" py="xs" bg="background" data-class="nav-bar" borderBottom="1px" borderColor="border" shadow="lg">
-        <Container size="lg">
-          <Group justify="between" align="center">
-            <Group align="center" gap="md">
+      <Block component="nav" py="2" bg="background" data-class="nav-bar" border="b" shadow="lg">
+        <Container max="w-6xl"> 
+          <Group justify="between" object="center">
+            <Group object="center" gap="md">
               <a href="/">
-                <Title order={2} size="2xl" fw="bold" c="primary">UI8Kit</Title>
+                <Title order={2} text="2xl" font="bold" bg="primary">UI8Kit</Title>
               </a>
-              <Text size="sm" c="secondary-foreground">Design System</Text>
+              <Text text="sm" bg="secondary-foreground">Design System</Text>
             </Group>
 
-            <Group align="center" gap="sm">
+            <Group object="center" gap="sm">
 
               <nav className="hidden md:flex">
-                <Group align="center" gap="sm" data-class="nav">
+                <Group object="center" gap="sm" data-class="nav">
                   {menu.primary.items.map(item => (
                     <a key={item.id} href={item.url}>
                       <Button variant="ghost" size="sm">
@@ -71,8 +71,8 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
         </Container>
       </Block>
 
-      <Block component="main" py="lg" data-class="main-page">
-        <Container size="lg">
+      <Block component="main" py="8" data-class="main-page">
+        <Container max="w-6xl">
           {sidebar === 'none' ? (
             <Stack gap="lg">
               {children}
@@ -92,14 +92,14 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
         </Container>
       </Block>
 
-      <Block component="footer" py="md" borderTop="1px" borderColor="border" bg="card" data-class="site-footer">
-        <Container size="lg">
-          <Stack gap="lg" align="center">
-            <Text size="sm" c="secondary-foreground" ta="center">© 2025 UI8Kit Design System</Text>
+      <Block component="footer" py="4" border="t" bg="card" data-class="site-footer">
+        <Container max="w-6xl">
+          <Stack gap="lg" object="center">
+            <Text text="sm" bg="secondary-foreground">© 2025 UI8Kit Design System</Text>
             <Group gap="md" justify="center">
-              <a href="/"><Text size="xs" c="secondary-foreground">Home</Text></a>
-              <a href="/blog"><Text size="xs" c="secondary-foreground">Blog</Text></a>
-              <a href="/about"><Text size="xs" c="secondary-foreground">About</Text></a>
+              <a href="/"><Text text="xs" bg="secondary-foreground">Home</Text></a>
+              <a href="/blog"><Text text="xs" bg="secondary-foreground">Blog</Text></a>
+              <a href="/about"><Text text="xs" bg="secondary-foreground">About</Text></a>
             </Group>
           </Stack>
         </Container>
@@ -113,10 +113,10 @@ const Aside = ({ context }: { context: RenderContext }) => (
     <Stack gap="lg">
       <SearchBar />
       <CategoryList items={context.categories as any} />
-      <a href="/categories"><Text size="sm" c="secondary-foreground">View all categories</Text></a>
+      <a href="/categories"><Text text="sm" bg="secondary-foreground">View all categories</Text></a>
       <TagList items={context.tags as any} />
-      <a href="/tags"><Text size="sm" c="secondary-foreground">View all tags</Text></a>
-      <a href="/authors"><Text size="sm" c="secondary-foreground">View all authors</Text></a>
+      <a href="/tags"><Text text="sm" bg="secondary-foreground">View all tags</Text></a>
+      <a href="/authors"><Text text="sm" bg="secondary-foreground">View all authors</Text></a>
       <PopularPosts />
       <NewsletterSignup />
     </Stack>

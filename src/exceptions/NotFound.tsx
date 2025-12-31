@@ -6,7 +6,7 @@ import { RecentPosts } from '@/components/RecentPosts'
 
 export default function NotFound() {
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <SEO title="Page Not Found" description="The page you're looking for doesn't exist." />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Not Found' }]} />

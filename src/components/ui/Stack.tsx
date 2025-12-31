@@ -1,51 +1,32 @@
 import type { ElementType, ReactNode } from "react";
 import { forwardRef } from "react";
 import { cn } from "../../lib/utils";
-import {
-  spacingVariants,
-  colorVariants,
-  layoutVariants,
-  flexVariants,
-  textAlignVariants,
-  type VariantSpacingProps,
-  type ColorProps,
-  type VariantLayoutProps,
-  type VariantFlexProps,
-  type TextAlignProps
-} from "../../variants";
+import { resolveUtilityClassName, ux, type UtilityPropBag, type UtilityPropPrefix } from "../../lib/utility-props";
 
-export interface StackProps 
-  extends React.HTMLAttributes<HTMLElement>,
-    Pick<VariantSpacingProps, 'p' | 'px' | 'py' | 'm' | 'mx' | 'my'>,
-    Pick<ColorProps, 'bg' | 'c'>,
-    Pick<VariantLayoutProps, 'w' | 'h'>,
-    Pick<VariantFlexProps, 'gap' | 'align' | 'justify' | 'direction'>,
-    TextAlignProps {
+type StackDomProps = Omit<React.HTMLAttributes<HTMLElement>, UtilityPropPrefix>;
+
+export type StackProps
+  = StackDomProps &
+    UtilityPropBag & {
   children: ReactNode;
   component?: ElementType;
-}
+};
+
+const defaultProps = ux({
+  flex: 'col',     // flex-direction: column + display: flex
+  gap: '4',        // gap: 1rem
+  items: 'start',  // align-items: flex-start
+  justify: 'start' // justify-content: flex-start
+});
 
 export const Stack = forwardRef<HTMLElement, StackProps>(
-  ({ 
-    children, 
+  ({
+    children,
     className,
     component = 'div',
-    gap = 'md',
-    direction = 'col',
-    align = 'start',
-    justify = 'start',
-    ta,
-    // Spacing props
-    p, px, py,
-    m, mx, my,
-    // Color props
-    bg,
-    c,
-    // Layout props
-    w,
-    h,
-    ...props 
+    ...props
   }, ref) => {
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
     const Element = component as ElementType;
 
     return (
@@ -53,14 +34,11 @@ export const Stack = forwardRef<HTMLElement, StackProps>(
         ref={ref}
         data-class="stack"
         className={cn(
-          flexVariants({ gap, align, justify, direction }),
-          spacingVariants({ p, px, py, m, mx, my }),
-          colorVariants({ bg, c }),
-          layoutVariants({ w, h }),
-          textAlignVariants({ ta }),
+          defaultProps,
+          utilityClassName,
           className
         )}
-        {...props}
+        {...rest}
       >
         {children}
       </Element>

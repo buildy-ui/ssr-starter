@@ -1,67 +1,53 @@
 import type { ElementType, ReactNode } from "react";
 import { forwardRef } from "react";
 import { cn } from "../../lib/utils";
-import {
-  spacingVariants,
-  colorVariants,
-  layoutVariants,
-  flexVariants,
-  type VariantSpacingProps,
-  type ColorProps,
-  type VariantLayoutProps,
-  type VariantFlexProps
-} from "../../variants";
+import { resolveUtilityClassName, ux, type UtilityPropBag, type UtilityPropPrefix } from "../../lib/utility-props";
 
-export interface GroupProps 
-  extends React.HTMLAttributes<HTMLElement>,
-    Pick<VariantSpacingProps, 'p' | 'px' | 'py' | 'm' | 'mx' | 'my'>,
-    Pick<ColorProps, 'bg' | 'c'>,
-    Pick<VariantLayoutProps, 'w' | 'h'>,
-    Pick<VariantFlexProps, 'gap' | 'align' | 'justify' | 'wrap'> {
+type GroupDomProps = Omit<React.HTMLAttributes<HTMLElement>, UtilityPropPrefix>;
+
+export type GroupProps
+  = GroupDomProps &
+    UtilityPropBag & {
   children: ReactNode;
   component?: ElementType;
   grow?: boolean;
-  preventGrowOverflow?: boolean;
-}
+};
+
+const defaultProps = ux({
+  flex: '',        // display: flex (bare token)
+  gap: '4',        // default gap
+  items: 'center', // default align
+  justify: 'start', // default justify
+  min: 'w-0'      // prevent overflow by default (preventGrowOverflow=true)
+});
 
 export const Group = forwardRef<HTMLElement, GroupProps>(
-  ({ 
-    children, 
+  ({
+    children,
     className,
     component = 'div',
-    gap = 'md',
-    align = 'center',
-    justify = 'start',
-    wrap = 'nowrap',
     grow = false,
-    preventGrowOverflow = true,
-    // Spacing props
-    p, px, py,
-    m, mx, my,
-    // Color props
-    bg,
-    c,
-    // Layout props
-    w,
-    h,
-    ...props 
+    ...props
   }, ref) => {
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
     const Element = component as ElementType;
+
+    // Handle grow prop that maps to utility class
+    const specificUtilities = ux({
+      ...(grow && { flex: '1' }) // flex-1 when grow=true
+    });
 
     return (
       <Element
         ref={ref}
         data-class="group"
         className={cn(
-          flexVariants({ gap, align, justify, wrap }),
-          spacingVariants({ p, px, py, m, mx, my }),
-          colorVariants({ bg, c }),
-          layoutVariants({ w, h }),
-          grow && 'flex-1',
-          preventGrowOverflow && 'min-w-0',
+          defaultProps,
+          specificUtilities,
+          utilityClassName,
           className
         )}
-        {...props}
+        {...rest}
       >
         {children}
       </Element>

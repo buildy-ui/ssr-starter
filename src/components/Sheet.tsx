@@ -1,12 +1,15 @@
 import type { ReactNode, HTMLAttributes } from "react";
 import { forwardRef } from "react";
 import { cn } from "../lib/utils";
+import { resolveUtilityClassName, type UtilityPropBag, type UtilityPropPrefix } from "../lib/utility-props";
 import { buttonSizeVariants, buttonStyleVariants } from "../variants";
 import type { ButtonProps } from "./ui/Button";
 import { Icon } from "./ui/Icon";
 import { Menu } from "lucide-react";
 
-export interface SheetProps extends HTMLAttributes<HTMLDivElement> {
+type SheetDomProps = Omit<HTMLAttributes<HTMLDivElement>, UtilityPropPrefix>;
+
+export interface SheetProps extends SheetDomProps, UtilityPropBag {
   id?: string;
   side?: "left" | "right";
   openLabel?: string;
@@ -20,7 +23,9 @@ export interface SheetProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
 }
 
-export interface SheetTriggerProps extends ButtonProps {
+type SheetTriggerDomProps = Omit<ButtonProps, UtilityPropPrefix>;
+
+export interface SheetTriggerProps extends SheetTriggerDomProps, UtilityPropBag {
   htmlFor?: string;
 }
 
@@ -36,6 +41,8 @@ export const SheetTrigger = forwardRef<HTMLButtonElement, SheetTriggerProps>(
     },
     ref
   ) => {
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
+
     return (
       <label
         ref={ref as any}
@@ -47,9 +54,10 @@ export const SheetTrigger = forwardRef<HTMLButtonElement, SheetTriggerProps>(
           // Apply CVA variants
           buttonSizeVariants({ size }),
           buttonStyleVariants({ variant }),
+          utilityClassName,
           className
         )}
-        aria-label={props["aria-label"]}
+        aria-label={rest["aria-label"]}
       >
         {props.children}
       </label>
@@ -91,8 +99,10 @@ export const Sheet = forwardRef<HTMLDivElement, SheetProps>(
         ? "w-[32rem]"
         : "w-full";
 
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
+
     return (
-      <div ref={ref} className={cn("relative", className)} data-class="sheet" {...props}>
+      <div ref={ref} className={cn("relative", utilityClassName, className)} data-class="sheet" {...rest}>
         <input id={id} type="checkbox" className="peer hidden" />
 
         {showTrigger && (

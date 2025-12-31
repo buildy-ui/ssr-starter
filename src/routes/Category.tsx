@@ -11,7 +11,7 @@ export default function Category() {
 
   if (loading) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Loading...' }]} />
           <Title order={1} size="2xl">Loading Category...</Title>
@@ -22,7 +22,7 @@ export default function Category() {
 
   if (error) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Error' }]} />
           <Title order={1} size="2xl">Category Error</Title>
@@ -37,7 +37,7 @@ export default function Category() {
   const categoryName = filtered[0]?.categories?.find(c => c.slug === slug)?.name || 'Category'
 
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <SEO title={`Category: ${categoryName}`} description={`Posts categorized under ${categoryName}.`} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: categoryName }]} />

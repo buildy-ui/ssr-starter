@@ -25,7 +25,7 @@ export default function Blog() {
   const nextHref = `/blog/${currentPage + 1}`
 
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <SEO
           title={`Blog${currentPage > 1 ? ` - Page ${currentPage}` : ''}`}

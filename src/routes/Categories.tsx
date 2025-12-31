@@ -9,7 +9,7 @@ export default function Categories() {
 
   if (loading) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Categories' }]} />
           <Title order={1} size="2xl">Loading Categories...</Title>
@@ -20,7 +20,7 @@ export default function Categories() {
 
   if (error) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Categories' }]} />
           <Title order={1} size="2xl">Categories Error</Title>
@@ -32,7 +32,7 @@ export default function Categories() {
 
   const { categories } = context!
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <SEO title="Categories" description="Browse all categories." />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Categories' }]} />

@@ -1,39 +1,54 @@
 import { forwardRef } from "react";
 import { cn } from "../../lib/utils";
-import {
-  spacingVariants,
-  roundedVariants,
-  shadowVariants,
-  layoutVariants,
-  imageFitVariants,
-  imagePositionVariants,
-  aspectRatioVariants,
-  type VariantSpacingProps,
-  type RoundedProps,
-  type ShadowProps,
-  type VariantLayoutProps,
-  type ImageFitProps,
-  type ImagePositionProps,
-  type AspectRatioProps
-} from "../../variants";
+import { resolveUtilityClassName, ux, type UtilityPropBag, type UtilityPropPrefix } from "../../lib/utility-props";
 
-export interface ImageProps 
-  extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'width' | 'height'>,
-    Pick<VariantSpacingProps, 'm' | 'mx' | 'my'>,
-    RoundedProps,
-    ShadowProps,
-    Pick<VariantLayoutProps, 'w' | 'h'>,
-    ImageFitProps,
-    ImagePositionProps,
-    AspectRatioProps {
+type ImageDomProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, UtilityPropPrefix | 'width' | 'height'>;
+
+export type ImageProps
+  = ImageDomProps &
+    UtilityPropBag & {
   width?: string | number;
   height?: string | number;
   fallbackSrc?: string;
   withPlaceholder?: boolean;
-}
+  fit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+  position?: 'bottom' | 'center' | 'left' | 'left-bottom' | 'left-top' | 'right' | 'right-bottom' | 'right-top' | 'top';
+  aspect?: 'auto' | 'square' | 'video';
+};
+
+const defaultProps = ux({
+  max: 'full',    // max-width: 100%
+  h: 'auto'        // height: auto
+});
+
+const fitProps = {
+  contain: ux({ object: 'contain' }),
+  cover: ux({ object: 'cover' }),
+  fill: ux({ object: 'fill' }),
+  none: ux({ object: 'none' }),
+  'scale-down': ux({ object: 'scale-down' })
+};
+
+const positionProps = {
+  bottom: ux({ object: 'bottom' }),
+  center: ux({ object: 'center' }),
+  left: ux({ object: 'left' }),
+  'left-bottom': ux({ object: 'left-bottom' }),
+  'left-top': ux({ object: 'left-top' }),
+  right: ux({ object: 'right' }),
+  'right-bottom': ux({ object: 'right-bottom' }),
+  'right-top': ux({ object: 'right-top' }),
+  top: ux({ object: 'top' })
+};
+
+const aspectProps = {
+  auto: ux({ aspect: 'auto' }),
+  square: ux({ aspect: 'square' }),
+  video: ux({ aspect: 'video' })
+};
 
 export const Image = forwardRef<HTMLImageElement, ImageProps>(
-  ({ 
+  ({
     className,
     src,
     alt,
@@ -42,24 +57,24 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(
     fit = 'cover',
     position = 'center',
     aspect = 'auto',
-    rounded,
-    shadow,
     fallbackSrc,
     withPlaceholder = false,
     onError,
-    // Spacing props  
-    m, mx, my,
-    // Layout props
-    w,
-    h,
-    ...props 
+    ...props
   }, ref) => {
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
+
     const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
       if (fallbackSrc) {
         e.currentTarget.src = fallbackSrc;
       }
       onError?.(e);
     };
+
+    const fitClasses = fitProps[fit];
+    const positionClasses = positionProps[position];
+    const aspectClasses = aspectProps[aspect];
+    const placeholderClasses = withPlaceholder ? ux({ bg: 'muted' }) : '';
 
     return (
       <img
@@ -71,18 +86,15 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(
         height={height}
         onError={handleError}
         className={cn(
-          'block',
-          withPlaceholder && 'bg-muted',
-          imageFitVariants({ fit }),
-          imagePositionVariants({ position }),
-          aspectRatioVariants({ aspect }),
-          spacingVariants({ m, mx, my }),
-          layoutVariants({ w, h }),
-          roundedVariants({ rounded }),
-          shadowVariants({ shadow }),
+          defaultProps,
+          fitClasses,
+          positionClasses,
+          aspectClasses,
+          placeholderClasses,
+          utilityClassName,
           className
         )}
-        {...props}
+        {...rest}
       />
     );
   }

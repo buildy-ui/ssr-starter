@@ -9,7 +9,7 @@ export default function Tags() {
 
   if (loading) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Tags' }]} />
           <Title order={1} size="2xl">Loading Tags...</Title>
@@ -20,7 +20,7 @@ export default function Tags() {
 
   if (error) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Tags' }]} />
           <Title order={1} size="2xl">Tags Error</Title>
@@ -32,7 +32,7 @@ export default function Tags() {
 
   const { tags } = context!
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <SEO title="Tags" description="Browse all tags." />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Tags' }]} />

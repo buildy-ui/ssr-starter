@@ -1,64 +1,26 @@
 import type { ElementType, ReactNode } from "react";
 import { forwardRef } from "react";
 import { cn } from "../../lib/utils";
-import {
-  spacingVariants,
-  roundedVariants,
-  shadowVariants,
-  colorVariants,
-  layoutVariants,
-  borderVariants,
-  flexVariants,
-  aspectRatioVariants,
-  type VariantSpacingProps,
-  type RoundedProps,
-  type ShadowProps,
-  type ColorProps,
-  type VariantLayoutProps,
-  type BorderProps,
-  type VariantFlexProps,
-  type AspectRatioProps
-} from "../../variants";
+import { resolveUtilityClassName, type UtilityPropBag, type UtilityPropPrefix } from "../../lib/utility-props";
 
-export interface BoxProps 
-  extends VariantSpacingProps,
-    RoundedProps,
-    ShadowProps,
-    ColorProps,
-    VariantLayoutProps,
-    BorderProps,
-    VariantFlexProps,
-    AspectRatioProps {
-  component?: ElementType;
-  className?: string;
-  children?: ReactNode;
-  [key: string]: any;
-}
+type BoxDomProps = Omit<React.HTMLAttributes<HTMLElement>, UtilityPropPrefix>;
+
+export type BoxProps
+  = BoxDomProps &
+  UtilityPropBag & {
+    component?: ElementType;
+    className?: string;
+    children?: ReactNode;
+  };
 
 export const Box = forwardRef<HTMLElement, BoxProps>(
-  ({ 
+  ({
     component = "div",
     className,
     children,
-    // Spacing props
-    m, mx, my, mt, mr, mb, ml,
-    p, px, py, pt, pr, pb, pl,
-    // Rounded props
-    rounded,
-    // Shadow props
-    shadow,
-    // Color props
-    bg, c, borderColor,
-    // Layout props
-    display, maxW, w, h, minH, position, z, overflow,
-    // Border props
-    border, borderTop, borderBottom, borderLeft, borderRight,
-    // Flex props
-    direction, align, justify, wrap, gap,
-    // Aspect ratio props
-    aspect,
-    ...props 
+    ...props
   }, ref) => {
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
     const Element = component as ElementType;
 
     return (
@@ -66,20 +28,10 @@ export const Box = forwardRef<HTMLElement, BoxProps>(
         ref={ref}
         data-class="box"
         className={cn(
-          spacingVariants({
-            m, mx, my, mt, mr, mb, ml,
-            p, px, py, pt, pr, pb, pl
-          }),
-          roundedVariants({ rounded }),
-          shadowVariants({ shadow }),
-          colorVariants({ bg, c, borderColor }),
-          layoutVariants({ display, maxW, w, h, minH, position, z, overflow }),
-          borderVariants({ border, borderTop, borderBottom, borderLeft, borderRight }),
-          flexVariants({ direction, align, justify, wrap, gap }),
-          aspectRatioVariants({ aspect }),
+          utilityClassName,
           className
         )}
-        {...props}
+        {...rest}
       >
         {children}
       </Element>

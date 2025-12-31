@@ -73,7 +73,7 @@ export default function AdminPanel() {
 
   if (loading) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg" align="center">
           <Title order={1} size="2xl">Loading CMS...</Title>
           <Text>Initializing database connection...</Text>
@@ -83,7 +83,7 @@ export default function AdminPanel() {
   }
 
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <Group justify="between" align="center">
           <Title order={1} size="2xl">CMS Admin Panel</Title>

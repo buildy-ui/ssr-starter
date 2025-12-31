@@ -2,7 +2,7 @@ import { Block, Stack, Title, Button } from '@ui8kit/core'
 
 export default function Test() {
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <Title order={1} size="2xl">Test Title</Title>
       </Stack>

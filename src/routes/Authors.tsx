@@ -9,7 +9,7 @@ export default function Authors() {
 
   if (loading) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Authors' }]} />
           <Title order={1} size="2xl">Loading Authors...</Title>
@@ -20,7 +20,7 @@ export default function Authors() {
 
   if (error) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Authors' }]} />
           <Title order={1} size="2xl">Authors Error</Title>
@@ -33,7 +33,7 @@ export default function Authors() {
   const { authors } = context!
   const items = authors.map(a => ({ ...a, avatarUrl: 'https://i.pravatar.cc/96?img=' + a.id }))
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <SEO title="Authors" description="Browse all authors." />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Authors' }]} />

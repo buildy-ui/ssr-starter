@@ -1,48 +1,29 @@
-import type { ElementType, ReactNode } from "react";
-import { forwardRef } from "react";
+import { ElementType, forwardRef, ReactNode } from "react";
 import { cn } from "../../lib/utils";
-import {
-  spacingVariants,
-  colorVariants,
-  containerSizeVariants,
-  textAlignVariants,
-  type VariantSpacingProps,
-  type ColorProps,
-  type ContainerSizingProps,
-  type TextAlignProps
-} from "../../variants";
+import { resolveUtilityClassName, ux, type UtilityPropBag, type UtilityPropPrefix } from "../../lib/utility-props";
 
-export interface ContainerProps 
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantSpacingProps,
-    ColorProps,
-    ContainerSizingProps,
-    TextAlignProps {
-  children: ReactNode;
+type ContainerDomProps = Omit<React.HTMLAttributes<HTMLElement>, UtilityPropPrefix>;
+
+export type ContainerProps = ContainerDomProps & UtilityPropBag & {
   component?: ElementType;
-  centered?: boolean;
-  fluid?: boolean;
-}
+  className?: string;
+  children?: ReactNode;
+};
+
+const defaultProps = ux({
+  mx: 'auto',
+  px: '4'
+});
 
 export const Container = forwardRef<HTMLElement, ContainerProps>(
-  ({ 
-    children, 
+  ({
+    component = "div",
+    children,
     className,
-    component = 'div',
-    size = 'lg',
-    centered = true,
-    fluid = false,
-    ta,
-    // Spacing props
-    p, px = 'md', py,
-    m, mx, my, mt, mb, ml, mr,
-    pt, pb, pl, pr,
-    // Color props
-    bg,
-    c,
-    borderColor,
-    ...props 
+    ...props
   }, ref) => {
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
+
     const Element = component as ElementType;
 
     return (
@@ -50,15 +31,11 @@ export const Container = forwardRef<HTMLElement, ContainerProps>(
         ref={ref}
         data-class="container"
         className={cn(
-          containerSizeVariants({ size }),
-          centered && 'mx-auto',
-          fluid && 'max-w-none',
-          textAlignVariants({ ta }),
-          spacingVariants({ p, px, py, pt, pb, pl, pr, m, mx, my, mt, mb, ml, mr }),
-          colorVariants({ bg, c, borderColor }),
+          defaultProps,
+          utilityClassName,
           className
         )}
-        {...props}
+        {...rest}
       >
         {children}
       </Element>

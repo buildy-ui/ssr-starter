@@ -59,7 +59,7 @@ export default function Post() {
   const post = posts.posts.find((p: any) => p.slug === slug)
   if (!post) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="md">
           <Title order={1} size="2xl">Post Not Found</Title>
           <Text>The post you're looking for doesn't exist.</Text>

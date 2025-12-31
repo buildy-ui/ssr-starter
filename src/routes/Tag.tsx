@@ -11,7 +11,7 @@ export default function Tag() {
 
   if (loading) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Loading...' }]} />
           <Title order={1} size="2xl">Loading Tag...</Title>
@@ -22,7 +22,7 @@ export default function Tag() {
 
   if (error) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Error' }]} />
           <Title order={1} size="2xl">Tag Error</Title>
@@ -37,7 +37,7 @@ export default function Tag() {
   const tagName = filtered[0]?.tags?.find(t => t.slug === slug)?.name || 'Tag'
 
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <SEO title={`Tag: ${tagName}`} description={`Posts tagged with ${tagName}.`} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: tagName }]} />

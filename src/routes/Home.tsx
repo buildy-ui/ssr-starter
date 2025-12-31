@@ -9,7 +9,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <SEO title="Loading..." description="Loading page content..." />
         <p>Loading...</p>
       </Block>
@@ -18,7 +18,7 @@ export default function Home() {
 
   if (error) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <SEO title="Error" description="Failed to load page content" />
         <p>Failed to load page content: {error}</p>
       </Block>
@@ -27,7 +27,7 @@ export default function Home() {
 
   if (!context) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <SEO title="Not Available" description="Page content not available" />
         <p>Page content is not available at the moment.</p>
       </Block>
@@ -37,7 +37,7 @@ export default function Home() {
   const homePage = context.pages.find((p) => p.slug === 'home')
   if (!homePage) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <SEO title="Home not found" description="Home page is missing" />
         <p>Home page not found</p>
       </Block>
@@ -45,7 +45,7 @@ export default function Home() {
   }
 
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <SEO title={homePage.title} description={homePage.excerpt} />
 
       <Stack gap="lg">

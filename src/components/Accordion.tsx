@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { cn } from "../lib/utils";
-import { layoutVariants, flexVariants, type VariantLayoutProps, type VariantFlexProps } from "../variants";
+import { resolveUtilityClassName,  ux, type UtilityPropBag, type UtilityPropPrefix } from "../lib/utility-props";
 import { Icon } from "./ui/Icon";
 import { Button, type ButtonProps } from "./ui/Button";
 
@@ -24,7 +24,9 @@ function useAccordionContext() {
   return context;
 }
 
-export interface AccordionProps extends React.HTMLAttributes<HTMLDivElement>, Pick<VariantLayoutProps, 'w'> {
+type AccordionDomProps = Omit<React.HTMLAttributes<HTMLDivElement>, UtilityPropPrefix>;
+
+export interface AccordionProps extends AccordionDomProps, UtilityPropBag {
   type?: "single" | "multiple";
   collapsible?: boolean;
   value?: string | string[];
@@ -33,7 +35,7 @@ export interface AccordionProps extends React.HTMLAttributes<HTMLDivElement>, Pi
 }
 
 const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
-  ({ type = "single", collapsible = false, value: controlledValue, onValueChange, defaultValue, w, className, ...props }, ref) => {
+  ({ type = "single", collapsible = false, value: controlledValue, onValueChange, defaultValue, className, ...props }, ref) => {
     const [uncontrolledValue, setUncontrolledValue] = React.useState<string | string[]>(
       defaultValue ?? (type === "multiple" ? [] : "")
     );
@@ -60,14 +62,16 @@ const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
       }
     }, [value, onValueChange, isMultiple, collapsible, controlledValue]);
 
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
+
     return (
       <AccordionContext.Provider value={{ value, onItemClick, type, collapsible }}>
         <div
           ref={ref}
           data-accordion
           data-class="accordion"
-          className={cn(layoutVariants({ w }), className)}
-          {...props}
+          className={cn(utilityClassName, className)}
+          {...rest}
         />
       </AccordionContext.Provider>
     );
@@ -89,16 +93,20 @@ function useAccordionItemContext() {
   return context;
 }
 
-export interface AccordionItemProps extends React.HTMLAttributes<HTMLDivElement>, Pick<VariantLayoutProps, 'w'>, Pick<VariantFlexProps, 'gap' | 'direction'> {
+type AccordionItemDomProps = Omit<React.HTMLAttributes<HTMLDivElement>, UtilityPropPrefix>;
+
+export interface AccordionItemProps extends AccordionItemDomProps, UtilityPropBag {
   value: string;
 }
 
 const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
-  ({ value, w, gap, direction = "col", className, ...props }, ref) => {
+  ({ value, className, ...props }, ref) => {
     const { value: contextValue, type } = useAccordionContext();
     const isOpen = Array.isArray(contextValue)
       ? contextValue.includes(value)
       : contextValue === value;
+
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
 
     return (
       <AccordionItemContext.Provider value={{ value }}>
@@ -109,11 +117,10 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
           data-class="accordion-item"
           className={cn(
             "flex",
-            layoutVariants({ w }),
-            flexVariants({ gap, direction }),
+            utilityClassName,
             className
           )}
-          {...props}
+          {...rest}
         />
       </AccordionItemContext.Provider>
     );
@@ -121,10 +128,12 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
 );
 AccordionItem.displayName = "AccordionItem";
 
-export interface AccordionTriggerProps extends ButtonProps, Pick<VariantLayoutProps, 'w'> {}
+type AccordionTriggerDomProps = Omit<ButtonProps, UtilityPropPrefix>;
+
+export interface AccordionTriggerProps extends AccordionTriggerDomProps, UtilityPropBag {}
 
 const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-  ({ w, rounded, className, ...props }, ref) => {
+  ({ rounded, className, ...props }, ref) => {
     const { onItemClick } = useAccordionContext();
     const { value } = useAccordionItemContext();
     const { value: contextValue } = useAccordionContext();
@@ -132,17 +141,19 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
       ? contextValue.includes(value)
       : contextValue === value;
 
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
+
+    const defaultUtilities = ux({
+      rounded: rounded || "lg",
+    });
     return (
       <Button
         ref={ref}
         variant="ghost"
-        w={w || "full"}
-        contentAlign="between"
         onClick={() => onItemClick(value)}
         data-class="accordion-trigger"
-        rounded={rounded}
-        className={className}
-        {...props}
+        className={cn(defaultUtilities, utilityClassName, className)}
+        {...rest}
       >
         {props.children}
         <Icon component="span" lucideIcon={isOpen ? ChevronUp : ChevronDown} />
@@ -152,15 +163,19 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
 );
 AccordionTrigger.displayName = "AccordionTrigger";
 
-export interface AccordionContentProps extends React.HTMLAttributes<HTMLDivElement>, Pick<VariantLayoutProps, 'w'> {}
+type AccordionContentDomProps = Omit<React.HTMLAttributes<HTMLDivElement>, UtilityPropPrefix>;
+
+export interface AccordionContentProps extends AccordionContentDomProps, UtilityPropBag {}
 
 const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
-  ({ className, w, ...props }, ref) => {
+  ({ className, ...props }, ref) => {
     const { value } = useAccordionItemContext();
     const { value: contextValue } = useAccordionContext();
     const isOpen = Array.isArray(contextValue)
       ? contextValue.includes(value)
       : contextValue === value;
+
+    const { utilityClassName, rest } = resolveUtilityClassName(props);
 
     return (
       <div
@@ -169,10 +184,10 @@ const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>
         data-class="accordion-content"
         className={cn(
           "overflow-hidden text-sm transition-all data-[state=closed]:h-0 data-[state=closed]:opacity-0 data-[state=open]:h-auto data-[state=open]:opacity-100 data-[state=closed]:ms-0 data-[state=open]:ms-4",
-          layoutVariants({ w }),
+          utilityClassName,
           className
         )}
-        {...props}
+        {...rest}
       >
         <div className="pb-4 pt-0">{props.children}</div>
       </div>

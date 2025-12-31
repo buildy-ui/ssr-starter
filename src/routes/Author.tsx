@@ -11,10 +11,10 @@ export default function Author() {
 
   if (loading) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Loading...' }]} />
-          <Title order={1} size="2xl">Loading Author...</Title>
+          <Title order={1} text="2xl">Loading Author...</Title>
         </Stack>
       </Block>
     )
@@ -22,10 +22,10 @@ export default function Author() {
 
   if (error) {
     return (
-      <Block component="main" py="lg">
+      <Block component="main" py="8">
         <Stack gap="lg">
           <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: 'Error' }]} />
-          <Title order={1} size="2xl">Author Error</Title>
+          <Title order={1} text="2xl">Author Error</Title>
           <Text>Failed to load author: {error}</Text>
         </Stack>
       </Block>
@@ -37,13 +37,13 @@ export default function Author() {
   const authorName = filtered[0]?.author?.name || 'Author'
 
   return (
-    <Block component="main" py="lg">
+    <Block component="main" py="8">
       <Stack gap="lg">
         <SEO title={`Author: ${authorName}`} description={`Posts written by ${authorName}.`} />
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Blog', to: '/blog' }, { label: authorName }]} />
         <Stack gap="md">
-          <Title order={1} size="2xl">Author: {authorName}</Title>
-          <Text c="secondary-foreground">Posts written by {authorName}.</Text>
+          <Title order={1} text="2xl">Author: {authorName}</Title>
+          <Text bg="secondary-foreground">Posts written by {authorName}.</Text>
         </Stack>
         {filtered.length === 0 ? (
           <Stack gap="md">
