@@ -1,0 +1,7 @@
+UI8Kit Design System Rules:
+
+- **Props**: UI8Kit props accept only single Tailwind values without modifiers. Example: `col="span-1"`
+- **Responsive Modifiers**: All responsive breakpoints and modifiers go in className. Example: `className="lg:col-span-3 md:order-2"`
+- **Grid Components**: Grid-like components (Grid) can use className for responsive modifiers due to their variant system
+- **Other Components**: Everywhere else, className is strictly forbidden. Use only component props or utility-props.map.ts values
+- **Validation**: TypeScript and linter will catch invalid props/values. Trust the type errors over assumptions

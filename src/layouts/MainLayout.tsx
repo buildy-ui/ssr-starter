@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Block, Container, Group, Stack, Title, Text, Button, Icon, Grid } from '@ui8kit/core'
+import { Block, Container, Box, Group, Stack, Title, Text, Button, Icon, Grid } from '@ui8kit/core'
 import { SearchBar } from '@/components/SearchBar'
 import { CategoryList } from '@/components/CategoryList'
 import { TagList } from '@/components/TagList'
@@ -79,14 +79,14 @@ export function MainLayout({ children, sidebar = 'right' as 'left' | 'right' | '
             </Stack>
           ) : (
             <Grid cols="1-4" gap="6">
-              <Grid.Col span={3} data-class="main-content" className={sidebar === 'left' ? 'md:order-2 order-1' : 'order-1'}>
+              <Box data-class="main-content" className={sidebar === 'left' ? 'col-span-1 lg:col-span-3 md:order-2 order-1' : 'col-span-1 lg:col-span-3 order-1'}>
                 <Stack gap="6">
                   {children}
                 </Stack>
-              </Grid.Col>
-              <Grid.Col span={1} data-class="sidebar" className={sidebar === 'left' ? 'md:order-1 order-2' : 'order-2'}>
+              </Box>
+              <Box col="span-1" data-class="sidebar" className={sidebar === 'left' ? 'col-span-1 lg:col-span-1 md:order-1 order-2' : 'col-span-1 lg:col-span-1 order-2'}>
                 <Aside context={context} />
-              </Grid.Col>
+              </Box>
             </Grid>
           )}
         </Container>
